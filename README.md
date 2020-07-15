@@ -20,16 +20,50 @@ pkg> add https://github.com/MichaelHatherly/TreeSitter.jl
 julia> using TreeSitter
 
 julia> c = Parser(:c)
-Parser(Language(c))
+Parser(Language(:c))
 
 julia> ast = parse(c, "int x;")
 (translation_unit (declaration type: (primitive_type) declarator: (identifier)))
 
 julia> json = Parser(:json)
-Parser(Language(json))
+Parser(Language(:json))
 
-julia> ast = parse(json, "{\"one\": 1}")
-(document (object (pair key: (string (string_content)) value: (number))))
+julia> ast = parse(json, "{1: [2]}")
+(document (object (pair key: (number) value: (array (number)))))
+
+julia> traverse(ast) do node, enter
+           if enter
+               @show node
+           end
+       end
+node = (document (object (pair key: (number) value: (array (number)))))
+node = (object (pair key: (number) value: (array (number))))
+node = ("{")
+node = (pair key: (number) value: (array (number)))
+node = (number)
+node = (":")
+node = (array (number))
+node = ("[")
+node = (number)
+node = ("]")
+node = ("}")
+
+julia> julia = Parser(:julia)
+Parser(Language(:julia))
+
+julia> ast = parse(julia, "f(x)")
+(source_file (call_expression (identifier) (argument_list (identifier))))
+
+julia> traverse(ast, named_children) do node, enter
+           if !enter
+               @show node
+           end
+       end
+node = (identifier)
+node = (identifier)
+node = (argument_list (identifier))
+node = (call_expression (identifier) (argument_list (identifier)))
+node = (source_file (call_expression (identifier) (argument_list (identifier))))
 ```
 
 ## Languages

@@ -1,6 +1,7 @@
 module TreeSitter
 
-export Parser, parse
+export Parser, Tree, Node, Language, Query
+export parse, traverse, children, named_children, @query_cmd
 
 include("api.jl")
 include("interface.jl")

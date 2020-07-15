@@ -7,7 +7,7 @@ mutable struct Language
     ptr::Ptr{API.TSLanguage}
     Language(name::Symbol) = new(name, API.lang_ptr(name))
 end
-Base.show(io::IO, l::Language) = print(io, "Language(", l.name, ")")
+Base.show(io::IO, l::Language) = print(io, "Language(", repr(l.name), ")")
 
 #
 # Parser
@@ -81,12 +81,13 @@ named_child(n::Node, nth::Integer) = Node(API.ts_node_named_child(n.ptr, nth-1))
 children(n::Node) = (child(n, ind) for ind = 1:count_nodes(n))
 named_children(n::Node) = (named_child(n, ind) for ind = 1:count_named_nodes(n))
 
-function traverse(f, n::Node, iter=children, depth=0)
+function traverse(f, n::Node, iter=children)
+    f(n, true)
     for child in iter(n)
-        f(child, true, depth)
-        traverse(f, child, iter, depth + 1)
-        f(child, false, depth)
+        traverse(f, child, iter)
     end
+    f(n, false)
+    return nothing
 end
 
 Base.:(==)(left::Node, right::Node) = API.ts_node_eq(left.ptr, right.ptr)
