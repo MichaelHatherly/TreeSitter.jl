@@ -18,6 +18,7 @@ pkg> add https://github.com/MichaelHatherly/TreeSitter.jl
 
 ```
 julia> using TreeSitter
+
 julia> c = Parser(:c)
 Parser(Language(c))
 
