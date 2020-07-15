@@ -1,0 +1,2404 @@
+[[tree_sitter]]
+arch = "armv7l"
+git-tree-sha1 = "47967fb4593e5537597c5095a1f1226c34027e14"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "ad43c4c78a615426f353a174caac9cc10255e05d31db910761afaf4fc517d701"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter]]
+arch = "i686"
+git-tree-sha1 = "f04e5f689651c7e478d3c9cb977f982482940be7"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "31852e1c311bf391197bbc5a961eafcb399763906c70a1ea49e08a5515873f28"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.i686-linux-musl.tar.gz"
+[[tree_sitter]]
+arch = "armv7l"
+git-tree-sha1 = "037846474acf35cc5a84923a312010d619dc3879"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "8d98df74e5062f1c62beaf20ee91f4d4b52cabb9bf66ab45a99af008746834bd"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter]]
+arch = "i686"
+git-tree-sha1 = "f1120c9e0e0e9ae6fd57e772483903b013062002"
+os = "windows"
+
+    [[tree_sitter.download]]
+    sha256 = "ac4d8fd43456719cb95b3d3a476a93a0cef5bbaedb4a8a094465727ecdc2f57a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.i686-w64-mingw32.tar.gz"
+[[tree_sitter]]
+arch = "i686"
+git-tree-sha1 = "095265212fa4490a8007bd3f783846219c12c589"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "0dfdf7d5d7a9881f401fdae082f165a35c532c26045ffc56d3191a237359fc19"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.i686-linux-gnu.tar.gz"
+[[tree_sitter]]
+arch = "x86_64"
+git-tree-sha1 = "30da1be8946331778ba0bfc59e34f04574875f3a"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "2d43517808eb6312525f03a3523d1279e3a48f9f653b66bd6170859c15091791"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.x86_64-linux-gnu.tar.gz"
+[[tree_sitter]]
+arch = "powerpc64le"
+git-tree-sha1 = "61b93b6037917475f4c839e970b6fed68bcbf1b3"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "81686cce91d7d2897f98d9f04ff6e023368d7c7e6bb4506cd9c6581ebc09b1db"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter]]
+arch = "x86_64"
+git-tree-sha1 = "be02d040996f6d680b0526465d426b07f4c83835"
+os = "macos"
+
+    [[tree_sitter.download]]
+    sha256 = "ef6c5196b267b918ef499592c08870e1454c04d074dc015f035d92c940fe3f1c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter]]
+arch = "x86_64"
+git-tree-sha1 = "6a062cced37bc13d9a054aeea759b47181be2985"
+os = "windows"
+
+    [[tree_sitter.download]]
+    sha256 = "b76b6f4e14234bdadc7a1532a289490f311e8b498ea96b8d06f3b05e3d1c67f0"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter]]
+arch = "x86_64"
+git-tree-sha1 = "5b65d22fd2466cb219c96852f499383da020866a"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "2c3ab60e2c21b967ca8ae817068bb3876fed927d7f6e4f083a0fc2df48424a42"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.x86_64-linux-musl.tar.gz"
+[[tree_sitter]]
+arch = "x86_64"
+git-tree-sha1 = "a559e49dcd114b07b9ca4af730c78a4ad0e36637"
+os = "freebsd"
+
+    [[tree_sitter.download]]
+    sha256 = "c15778dc99201b64941212e200aecc39a11f4e7af9197717e80b4541c4f8daf7"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter]]
+arch = "aarch64"
+git-tree-sha1 = "f9ba8202bbf320e3653db006d6c6c6e6bdf69093"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "58e09e5197586b01cdd939fe6c18524027256213bad4deebd7e3b61975ed8842"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.aarch64-linux-gnu.tar.gz"
+[[tree_sitter]]
+arch = "aarch64"
+git-tree-sha1 = "e1f1934ac1e2683200884cfecaa840319c2090fa"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter.download]]
+    sha256 = "a8b242f5dc8697809e3425bf4368443f5e8691d804990ece78b4b2763ab31a4d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter.v0.16.8/tree_sitter.v0.16.8.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_bash]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "4d53f9ec0a7f571bc452679a66f7a440d058611c"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "315ad499b2733b7c316feccb606b3e6e2a51133f8cd358de83231f8e5b015863"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.aarch64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "7ac0aca1e7d325e2df57bafd3e77af4fd3349116"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "d25b4c57b4c0d2a74d70d365aa84cf298eed852e91a171bb6033b6fa1405928c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.aarch64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "827d5ee66dcaa50f7a6cad211fd596898513cafc"
+os = "freebsd"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "a4a4c401d2f943b771a90975a740636f835fcba4d5a413e04e733e2b9b3f298b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-unknown-freebsd11.1-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "affbdf940dcdbf61c2ee1998faa69277f206a139"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "eb1bea0502746bef062a6cceeb1afeee95783fa862c1ce9f2322ff9ca7ad3fb3"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.armv7l-linux-gnueabihf-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "a5e46386ebc85791a3dc19346569d3a2785e5d2e"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "775305173aeaf6fbefe49ad9ba820e362714add13a2379c88784584ccb280c48"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.armv7l-linux-gnueabihf-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "4450212c846125eba15543af41f2445b8244bd74"
+os = "macos"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "c5f9118724ec355e4bcbd8a032ae16f32ea9b376f04c565b7f9df9030bcb3071"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-apple-darwin14-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "64933596150a282672a15e853c5addaf3c863929"
+os = "windows"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "4645f8a38cae61533d67380f32a695b9faa8d706ed7d0b0d3a10c88dfecc5c50"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.i686-w64-mingw32-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "d96e5364f157a297b5f835a8882341eed5f749fb"
+os = "freebsd"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "d67749cb95dd979ac1d09d1f6100f1f8c1f930dc43c26a1953d62b87ae6d8050"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-unknown-freebsd11.1-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "2bf41873ec9b8268c8e91a27d51a681f66bf07c4"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "faaae759822ba9504c08edd5904dd3395132a6874803c05d23e12985503a092d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.aarch64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "cd21542dc2a3396c5264b93daba4e468e2f32e4f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "dd92f90e2e9d14da475dc01117df18de4c39a7a7195af298a0f00c6b330af81d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.armv7l-linux-musleabihf-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "7dad5cc3afe78938be8cb6821e9a6f471e9d6596"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "31169c8c67f28b12fab7b4c94f34b6defcf58a8ba2154b08268d3df563bed53c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.armv7l-linux-musleabihf-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "30a4c01c6ae626437081e4bced8c16d86b81730b"
+os = "macos"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "f2bc9d7a1c9627d071c573ed9ae90196a292eec39014092b15ef5cc5ea579500"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-apple-darwin14-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "5ab424235735957b2ea8711874a7b1ef81c330e4"
+os = "windows"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "6a5fa152d28a52c58c4953da7ca4c845ccf1bd2a6023c5ec930851b7254e9b25"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.i686-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "93b0e180218bdd2214e754cf37a7c5367e87e80f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "b87961b46423eaff57e7bf4fb642423b95943a4c13bb1306773b7125e33876bc"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "1e55ffd14cf3181a4ac8cf33bc319fe02828d9be"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "e55ce86bbd6fdedc31b6562526e30c6dec83c6ad8807827ddba67715db42f033"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.i686-linux-musl-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "a135ea1fdd6a24e81b6856bc6bc97d233db2e756"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "e025b5f07e89fc4b154b8db087bf6c801476494d72b70c95753c256466d7dd4a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "250cddd05d978e059b94c24b6d76ca77cd705f0d"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "06fa182fccf0141c2137b2746639f6ca8f4842b50bb39ed20ca9597ac89088bf"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "e05ff175fc0531661e510a93919809248b9f683f"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "e940bfa471401700a1cfaeecbf5ec546620b39616ab269f6c80bd8163672785e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.i686-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "71f0945a1ccbc81c27ef15c1fa1d86c44c0805fb"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "aac9af684755b82e82e9fddcdfebac25283afeb09dc8c2499c65b75a2ca70fd5"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.i686-linux-musl-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "ffde5b109960c814a040e32628337dc17e969688"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "02d93b19908b283e0f95abbe89685612214b005c12061b9cbf7d7c119b0518fc"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.aarch64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "73d02537ceb47f90e492e113e3c45cfebc434b94"
+os = "windows"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "bc5af953d8caeb9fb246bdbca0335cd49f7f3287ddf43478c9f9aa23bccb298a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "3e87ca16e8cd9cb725f1b84d2661d1269caef3c2"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "658611d7569c3c4c8800f071646966e60321b7b2b71a76b1abc1927ed8716b50"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "069eea01771e07cd10e7ce188d0d244fe8b179f1"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "8007e6aadf7938e610e75b191fb77e8bafd66ed61995d9ad09e0a41f8e0e35fe"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.powerpc64le-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "efa41fee6d41bd86356f05212d0c1a7b9ef8ee1d"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "80944122c53e4c14bf0975cff90c15848eff21379344571527b519cc32b695fa"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.i686-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_bash]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "52abd9373225ebbb11025fdf5b55cec642b839a0"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "cb5c99dacc92e33ff1fe164461bc2703f29738e46abc5f308052c721740fcab5"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.powerpc64le-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_bash]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "db0632bd9f0a41f291b3b969bc3efbb771caa447"
+os = "windows"
+
+    [[tree_sitter_bash.download]]
+    sha256 = "613ac21614ad0047cb5266b319bab8ef03fbba5fd8ae8918c72a46d4b991b2df"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_bash.v0.16.1/tree_sitter_bash.v0.16.1.x86_64-w64-mingw32-cxx11.tar.gz"
+
+[[tree_sitter_c]]
+arch = "armv7l"
+git-tree-sha1 = "0fe5e0d2cd046f308b07e3de27ae3d9d71b53482"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "7248374c6cecdcbb3537fd0c936e5b87bb4bf1f2ff8aced70f6c861b743bece5"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_c]]
+arch = "i686"
+git-tree-sha1 = "ac88c1198fb71b240a0ada35b19744a3781addf0"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "cc5ff2228f9587071ceca6798fd1a18871fb1525648e4da458c272a19dd4fa6d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.i686-linux-musl.tar.gz"
+[[tree_sitter_c]]
+arch = "armv7l"
+git-tree-sha1 = "d91b1bac3a391e1cd44d354963a518e57a166a4f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "048864e510340a27f64e943351b7a696f3ef6a08c68e0535b9a7550167c3df69"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_c]]
+arch = "i686"
+git-tree-sha1 = "25e16443dd1873ff9a32ccbad6dda6be60490d01"
+os = "windows"
+
+    [[tree_sitter_c.download]]
+    sha256 = "d66daed9e217480508ba41097ef8b612c9e51d9da993a2e10da8de5c2733b5e6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.i686-w64-mingw32.tar.gz"
+[[tree_sitter_c]]
+arch = "i686"
+git-tree-sha1 = "26cc8ee422af4cf1e0d13a7308819872a11ac06d"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "9abb2b73d867b7f083612806da2f9e2a2c51e4529e3779ca44cd7c387cf68165"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.i686-linux-gnu.tar.gz"
+[[tree_sitter_c]]
+arch = "x86_64"
+git-tree-sha1 = "cb4e2b469fd7179b12a1e3ef44c76c91e1d06afa"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "7960dc1adc6923d422eadc58c1ff2e6a913c3e1d177914ac8292b384cf79f1ed"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_c]]
+arch = "powerpc64le"
+git-tree-sha1 = "43f9185d60ce47f0b815ae8c26d6cacde0845291"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "dbe181f9265dfc7d40bbd045cafe7ec4bfa3b8dccb7aa084ea7de6b49148de6c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_c]]
+arch = "x86_64"
+git-tree-sha1 = "746744de9270d46c1006c21142ad563444187ada"
+os = "macos"
+
+    [[tree_sitter_c.download]]
+    sha256 = "f3fb683212ee0ec011fda81b7832134beabe76aab6fa9cb099ed8c892d58294a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_c]]
+arch = "x86_64"
+git-tree-sha1 = "402daca9bdd20ebbd3502606415c40c1071207b8"
+os = "windows"
+
+    [[tree_sitter_c.download]]
+    sha256 = "e4e9b0ceb32133162acf2592dcab248bea7adda4b5b04322b353425dd927cd56"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_c]]
+arch = "x86_64"
+git-tree-sha1 = "135f722f88b8d4757ce71540154f6a2a46881540"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "42cbcdb24d32b7a87bd27ecc5b31e309aa265e2b59ceb21573f940a2281429d1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.x86_64-linux-musl.tar.gz"
+[[tree_sitter_c]]
+arch = "x86_64"
+git-tree-sha1 = "d16e3b5c98437c9db29b53df344b418a0f3f1315"
+os = "freebsd"
+
+    [[tree_sitter_c.download]]
+    sha256 = "99410359b3036d2ceaf2705abe85762ce3f18e558c2b938928fa11a55143d37d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_c]]
+arch = "aarch64"
+git-tree-sha1 = "32ea811697521b038db40a11e9cb035b70fb9fbc"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "63b3b1daec72697dfc99c2a1aa685313491b81a536b20720ed7df8c74e60f1ac"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_c]]
+arch = "aarch64"
+git-tree-sha1 = "ae6d71420c48235fb273df453a95bf179cce96c9"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_c.download]]
+    sha256 = "c4e81db70abec6595b65dea272bd88148e97e31ea4508fbdf9754c775a206281"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_c.v0.16.1/tree_sitter_c.v0.16.1.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_cpp]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "c530b15babfc909e9d0f03b5f6e642bcb8ae2ce9"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "487134fc8818e128735db6b0ca942d39b90f523b6ef50911a2da0940e3047d14"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.aarch64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "b139f65410b814bb7d818620dabb01f56f08ccd6"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "c46e96fb767e6fed6fdcf8ce21f470b5cd635e4cdee9475863c30b37ee6ed835"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.aarch64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "0a9fbf067ff99ad8be930915c27445001b21e63e"
+os = "freebsd"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "0a5452cb1de0652b1b6dcbfa52125542e6b7ea64b476da2874ab472c8176a2ad"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-unknown-freebsd11.1-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "347cc54c137f0b615ea8bd907a407933430aa6b1"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "d7b3ede8d2247f0afc6d4534b35c65aba30c9ca82ac7ff06ae9ff3895cf8019e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.armv7l-linux-gnueabihf-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "ae8d2948e3a5745a72b1c1d374bf2483322d1ac3"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "07ba782132b1ac1f8e2359668f48eabfc1ac136958043a35553cc23e4be14217"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.armv7l-linux-gnueabihf-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "84c75565603c92c1c66294d560522879d355731f"
+os = "macos"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "e769e0e4c5ac9ea14217f9079a34e1bee5269d3e08753f5f13967ca8b037031f"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-apple-darwin14-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "e5b21b047e3fba303348163e55702c26e1ca7808"
+os = "windows"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "711e5fc1e0b9ce8fc4feaab36ed54f19c8a32794db1d88e92344023676ccb9a4"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.i686-w64-mingw32-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "fbaf16efdf0bf2440c23b3cda3e61827453cd59e"
+os = "freebsd"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "572dab323f5649a50b3f5b909eeb757170de1d0d60c1d4b084cc745e6c73bc01"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-unknown-freebsd11.1-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "77019fc00121915f3d11d0ea1e39f1b550148897"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "cd2602351bf5376c2b323197f2d43644be7b0a197b0c90a2df135e24c4a5c683"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.aarch64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "c3956af739d59cb6b230bab280a83e46bd28e1a4"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "c3accb14bb1cce59c9d0d924cac62c1750c86a56fbefdfdeada831cc2e7e6d14"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.armv7l-linux-musleabihf-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "b6cf3f68892fbbd92c6f99990e82bb38737c794f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "0d91c33b31645ec928d3ca4df62ede4433824358b7ea9838eec9f04b93262485"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.armv7l-linux-musleabihf-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "654264afe37e0929ee3ea53a18a482fd9c66fed6"
+os = "macos"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "124a348efee41c99ddf5913f03edf44070026b50cb4d3c1345941c06e6ccc650"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-apple-darwin14-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "e22f72e135fdf4677b3d2ca9a147f5a512c8497f"
+os = "windows"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "e2e9a919b83d44fe5b1a3c9c835dcdab28dc2b50713181b0e27db5ba6d0280bb"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.i686-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "6a9ca0f1136aabb689240c7de3b7d99d4bd81fa0"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "13e22fe95c52ae28dbd4c0166fa1ded9b49f84511f69bbd89aca674cb983d23b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "08a39e0423f259cc7165552ab17dae2cd8a509a5"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "9d2a940c04109468fe43ba16685454ac2c222252855229854ad06e965b8ae54b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.i686-linux-musl-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "4a738ed1d8b55d78930ac2f454b035fec648a0d3"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "4fce9f11f66870980c9c5afb076066a7bb94a3b55e48c0bd5269c4d87c0a72e2"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "30d832ca05fd5790bcbfec51100968421320e1e4"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "64f6ac18f6b517d01f8139c10f7ad6d1fc7fdc086cbfef72651f8be98d3b15e3"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "cbb6ff5cf21b5bf06988f14ec42c05148af014ee"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "a8a4e2302b29ed4b44c303575134320bb0624e5cbf7944aa3e574ed77d9d0acd"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.i686-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "5bbfc96464e608d617b6153e37247c09a98d4a34"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "5dd10aa7cdb663d43006496108449d1617b882ba27cd82aa490aa4156aa16184"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.i686-linux-musl-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "fbf584479d3cdb213991b81cd875a39942872168"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "2b6bc1d7af0548bed7b8e0c7136a609db465aaa789f2da3e873d55368dccbe8c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.aarch64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "b4b453240069d2ee5b1091ecfaa373b99eaabf47"
+os = "windows"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "5812c8d1487d5aaa7d1e9c55e417e3d2a12d9c6a58d6827752ad9dde797f78ad"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "eeef024e8f7b62ab62a45923bc692ae16bbd90ef"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "fd870fe9d29cd45060470a7b99dd38e709c1e22db1f761986820f5b97f6ef4a8"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "55548e5c937b45974fe32fdfed224e45c1f4e712"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "dce3686759761142b6ae1684c755480ab4fc3a8b4933e4643cef1c76b10387d1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.powerpc64le-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "73fbd38856b129c46268350194572e2694556a9e"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "b1b421e3927cc3bc9835cb4a8b30aed6d88996c44040f4ba1a05b75cd28236cd"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.i686-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_cpp]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "85f4b57d33b9d558418a5638cb6b5abd4d830f57"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "903911dfbda264dfe93e82cd085e3a697bb4b04d25420319133215fc8af6707a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.powerpc64le-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_cpp]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "56f14c314b53aa9c46312ce9e1da002bb6facd61"
+os = "windows"
+
+    [[tree_sitter_cpp.download]]
+    sha256 = "5f5c963dcb3fd519d86df76b22e98faf7872c1d1569775e1d1847b41a26ab5e4"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_cpp.v0.16.0/tree_sitter_cpp.v0.16.0.x86_64-w64-mingw32-cxx11.tar.gz"
+
+[[tree_sitter_go]]
+arch = "armv7l"
+git-tree-sha1 = "514ce03eae34204b3a9bbb7ffe7141bd5e12b923"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "03de1163986171926f40cb39964929d9458247a52fc04ab2f8a11ff9cbc5b64e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_go]]
+arch = "i686"
+git-tree-sha1 = "780bdb94acbc288ad92722d4c9645679dd951e86"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "a14e0e48e9ea5520c32cef28d3b4377382863f002c962701e773c4a6ef5c2a87"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.i686-linux-musl.tar.gz"
+[[tree_sitter_go]]
+arch = "armv7l"
+git-tree-sha1 = "60f16d0a46734b90534259eaa792626bbcb0d073"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "cdabfab0c2c708c68083b5f6612b97a3e40aabb6b5b18357dfaab7c57de8f42c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_go]]
+arch = "i686"
+git-tree-sha1 = "861fb63bfaf2636902c4896dbe4ab2a74b44e055"
+os = "windows"
+
+    [[tree_sitter_go.download]]
+    sha256 = "d13ed343be3a4c0ee24ca6586b421b13c25394c38b679a0636a2e4f6aeea380f"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.i686-w64-mingw32.tar.gz"
+[[tree_sitter_go]]
+arch = "i686"
+git-tree-sha1 = "c49194ab1178b314c79f25a4aacf6f9f3a379a26"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "c26163f82ba8138933d499137800d2de4339467b6b85fc11443caad7ba38c9b7"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.i686-linux-gnu.tar.gz"
+[[tree_sitter_go]]
+arch = "x86_64"
+git-tree-sha1 = "8ea6068b6635e5fbe5127e8136680e4b349503bc"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "f9ffb76aef3d577f4a9f2e9e338dc893287510c08b365b9faf175ba6ab9e825e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_go]]
+arch = "powerpc64le"
+git-tree-sha1 = "cbb0458eb481be2c20b57cde36f136cf2176e74d"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "d7ea24d6e33f491d9a36ba62b3f3b689157222dbe82d6de44e56b1b6b4785ae3"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_go]]
+arch = "x86_64"
+git-tree-sha1 = "9018fe858ee927dee3da8138bcbd6588ffe8245e"
+os = "macos"
+
+    [[tree_sitter_go.download]]
+    sha256 = "eadb4f32fd387ab5856583fe19290fb86abb73395c857fc8938c2f205b5546c7"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_go]]
+arch = "x86_64"
+git-tree-sha1 = "187945d21d5af7180107b3eb57c395b9300cd297"
+os = "windows"
+
+    [[tree_sitter_go.download]]
+    sha256 = "250987ee5aba3bfef9fcb973721d92fda1f9dc02ab9a2a17b9daaa5997de95f2"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_go]]
+arch = "x86_64"
+git-tree-sha1 = "9ff7f45cfcd2b9415759d8665d990d1447ab7ae8"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "7cb5f8155cdcc8ce3e7dc38b104f4360d362bbc5ebc2b6a6a3273145f20441e0"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.x86_64-linux-musl.tar.gz"
+[[tree_sitter_go]]
+arch = "x86_64"
+git-tree-sha1 = "4e923b0ec16e1c2ffb0ce49b8ca9cb2cc2f55942"
+os = "freebsd"
+
+    [[tree_sitter_go.download]]
+    sha256 = "71847acf0d9e0408fdce033e4d39ed467ccee4d1aa2b25da8a06e2212640f29b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_go]]
+arch = "aarch64"
+git-tree-sha1 = "8a908018230e893737f101791ab8ed16e2bfdb3b"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "500dbd1b4dc2dc2a52c5b76e1fefb88302720e40ba74bb4cee3171533c979c87"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_go]]
+arch = "aarch64"
+git-tree-sha1 = "beba4c0ef6f282882a4fa62ac44442aab7beb6be"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_go.download]]
+    sha256 = "966ed4d0bb111a9a731bfd5e4223684012e2b3372a9c7ed549aaa80586dc1620"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_go.v0.16.1/tree_sitter_go.v0.16.1.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_html]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "c6a1f52800522abc1abbd095e3bf54fc3c58c728"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "2c9963724933bbfff5441988e3c0b486fca87b1a4da07989dd169d062d5ace5b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.aarch64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "fe29b872ddcff1b1ee95b08774ea476a5c2bd3ff"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "9424859b902493fbded80b781112d7560c48af9c57f484857a1f6966d143fa75"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.aarch64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "6062acc54411f2d34f96915887c2c4b86f1864f8"
+os = "freebsd"
+
+    [[tree_sitter_html.download]]
+    sha256 = "9445dec52b8f88843870ad646306389452e52d9813de5e28fa4d33264c0c0b64"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-unknown-freebsd11.1-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "f9f7e429ec09aaf8e3e9187c072eee28a33f289d"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "cba2c0eac45d9fc711413211749dd5ce710308ea562ab707a4d0457e5ef872e4"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.armv7l-linux-gnueabihf-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "e26f3dc9726ab87bfd5966f27e306ff46aec127e"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "f79b660fd859c4b03886e9a422d555e4fb9cc0d8c9af36e35344c95b8ad8d9dc"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.armv7l-linux-gnueabihf-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "37ed933ac7ac40ac8e9dc956f12635e271a7ed4a"
+os = "macos"
+
+    [[tree_sitter_html.download]]
+    sha256 = "658753dc033b4e4cbbba68caee5497c7173e42f4e1531024d88ec52a803952bc"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-apple-darwin14-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "5cd87db1f368b84f86b2401584b74e9e2ea0a2fd"
+os = "windows"
+
+    [[tree_sitter_html.download]]
+    sha256 = "52eb6564a6c4d0ec096728ee3dcc7903702ffda74fcac8865aab3db93bfb8496"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.i686-w64-mingw32-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "3a490f757ea5c69bf9ff70104d3591b1537c1f97"
+os = "freebsd"
+
+    [[tree_sitter_html.download]]
+    sha256 = "3916d9268714cab8ebb99e519f6e1560d06ab9f096d58e28b6a03962de005d63"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-unknown-freebsd11.1-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "8d3fb21499671def4aa91c8647d63d9b361fcf06"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "f988455df19f0512a28512a51965a452966c645048fe3f388e3deaddcfa26c84"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.aarch64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "589782f49c00bbd48a0ba0053ad0b6e0ce6eeeb3"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "7e3a84306a60ff0946fdfabde319100743c941c85cf7bc6f8016efbc949f88bd"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.armv7l-linux-musleabihf-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "3f0983c4a5ed6be6a48ea9c37f5599c29b0c6317"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "73a6cae5041ab25ba68887b7d8271d043c28d0214148bae229949c35d986a79b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.armv7l-linux-musleabihf-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "09a4db06ff78ecdae6d41541e5b813cd6b8ab00e"
+os = "macos"
+
+    [[tree_sitter_html.download]]
+    sha256 = "a1c9b1973a6d9b09d9d2a53482ded468166f75c4e0c3be0d9114f90f4b7d8373"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-apple-darwin14-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "1e252b3ce79fc91bbcb5cbae0f48e2be3433f18a"
+os = "windows"
+
+    [[tree_sitter_html.download]]
+    sha256 = "e9b6d6db7a1e512020d570d1c362226e4cebbea33430b7f92cb3fa36dbb3df06"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.i686-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "fc6c9ee16295d5c613e5798aecc6bf4834588a84"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "e57d99cad1c18e82482fc3d4a6775ff24e2730c1a71b8beabcf91cc570c5d96a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "b3009cf2f866215991ecf04062c2c89b1196e9b6"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "45491f07c46549f04298372344a539c1c508e6e2bf3f9f3284976a04c5460eb1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.i686-linux-musl-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "22a38c35d68142a7368445468bd6bca577777e78"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "f42d40176fab85cf420cadc5f4cadc5f5172d26d7fff9028572246ba2c4b0e95"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "01420be14d92e951045531b70d95d860fcecc275"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "e2b339f1bc0cfcdc9854ea988e5cc9d061b36219fad6ebe0231c8b79196912d6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "e473bf4e6a9941e9882255c76aaf4e1add816306"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "c66f837ae137564d07fab2e3760b5d99c93bd55e2bdcfbbdd5c6b69e4d5a4b9d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.i686-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "ec71852a86648b71c087edad02152f102c87e50e"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "8698f4c100b50560eb533adf73b9e30cd3a21cc03172153a0fa76bdc03abf37c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.i686-linux-musl-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "36f882f8cfc763fa2e240087b3892d5e8ae978f5"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "4c3f4e3ecc8402308f9a1e5d047d6cdb630798dee5168e759f8a51b77064f85e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.aarch64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "1391f7d0caa7d960ca342a1acffce03bfa0a89a2"
+os = "windows"
+
+    [[tree_sitter_html.download]]
+    sha256 = "4d8b21cf8826c4ab17c63787564e24c868975905867c47865d813a00f94af2f3"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "93855e22913dac46a3c225b322a4fcc893cb9cdd"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "d5cadc29fb0c5991a18c94171b7ee4a2ef9f7ad43496bec8925581a7c2929147"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "1a3889dbc021732abb72bafc3098b8eb42616adc"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "14a5622e144518246588045e8a0b8e08af4b03ee1142f7370fe6fa6fcaf9e117"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.powerpc64le-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "d512a89444bc30d7dbb16149497243192a421f15"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "a6a70d22568c37328027ed37f17e3b5522a0b7f068ad91f4fd039cddea4bfce9"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.i686-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_html]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "0210c14f3e84d947e7366f5314539c6eed6e0530"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_html.download]]
+    sha256 = "a123ece459f692d5d0413c530f90a3531cb83a49c26ac740cd099d0351ff7f28"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.powerpc64le-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_html]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "b3e593296e067b2ed289d8a3c98b60f097e43514"
+os = "windows"
+
+    [[tree_sitter_html.download]]
+    sha256 = "38d8d62d386bc46d3d21fed3b625f98fcaa6edeb09edaf8e2669b59caff9746a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_html.v0.16.0/tree_sitter_html.v0.16.0.x86_64-w64-mingw32-cxx11.tar.gz"
+
+[[tree_sitter_java]]
+arch = "armv7l"
+git-tree-sha1 = "4592c5954c99db3703591022002d97a53ec7e6ce"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "16a44ccbccc1868382522ddecd133d804424c59d9c76f3ddc367c6d93befbaea"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_java]]
+arch = "i686"
+git-tree-sha1 = "a2ea0756c036a5e199817da038b29424ab21115f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "a3445934bf3f7afd2f1e4c6be6eaaaada1d365feb8cbd321463d4dab655f2801"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.i686-linux-musl.tar.gz"
+[[tree_sitter_java]]
+arch = "armv7l"
+git-tree-sha1 = "8bb550735446a2efeaa980210fb9f9847bb4f202"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "0f68d6d1a377a56bd26911bc4180d46f773283b9333c694aec38c3578bf04b97"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_java]]
+arch = "i686"
+git-tree-sha1 = "7f81d60ccc205a2914dfc505d98d63298f1c42e4"
+os = "windows"
+
+    [[tree_sitter_java.download]]
+    sha256 = "e053dfab9765f297816fe2ca7220d2946b9aaf0af5226b459a05e59fa45edaec"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.i686-w64-mingw32.tar.gz"
+[[tree_sitter_java]]
+arch = "i686"
+git-tree-sha1 = "9e62204fdb5e6f22c5f99adc1529a34754397288"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "60fc51e574cf1417b3f9bde2ad88583628a560e1534a41d509a08caa6b4f204d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.i686-linux-gnu.tar.gz"
+[[tree_sitter_java]]
+arch = "x86_64"
+git-tree-sha1 = "755d06f1da7edaf88e65581b900b343aa63b45a6"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "ca16e86fa9c10753a7c2112c31674e143f32ec0e32ed938a30cef03281be1757"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_java]]
+arch = "powerpc64le"
+git-tree-sha1 = "0368d42efdbbe201fccf1fb8014827ab00c5654a"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "558410a9f07dae02a452136bf2b302f7f6fee159faf24414ab7c9c09b451c1ba"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_java]]
+arch = "x86_64"
+git-tree-sha1 = "8d244f7d026fd9ee7273fa7ecd8d8412e432f80a"
+os = "macos"
+
+    [[tree_sitter_java.download]]
+    sha256 = "6785376e0ef9c100f875ae02bcdc8699843da303386264c70b612ac7949927a2"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_java]]
+arch = "x86_64"
+git-tree-sha1 = "a327b072f60f4799340f27d9be191883bf0efc27"
+os = "windows"
+
+    [[tree_sitter_java.download]]
+    sha256 = "b1d0cad041c6ddfc666fea7aff2f6757cc44713be21ddc6baa9210bf66ef766a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_java]]
+arch = "x86_64"
+git-tree-sha1 = "4361455891cba40e4a1c69164d73697fc0a7e487"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "622ca094d409424361de85ca07c855b6871729161fd56df2603673f1e8cc5bce"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.x86_64-linux-musl.tar.gz"
+[[tree_sitter_java]]
+arch = "x86_64"
+git-tree-sha1 = "7615e68690a990ba9f6db2230cd50733ea4c3e0f"
+os = "freebsd"
+
+    [[tree_sitter_java.download]]
+    sha256 = "5e8f52f561e41d417f264db53830f5ca2e4d83b0de91a0da02cecd9535ef0981"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_java]]
+arch = "aarch64"
+git-tree-sha1 = "db8c11da7ccdafcf1a253b2b4c6669da38bc8ec8"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "5a7ccce5a35fdbfb1e4d80409fcb2e1e68698ea9b6888506e4156d0b93472c52"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_java]]
+arch = "aarch64"
+git-tree-sha1 = "0f4822ed617c3bf8b355d86d9d917f7d37428435"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_java.download]]
+    sha256 = "de27c82e29d31ea61d9b915c7069fc2ce1c5be9b6a24f47874e34c7a1c8dd260"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_java.v0.16.0/tree_sitter_java.v0.16.0.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_javascript]]
+arch = "armv7l"
+git-tree-sha1 = "dfcebe3270dfb76ae58fe7226b71b3532b1072a4"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "1f2a6328bef6ed27ce9967f50af010fc55da9d7f1b6ded39214183372da5c43e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_javascript]]
+arch = "i686"
+git-tree-sha1 = "c076a39b20ca92c179b71ea09933dd0a8171d847"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "d64cf07569df20541ec25b15eb9019b23dda19b1ac8fa4cac239d3efb3dfc167"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.i686-linux-musl.tar.gz"
+[[tree_sitter_javascript]]
+arch = "armv7l"
+git-tree-sha1 = "c9d2b8b2a363c76f833a2119a47d57adc8dd7e7d"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "1a183f22e50701bdd970a2c8b4e62e50baa38bc9142321adb87839cd0749dc37"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_javascript]]
+arch = "i686"
+git-tree-sha1 = "d39f12c28e4836c192775877dc462afcb365219a"
+os = "windows"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "a4bc4e289b965e18589685c17160d514bc2b4b1f79094963ff24daedb88372de"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.i686-w64-mingw32.tar.gz"
+[[tree_sitter_javascript]]
+arch = "i686"
+git-tree-sha1 = "436288cbd2ebbb2fb6e1cc1f44ed6e254062828c"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "109455642a929b36e467896912864e2f481179427a2dfddf2dbc45e6e64a0169"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.i686-linux-gnu.tar.gz"
+[[tree_sitter_javascript]]
+arch = "x86_64"
+git-tree-sha1 = "509b5104eef95fcb29066433265846e81f0aa27b"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "0510a7f52a27703aaba1d2dd02d27ce4067a44147ea217b6daa98e765998e64b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_javascript]]
+arch = "powerpc64le"
+git-tree-sha1 = "ac6de9571aa2fcc342564a302bc4dbd477a78d9a"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "33fccbef4a011a791c7a56ae8abd6c9747a8b6cd2848df88117344f1e17847b4"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_javascript]]
+arch = "x86_64"
+git-tree-sha1 = "e0c61e18dfa740957444e9032e15aa8aa9334f9a"
+os = "macos"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "ba0a16418c94d8ba79df909d70dfbdd62a775da2b3fd8e4bb2a71746c7710c4c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_javascript]]
+arch = "x86_64"
+git-tree-sha1 = "000fe8c86f984f5f19b6c493c54d7e18dd8089b7"
+os = "windows"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "2cbe4abab320769612e0b445cffafa22c29a02938cf81d030897dec3ce7b48c6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_javascript]]
+arch = "x86_64"
+git-tree-sha1 = "f1aaa8e97155a7d8ccef94d489186f2e20761e82"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "bc41603da34b86e5fe1b279728c29747e4397e7c10caf12fab22fe5a42342eb1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.x86_64-linux-musl.tar.gz"
+[[tree_sitter_javascript]]
+arch = "x86_64"
+git-tree-sha1 = "6902e0cefb6f69fbe42e29b6b582f0e82bfd9bff"
+os = "freebsd"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "bb4cbb2b53735850ab719a825dff7aad84bf17cfdb3e37384ae9df31fa0e13da"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_javascript]]
+arch = "aarch64"
+git-tree-sha1 = "3381ea2d80ecb1929a3c2a9d433d7f0267c76be7"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "7b14ac1fe7f20aab4c927c6148aba7b64d8bf8f6a7d6b1517b01f59180151698"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_javascript]]
+arch = "aarch64"
+git-tree-sha1 = "c56d7b7ddeef1f6a9a2efb20ae515b6646252d43"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_javascript.download]]
+    sha256 = "92791c0d7938eced5e58d1b4cfec4e66e3ffa93b73868ad6e37c81fa1b51d976"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_javascript.v0.16.0/tree_sitter_javascript.v0.16.0.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_json]]
+arch = "armv7l"
+git-tree-sha1 = "3d4ffc9a4eaf635d9de0b1a0eb8c5ea6b05a6743"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "7bf4307904c4ea21e168b23afa49f0284bfae64b604134f42497e2517ae19c99"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_json]]
+arch = "i686"
+git-tree-sha1 = "ee65894cf262d9f76ae93a7024c2642ee411743e"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "535c9e906a745b7c51c452a343066fba92ed39892c21735854801abe7e07db44"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.i686-linux-musl.tar.gz"
+[[tree_sitter_json]]
+arch = "armv7l"
+git-tree-sha1 = "d6560a8a5461f85b072a3fa0d4e082bfbc1c6714"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "3ce6fe9df6c42defe464fa7adfed5311c27d27f70283434ff00d40376a678d75"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_json]]
+arch = "i686"
+git-tree-sha1 = "bd2b389f969cd98cfea991e9446449abb0b57824"
+os = "windows"
+
+    [[tree_sitter_json.download]]
+    sha256 = "a3d204d70c69efe28d35b641293de03b602d73d606f6affd934a33eda49da5b9"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.i686-w64-mingw32.tar.gz"
+[[tree_sitter_json]]
+arch = "i686"
+git-tree-sha1 = "28cd378322a89e93b6755adc5e430252e9312c41"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "b865de5a4e6b0b711ceba7b91bc87dfe311ea7a873461e533e0e93490af58882"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.i686-linux-gnu.tar.gz"
+[[tree_sitter_json]]
+arch = "x86_64"
+git-tree-sha1 = "f60815b52cb55e627cfe35bbf9f1cfe294877d7b"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "ac1af2fb8ae901b5e3303c67e33a3fbaece72d91fc3d58e12431a65b3cdf71ce"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_json]]
+arch = "powerpc64le"
+git-tree-sha1 = "175f5e57c4b5eb94aa5ff032e89fea383a8be60e"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "896272d0726c82b0f362b9550649abaec440817dff0b80f47bb37da71db15f1f"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_json]]
+arch = "x86_64"
+git-tree-sha1 = "c5a898a5896383f70df359c495eb7214f4533fb0"
+os = "macos"
+
+    [[tree_sitter_json.download]]
+    sha256 = "13b3daf84b5e504addc9344843d55595bd0d8174e43c47bb9256589f6453fcab"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_json]]
+arch = "x86_64"
+git-tree-sha1 = "1aa278615204d600ebd752b85baf144092576b46"
+os = "windows"
+
+    [[tree_sitter_json.download]]
+    sha256 = "5f90297fa95a14a89100e65ef119a04d02150527af6fa2db5055bab49e997d80"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_json]]
+arch = "x86_64"
+git-tree-sha1 = "4b9e8087a4d5b113a8344c44f4c457e807cf7b5a"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "ed0f11a0524d4216421c4e92d54a877b7b266a9fb58887d2c2076ebdcf7acfb1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.x86_64-linux-musl.tar.gz"
+[[tree_sitter_json]]
+arch = "x86_64"
+git-tree-sha1 = "48bb29526bac32122d27556c7ce7cf522e9b50ca"
+os = "freebsd"
+
+    [[tree_sitter_json.download]]
+    sha256 = "b98ed54dc02e11830b4cc3afa80456d7a76e7e8748e0b6284ac80b4312a73d1f"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_json]]
+arch = "aarch64"
+git-tree-sha1 = "a7ab0c11f291615a8f25a8b8375b132aad7514ef"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "aecf2089693b1aa245dd7a2b6dc108dd3ca0834cf060622d62c4cbca8f3a8e35"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_json]]
+arch = "aarch64"
+git-tree-sha1 = "0a0685ba469ab218fccf73df04f0c20f0395f43c"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_json.download]]
+    sha256 = "650935f353461931818c5be9d3f4838509c2b8f3f8a1c3916d260f5cae636b49"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_json.v0.16.0/tree_sitter_json.v0.16.0.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_julia]]
+arch = "armv7l"
+git-tree-sha1 = "9baf2eead1e6b54185a8d05ac83a6de79c489b5f"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "79521050c771da4bf2d87a08bf52cd084cc74e7a91ae6d688875162faf257025"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_julia]]
+arch = "i686"
+git-tree-sha1 = "ddcd06b804dab0380d2d1dc2d1dcf8542142984e"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "80965130ffede3a26660a26df75db8357ef6cec65fb435bd79238b287f895ca8"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.i686-linux-musl.tar.gz"
+[[tree_sitter_julia]]
+arch = "armv7l"
+git-tree-sha1 = "763c4d7e3cb84696632d9b53e12636b4906175d1"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "a292d78ac43efa0a574b064a57f268853fa944873ec3701b01a585fa98b79ae5"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_julia]]
+arch = "i686"
+git-tree-sha1 = "a27a22c8df22d7c9df2c6fe2eb48538625223e02"
+os = "windows"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "f564479a9ae6af78192443c7be69a3a6e0e23f6d649f77c6285424195b8759f6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.i686-w64-mingw32.tar.gz"
+[[tree_sitter_julia]]
+arch = "i686"
+git-tree-sha1 = "9b85f87fe7d697da85c811bc2ff65390e39c4f82"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "f9452b011ab3366745825523f5c1eba76bdd1d335b15429c79363596db02d9db"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.i686-linux-gnu.tar.gz"
+[[tree_sitter_julia]]
+arch = "x86_64"
+git-tree-sha1 = "a15415e64c3df0166d3369c6c25a068187958f8b"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "8f4d1dbe9cb097da5a3d869142f7db389c9aa916f1f5696486c3843109fda6b9"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_julia]]
+arch = "powerpc64le"
+git-tree-sha1 = "c6410617483fefb879ba840b488520fee6f136c0"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "89f9e80cbafaba1cedd11196e4a2b01a4b1f47bbf470db89493c46f0862a7952"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_julia]]
+arch = "x86_64"
+git-tree-sha1 = "6f83f945b8a2a74209742b3177b7b8fe2f1cd3f8"
+os = "macos"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "40b259b306767c905e9fe0319cdc7e581f5c507fc07c7537429bb749c92f2ad8"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_julia]]
+arch = "x86_64"
+git-tree-sha1 = "16e5907c30f993c55e13ca0bc3b43439facbbf0c"
+os = "windows"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "20ef9ea1ca561e7ef078ac4c0ffdb70c4794547968c56138120b164c02c5179e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_julia]]
+arch = "x86_64"
+git-tree-sha1 = "795d0c2469ea8ca107bec4217aa1698cf1f958ba"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "fad9bea5d52756f82f1d035f2f2d6bb6731d0c3b0f833f8d581dd7c3cbd08f1b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.x86_64-linux-musl.tar.gz"
+[[tree_sitter_julia]]
+arch = "x86_64"
+git-tree-sha1 = "53127591bf7b10c95c14f25b7f60cea39f1c97aa"
+os = "freebsd"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "52fccfdb82bf1143471b518de6b6c624f7db6d522c1558c80a5c3a435d97b8f5"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_julia]]
+arch = "aarch64"
+git-tree-sha1 = "b98b4b9ab23f8d806e56df9e040c5e782506df55"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "fc585be7d52c1cb93b5a6d74493b56e068aa492b113453b19ac0744c6a50bfc5"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_julia]]
+arch = "aarch64"
+git-tree-sha1 = "faf112d1c74f0fb5c7df19515ff8376d7055c7cc"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_julia.download]]
+    sha256 = "3a2ec4b3e7157d78d93b40b9e3f11bce38f27aae1fcb11e3e88655638db081d8"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_julia.v0.0.3/tree_sitter_julia.v0.0.3.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_php]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "efbba89fab17ffdcff8d7873d001a799aab57804"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "3ce082fe3b1b20e2a0035c5e74a0224cbfa3eaf2b6c518d65c0d6e6c473ba7f8"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.aarch64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "bfa6778ca15f57bbb9a44d33285e8a8c085c5c29"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "003e00def37ab0fdcc090be4c00fcb1caef63f35af35cc6571a7ba8395b07688"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.aarch64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "63893279fd08c1caa7f8f136800b0f135e7c3868"
+os = "freebsd"
+
+    [[tree_sitter_php.download]]
+    sha256 = "3ab489eb3f2eb050a222b1c35c5a8199c827cdf1c0d3e19cdaa5abbd4e0ffbdd"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-unknown-freebsd11.1-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "4f603e7f047d5fd0a1ca5584cf4632d505ad71d1"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "0b04e703e4592152c9cf178698d24f42d14c264c24ec478b8654441660308e13"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.armv7l-linux-gnueabihf-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "dc9712708c511b7726cc3a0329b1ff13590e7031"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "18b3ef0309987aa8606bb4526d64f609eb23380ffd9744b4579b0c0f3c351b06"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.armv7l-linux-gnueabihf-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "142a895d5b482cf0c8e000441acf60b0730ba3a6"
+os = "macos"
+
+    [[tree_sitter_php.download]]
+    sha256 = "e00b58ffc4632c2bd3dc7c6d905d5df8f8b9b6c3f2239b29442af97fe550ca3b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-apple-darwin14-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "7203a854f2e6d4e9e18fbec1ba6a1fbe64f20eb5"
+os = "windows"
+
+    [[tree_sitter_php.download]]
+    sha256 = "204bc886dd12d51e6555c2c470bca63d6e5ffccfd4da8d69b33fad32d6187a43"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.i686-w64-mingw32-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "114b9162cd40c5f5218576c26602b63bfe58b025"
+os = "freebsd"
+
+    [[tree_sitter_php.download]]
+    sha256 = "43463f3974f14559cbc1f7944d475a38f6c95b17af563417299393474073dd37"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-unknown-freebsd11.1-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "72f70431867923c7145a14b833e80ac109cc7a74"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "7a81dbffefeeaf0f6e4961b07c0c6d131158d0b17bef594431e0be27814cb017"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.aarch64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "8054a0f2c5ed7511c86b093b8d0c2f6c68c1c1b9"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "eb1a2a37054bcfa6c23325986fe3715aa04077632ae378a078cd9c9386a60437"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.armv7l-linux-musleabihf-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "f85bd1f0af4cbb01d7a3e855b3a9dd36a9bf807b"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "05a2ff0a10464520a3b42df7013faa1c852fc7139128c2bd777be77ffc48eca1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.armv7l-linux-musleabihf-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "aa5ffab33a792a3b054baaad347d640c4288ad3d"
+os = "macos"
+
+    [[tree_sitter_php.download]]
+    sha256 = "d07e49bdd7c0b3724e21bfaab6cbbd11fffb5c918bdbed30b46981ea8be70b7e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-apple-darwin14-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "57bf8a1aa97ef84ae20d9ba23a952e5961a779c8"
+os = "windows"
+
+    [[tree_sitter_php.download]]
+    sha256 = "915c6da572773bd4214b2459d0064aa890c589a74ba8ff9087524fea5be17347"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.i686-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "417f17ba67bda4911b584b7ae8f4f28205492dba"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "d3ee7b6ec410e951e1b21b70a738d84c38d6aefa5bf67d4945b9ce26fe95c5cc"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "a0824b0f0d8d3556ca8d19ef0ed59901362ef7ec"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "255ea79ab1cbbd7b5cafa2cedb9a5ced2e10606a1e093b0a90752489f8775f5a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.i686-linux-musl-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "89385067494fb56687eb7ae4a3a183e9d1518ba0"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "bc696f7bf6cd5135395c71826f57bd790d44538b5da58b5f01f89c983b73fac6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "e93b53b63a0fbff43982361bf27a4b059704fd72"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "fe16c835f2bb819fa77b30915a176c9c531fb89551c1c84dec2c1aedeea9ca2c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "e5e2b6c04be048ea975e7841c10a5f78f3be8bda"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "a7170de5b143766ef6ff3e8067e8da02e857e35b025bf83070f729f8c34b64e7"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.i686-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "48f7f8bc6d208cd58a8f0fac3741ab9182c1e208"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "7588a8e217f5966db7861caa187d40d37d8421c04b1a8f64e8bf51a037f557b4"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.i686-linux-musl-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "74f8f4c097269ac145abedccdc1a6c6a75e57b45"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "c6d3d28c0960a28c90018948bda8e67b19b1603962b4cf0ef5b88fa50fb1ab93"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.aarch64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "d4879a5b6b3ad570bc7c7baa83c2b331668febe7"
+os = "windows"
+
+    [[tree_sitter_php.download]]
+    sha256 = "0f7773e2471ddd1b44aa77597829e30119c77a448074ccd35f003bbc57b72e47"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "45cfb7f2c4e834ea4dd5a2cdac4e50d4a026112f"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "f2026df284852ca60b84532f98418a5bd51b2bd431189600044de82a33855e04"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "efc69f3c5ad6252abb3b3d4a884dca01f58ed691"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "ff90501b03b2cea00c64631c1c1f64b980b01f721e03d177a19a340a06d71a9d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.powerpc64le-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "0200541ed9555d775a40988c2d869edc5daae6b4"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "bbd15ebe00c7aa58435fff8b2a24fc4104a5a801cd6e45c225f0f670c830895d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.i686-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_php]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "01d711690e8cc673d597935c3f6a8d3085e0b029"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_php.download]]
+    sha256 = "fc5fc2bc79ca11bf0f8d95ba29125c80bfa49a0d424e207f8361c3658255a3b7"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.powerpc64le-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_php]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "dbafd2321b4ccfe7b2e5818eade1df34649250f0"
+os = "windows"
+
+    [[tree_sitter_php.download]]
+    sha256 = "73a28f66b7183611b352c56c18cfb62081e70fb15a91d9464bff4d1080658a76"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_php.v0.16.1/tree_sitter_php.v0.16.1.x86_64-w64-mingw32-cxx11.tar.gz"
+
+[[tree_sitter_python]]
+arch = "armv7l"
+git-tree-sha1 = "f5a5984d6676a3a5b5249c09b4409a6f704f5f23"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "586a5e8b440c83e406bdd526d8f4bd879ccdb2fa9d2cbcf08ee2c5a7f02fcef0"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_python]]
+arch = "i686"
+git-tree-sha1 = "cc95257242209399e078997e83cac047c98def07"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "f6f6fcdc1683b6827f27342017ac29b8075fa39e4c663237d26b988b0375a5ef"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.i686-linux-musl.tar.gz"
+[[tree_sitter_python]]
+arch = "armv7l"
+git-tree-sha1 = "e4195aa49e2663b57661670b8b9165d6b28ed501"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "a9058808be7f45c6da732d54dac1b4b7bbaaf37dc06081b3dc76c40575d73bd6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_python]]
+arch = "i686"
+git-tree-sha1 = "e08ec12fccb2f4b542b23be84c454908c118fe0e"
+os = "windows"
+
+    [[tree_sitter_python.download]]
+    sha256 = "0ed5bb276eb34348af8120136662da6867f37272c8ec2156bfb12593e83984ff"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.i686-w64-mingw32.tar.gz"
+[[tree_sitter_python]]
+arch = "i686"
+git-tree-sha1 = "4df5e8d4862f477a3a234d619d17f166aa46eeb5"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "7efc87643bef9ecfddd1331dd2d96c85d9537fe4e255f5e68b9d8dc6ba58e91b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.i686-linux-gnu.tar.gz"
+[[tree_sitter_python]]
+arch = "x86_64"
+git-tree-sha1 = "35d450d449c0e3d77ee522a7aaa1e345272ca0f4"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "76c9125d3898330f9db46408d3e7c090e03d75a7ad9a2b93f5fe13f3b02bf77e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_python]]
+arch = "powerpc64le"
+git-tree-sha1 = "13b4c2b77287b6f679492a4acbbe7b4ce4cbec21"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "3d879a46bfa52c0abb5234c033f7e26b2420a8773d265a9ec08212848ad53dfb"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_python]]
+arch = "x86_64"
+git-tree-sha1 = "adfcf3d5bbbe2761ef52953e53b3ff264e983fcb"
+os = "macos"
+
+    [[tree_sitter_python.download]]
+    sha256 = "f4122becf8bed953dfe32223f817100831e0cc7e985a19a0f59a93a488a6a1ff"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_python]]
+arch = "x86_64"
+git-tree-sha1 = "38cb1b1ee563621bc67424e07a7a5acf07499fdd"
+os = "windows"
+
+    [[tree_sitter_python.download]]
+    sha256 = "802be9ad72b090f023db2707c5cbae94c11caccdfedf235c3cbd9ceb5bf3c55a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_python]]
+arch = "x86_64"
+git-tree-sha1 = "bae18dbb4965b7f6bc51870288b2f6986735ad9f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "3d43e81aa6534e59f08133c9975d46fe42265d97d89fc446b7a4f7a5a340fff1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.x86_64-linux-musl.tar.gz"
+[[tree_sitter_python]]
+arch = "x86_64"
+git-tree-sha1 = "9f02d8c0c0cacf97c2769bbbe81dd3a931e2b038"
+os = "freebsd"
+
+    [[tree_sitter_python.download]]
+    sha256 = "a1d89b1f8e8df0ff8b5bde90c6c63a7cf60377914bb3f380b356e287ec32823a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_python]]
+arch = "aarch64"
+git-tree-sha1 = "cf25ad3ee7be1754c77ae3bf477799280960aba4"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "6abf63c0d5048ee45895bb8febef340816bc6b9abe7188ebc5c8b47e5bf28519"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_python]]
+arch = "aarch64"
+git-tree-sha1 = "45765eee70fa2c0313f9be1b82705531f6312690"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_python.download]]
+    sha256 = "b2a65c16a7866cc264bf8ac9d0b1aa10e695fea20c3692ef022c83badabd0d2b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_python.v0.16.1/tree_sitter_python.v0.16.1.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_ruby]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "6f48dcc35780eac957feb41d7fd9d94a6629a47f"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "7c60e43a52ba679c4950818a63da5612e9f6dbb3dd3b0e43f1943f296c322f2b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.aarch64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "5f124b481d6fdb714a30a8a4340163faa0f599ec"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "978ce396f3bd204ba65d853a9b1891b34209f407eaedf6c81defd1c07de607a1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.aarch64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "a83388687766bdd52a53d10955e865ad2fc00c33"
+os = "freebsd"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "4c16ad028e5389d789f0167eb66e2631583533ff715b711f00949a54399f5135"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-unknown-freebsd11.1-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "1927ddb6de4891cd78ed0541d0e97faa02b0e987"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "a61104536298220b3e3b3084884619f355cfb9c9bc2f771d296aae9b2498e264"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.armv7l-linux-gnueabihf-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "fba5b1c8df4ac3166b222723ba80b30f9380cfe1"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "92e891c5041131fea40ccf7275dcd3878cc5c51dcd100e99b896ca579e855502"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.armv7l-linux-gnueabihf-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "3c74b8791a3fbd894fc0aae18de6b663bc1047ce"
+os = "macos"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "d4f223e0d57e75492a333f3a3dd117c43677a56119c4eedf66c03b9eedabe4b6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-apple-darwin14-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "72ecbdee340a2d57429a4e644e89f0cb9c85a8ac"
+os = "windows"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "6a648ab562e2cc55949cc1e81b6187b778006e5cc20d6ba16e01389a3d749cb3"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.i686-w64-mingw32-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "ff028a710bc8d1d54b9950fe50fd033fdf0fe64d"
+os = "freebsd"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "c90566681cbeff12ce4d01b369473991fcb262ba6389fd4c210a1c15a35b1dd1"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-unknown-freebsd11.1-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "aarch64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "6cc558b5f143577284d1ee30741bcf48dadd3160"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "7c51fb3d40c46347d64c6f8b15acd4a051c16819daf7b82a910e2490834d24e0"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.aarch64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "armv7l"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "011460f2ad7bc0903019698ea968aff6a795aba3"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "0675de96ecfb8ac4cb7ec2c5c0fed66bbcb4f29ee73da420813c5498a53439ed"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.armv7l-linux-musleabihf-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "armv7l"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "c35777cdeda257d5c1230648bc1e9628ff2f611f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "2c10f4f33699e6050a304016279e00eaa28385c0f10d72a9dd499390a24499bb"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.armv7l-linux-musleabihf-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "1779a8601e6d8be1b620a7e73e21cf541208ef71"
+os = "macos"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "7d785a510a882d268e48abd3c25053c5b4ef499193d888d283f35c1217764858"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-apple-darwin14-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "4916861c6e05e535d9190ba66815ccc8af9d0bb0"
+os = "windows"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "859a9bf741f025234e3374f840e1ba9e54cc964209d009a1de6db15143aa1c3b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.i686-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "95d8a4427cd83ae77ab2d08dea77eb770c4d2a26"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "d8160b17a6289fbe4b6e07d6b8cc2923d793f55be7b89f1ecc1696c928829362"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "86d1f05057338c91de12a077c50471eb877c2b2a"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "f7f91df33f31c42537721d52e73bfbf6a6d23f4cefb7df64ee1e23869bcf8f4e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.i686-linux-musl-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "8091c2c04d74b6980a481e4a33f75f0cf03cfc72"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "76a39457804dae8c30662b7c001228bb929e0bb5ce336b89a4807fe8284e0b14"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-linux-musl-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "56389a043cc709885665326009433f5924d8ec03"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "96f3bbc65a35c3fd17f7415771263e307c090f96288209ace9cd863381dd25a9"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "4faaf7f9a2977ce2cd3efc8d9ae0f771ac393831"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "9f277310b4734c684edf71e278e52ada8ad5cc1b511fdff7f501ffa6b7e1a51b"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.i686-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "i686"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "1dd1b601e650f256dcee4bea9841c58099925cef"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "0635352817f76465a38eb0f5b39ebfba1b7b3374ebf09addba1052a467882e6d"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.i686-linux-musl-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "aarch64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "58d7f1f94ad1a363448573ffada4682e7764673e"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "e93d347e24d5a526cd69f5c9194e602b63de282fb6da0d15a95f6f08ef2fa0a4"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.aarch64-linux-musl-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "96abd11fabb337caebe26224ccbe23744da8f0a7"
+os = "windows"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "47e65339fe45a0002126b36c29909cb691e35fc40e8e3d7180fd0fe0af9bcb3e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-w64-mingw32-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "6463920aedf6867333ebec315c300452e4196e47"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "d72273badcdbf5b9fe41ffc98a241a99f122568a9ee394233cb6d692ee026f7a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "6440161b36bf5af253d1649ceb5c3364667db251"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "d5d449ab9b0a4a0489cfe37bbbdd1664d2afb41a7892489fa95e34e99f478103"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.powerpc64le-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "i686"
+cxxstring_abi = "cxx03"
+git-tree-sha1 = "bb59460c818ce35fafc81a49be67b979d89628f1"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "232db60bce7a82d5baf998971db5c67b0ea8690ab22f25745772dc9f5f3df974"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.i686-linux-gnu-cxx03.tar.gz"
+[[tree_sitter_ruby]]
+arch = "powerpc64le"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "fa9a29291a4c0b97fc90e2cf21c5d91aa761b9e3"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "c71ae0992abbd03d9dabd3e94bba9e0068e13d2879b9bd89bbfc8c5ed98702c4"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.powerpc64le-linux-gnu-cxx11.tar.gz"
+[[tree_sitter_ruby]]
+arch = "x86_64"
+cxxstring_abi = "cxx11"
+git-tree-sha1 = "8a4e8595a058332009ced1939e466b77fa6ab642"
+os = "windows"
+
+    [[tree_sitter_ruby.download]]
+    sha256 = "8210bdd9bf26a4844c8401eb09624a6c787223b6467fc43dde3e9cf8b124e217"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_ruby.v0.16.2/tree_sitter_ruby.v0.16.2.x86_64-w64-mingw32-cxx11.tar.gz"
+
+[[tree_sitter_rust]]
+arch = "armv7l"
+git-tree-sha1 = "5213c2d1a3d9368c03396606edebd8ebdcee9a42"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "85b1a30390961d58a80a444590fa1e965e8e2bc4befd156717d1d991763c5c1a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_rust]]
+arch = "i686"
+git-tree-sha1 = "2f424c092658022d4ddeaa8c823abe97db15bc24"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "2cf6636e8f4a3a8b6da645407a3e954c2c89da6f97d70f48039dfcf0f582884a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.i686-linux-musl.tar.gz"
+[[tree_sitter_rust]]
+arch = "armv7l"
+git-tree-sha1 = "0d98f1e1e94ba091aa535726d44f5bf4504b35c4"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "8b14c238f94b5d2cc86bad209e43ead2718074c07bee0682ee93d58ff6ec66a2"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_rust]]
+arch = "i686"
+git-tree-sha1 = "bf1024a10cb66cea59a9594a311bc74805216c62"
+os = "windows"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "a1fe2be03bec02fe3e0650c6bfe6574612cacdd5068fdc48f04ecad7cc65589c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.i686-w64-mingw32.tar.gz"
+[[tree_sitter_rust]]
+arch = "i686"
+git-tree-sha1 = "a5ca962ccaba6d672f2f4530a40316a89958ffb1"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "2f7527860d57eecd4d8e6780f02c06cafed5370d70093345374723417500e12a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.i686-linux-gnu.tar.gz"
+[[tree_sitter_rust]]
+arch = "x86_64"
+git-tree-sha1 = "6d1f812811f5fe4d40e22bcb87a2490e02bfc08d"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "048e7fa094c9df92f0f0097cf7e69fc1f27841530c3b20cc57d310912589775e"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_rust]]
+arch = "powerpc64le"
+git-tree-sha1 = "527f3fb82a7beff1f825a3f091a0fb79c660817c"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "57f6ec2197836b8bd7b4944651726b9bcc0599b29d93e8f08d0b0cbd4ac27f55"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_rust]]
+arch = "x86_64"
+git-tree-sha1 = "62c256ba8bc7bdff49b23309551a872742df3b81"
+os = "macos"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "e7832570b0e06586c838239a4a45e3625d70f6ae600fcb249afff53327246184"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_rust]]
+arch = "x86_64"
+git-tree-sha1 = "6e0d4678c26db7275dec54998ee62e406803d78e"
+os = "windows"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "8e7b7baf95334e276784a0b130e1a941142c6e877deceb7bfe01566d19ce3223"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_rust]]
+arch = "x86_64"
+git-tree-sha1 = "6edae4d60548d0681baf3f1ebc0f5dd5efd3e5c3"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "c939ae78a0b4d8614781a6e1636e99d57bb3fcade38a8dc536dc7babae30a99a"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.x86_64-linux-musl.tar.gz"
+[[tree_sitter_rust]]
+arch = "x86_64"
+git-tree-sha1 = "c2e0792edbf53618257a9b0917e11f46a637e467"
+os = "freebsd"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "3a8a33db308ea098966706a59ff1d02a425bd4c005200267edff4164f673ec77"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_rust]]
+arch = "aarch64"
+git-tree-sha1 = "8f0c510e72032bb29a93fb99dcbfb788aae7a274"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "1ccb1aa70d2b74871714d63b1e8c2f0d399c0495e404e07707734323300a8a37"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_rust]]
+arch = "aarch64"
+git-tree-sha1 = "224ee90f110f1d8078f03bcea2c5133a9c7cf926"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_rust.download]]
+    sha256 = "bd77f8ae37d1c54d5d1fa0ab56f21fb84b58bb41a69ce71aa76a7d259c81e2a2"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_rust.v0.16.1/tree_sitter_rust.v0.16.1.aarch64-linux-musl.tar.gz"
+
+[[tree_sitter_typescript]]
+arch = "armv7l"
+git-tree-sha1 = "751a78651e7c0d59b73d0a5926a864df199b03bc"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "2a0e4235739c5d1edaf0913a1399bb01eef0958e128d415f76a77e965a3fcdd5"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.armv7l-linux-gnueabihf.tar.gz"
+[[tree_sitter_typescript]]
+arch = "i686"
+git-tree-sha1 = "f0a64fc5dc5d387a28402acb8b0169d63a05f1f3"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "0355c4e5cdb6dbc0d9a8cce883fe1e1a8966c6378810ab6efde60d13e3209ad6"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.i686-linux-musl.tar.gz"
+[[tree_sitter_typescript]]
+arch = "armv7l"
+git-tree-sha1 = "15f21158a4853ae892d7d48da103d10e641fc89f"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "fa0c702bfa447f6903f38a7dd99f45373ba67f644c81487c1706b907eabbaa15"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.armv7l-linux-musleabihf.tar.gz"
+[[tree_sitter_typescript]]
+arch = "i686"
+git-tree-sha1 = "8738813e4e7468019fbeedff289ae055fa4b9e88"
+os = "windows"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "b26cf182ee03d0198eae194b9c609fdf85bb9228603727833e7a073a4198433c"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.i686-w64-mingw32.tar.gz"
+[[tree_sitter_typescript]]
+arch = "i686"
+git-tree-sha1 = "8e94d4a5a2f813f691a90850ddcd4831c3a9ff2e"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "f4661a311b4aa592ef16d324b0b906270239d8664ee2ae8cfbcc3b5dd6e05916"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.i686-linux-gnu.tar.gz"
+[[tree_sitter_typescript]]
+arch = "x86_64"
+git-tree-sha1 = "76d91315067c4acc775e8a8a71e5cb4eb3c8a084"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "22adc479c8d7a10de03ddca0caf8bf32df61c3cd03cdca9a3eb27eca7340ce4f"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.x86_64-linux-gnu.tar.gz"
+[[tree_sitter_typescript]]
+arch = "powerpc64le"
+git-tree-sha1 = "08594e053870bd57e5dec0ece64979e41dd60e3f"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "88f92da6907b2fb79f65312e2ca5397f96f901c9ec4fd1166ec364732488cfbb"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.powerpc64le-linux-gnu.tar.gz"
+[[tree_sitter_typescript]]
+arch = "x86_64"
+git-tree-sha1 = "e5e799a973c804e51c00ff051b22a03b9054083f"
+os = "macos"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "98df9774e022509dafbf433d9d8c02e2ed251bc68c320dea4c2c0bc9b8ab7712"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.x86_64-apple-darwin14.tar.gz"
+[[tree_sitter_typescript]]
+arch = "x86_64"
+git-tree-sha1 = "91f694946f4e58ea072ff755cde3fe2819891659"
+os = "windows"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "821db41db512d6d2535203d79eb259681e49e5f5603f3c807aaaaf382392b523"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.x86_64-w64-mingw32.tar.gz"
+[[tree_sitter_typescript]]
+arch = "x86_64"
+git-tree-sha1 = "c94ee4d5d9b1d0247cd9b97613846b411df0a538"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "380168b4cbd06e0f5bbc26e75dde9b1355ab59557d8032e79634f02a04e1ccc3"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.x86_64-linux-musl.tar.gz"
+[[tree_sitter_typescript]]
+arch = "x86_64"
+git-tree-sha1 = "002912cdfaa372ffd1c8538885ba9578105e9adc"
+os = "freebsd"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "012de5dd4cefc6a2faabd2e79e2c98b18456b5ee9db7f5f7e171c72fbd945dc2"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.x86_64-unknown-freebsd11.1.tar.gz"
+[[tree_sitter_typescript]]
+arch = "aarch64"
+git-tree-sha1 = "ef6ad578ef31a4a38f9f980536bb5fa6d5fcb570"
+libc = "glibc"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "a3eb3971e1c0c7620297a6286494fd703287427fdbdae444e7cf910bc474ed4f"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.aarch64-linux-gnu.tar.gz"
+[[tree_sitter_typescript]]
+arch = "aarch64"
+git-tree-sha1 = "bbe5155e0b5a4fe58305afbc3253de254fc4e253"
+libc = "musl"
+os = "linux"
+
+    [[tree_sitter_typescript.download]]
+    sha256 = "715b22ae727828cd1dfcd098a2340e69e1427d4a3e5cf5aabc46da91082ffc01"
+    url = "https://github.com/MichaelHatherly/tree-sitter-binaries/releases/download/tree_sitter_typescript.v0.16.2/tree_sitter_typescript.v0.16.2.aarch64-linux-musl.tar.gz"
