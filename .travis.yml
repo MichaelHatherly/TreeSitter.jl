@@ -1,5 +1,9 @@
 # Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
+arch:
+  - amd64
+  - ppc64le
+  - arm64
 os:
   - linux
   - osx

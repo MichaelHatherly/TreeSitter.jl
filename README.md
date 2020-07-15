@@ -1,6 +1,6 @@
 # TreeSitter
 
-*Julia bindings for [tree-sitter](https://github.com/tree-sitter/tree-sitter) ---
+*Julia bindings for [tree-sitter](https://github.com/tree-sitter/tree-sitter) &mdash;
 "An incremental parsing system for programming tools."*
 
 [![Build Status](https://travis-ci.org/MichaelHatherly/TreeSitter.jl.svg?branch=master)](https://travis-ci.org/MichaelHatherly/TreeSitter.jl)
