@@ -154,16 +154,21 @@ mutable struct QueryCursor
 end
 Base.show(io::IO, ::QueryCursor) = print(io, "QueryCursor()")
 
-exec(cursor::QueryCursor, query::Query, node::Node) = API.ts_query_cursor_exec(cursor.ptr, query.ptr, node.ptr)
-exec(cursor::QueryCursor, query::Query, tree::Tree) = exec(cursor, query, root(tree))
+exec(c::QueryCursor, q::Query, n::Node) = (API.ts_query_cursor_exec(c.ptr, q.ptr, n.ptr); c)
+exec(c::QueryCursor, q::Query, t::Tree) = (exec(c, q, root(t)); c)
 
-struct QueryMatch
+Base.eachmatch(query::Query, tree::Tree) = exec(QueryCursor(), query, tree)
+
+function Base.iterate(cursor::QueryCursor, state=nothing)
+    result = next_match(cursor)
+    return result === nothing ? nothing : (result, nothing)
+end
+
+mutable struct QueryMatch
     obj::API.TSQueryMatch
 end
 
 capture_count(qm::QueryMatch) = Int(qm.obj.capture_count)
-
-captures(qm::QueryMatch) = (Node(unsafe_load(qm.obj.captures, i).node) for i = 1:capture_count(qm))
 
 function next_match(cursor::QueryCursor)
     match_ref = Ref{API.TSQueryMatch}()
@@ -171,19 +176,120 @@ function next_match(cursor::QueryCursor)
     return success ? QueryMatch(match_ref[]) : nothing
 end
 
-struct QueryPredicate
-    steps::Vector{API.TSQueryPredicateStep}
-    function QueryPredicate(query::Query, match::QueryMatch)
-        pattern_index = match.obj.pattern_index
-        len = Ref{UInt32}()
-        ptr = API.ts_query_predicates_for_pattern(query.ptr, pattern_index, len)
-        return new(collect(unsafe_load(ptr, i) for i = 1:len[]))
+struct QueryCapture
+    node::Node
+    id::UInt32
+end
+
+function captures(qm::QueryMatch)
+    fn = function (ith)
+        ptr = unsafe_load(qm.obj.captures, ith)
+        node = Node(ptr.node)
+        return QueryCapture(node, ptr.index)
     end
-end
-Base.show(io::IO, qp::QueryPredicate) = print(io, "QueryPredicate(length=$(length(qp.steps)))")
-
-function exec(query::Query, qp::QueryPredicate)
-
+    return (fn(i) for i = 1:capture_count(qm))
 end
 
-match_name(q::Query, m::QueryMatch) = unsafe_string(API.ts_query_capture_name_for_id(q.ptr, m.obj.id, Ref{UInt32}()))
+function capture_name(q::Query, qc::QueryCapture)
+    unsafe_string(API.ts_query_capture_name_for_id(q.ptr, qc.id, Ref{UInt32}()))
+end
+
+query_string(q, id) = unsafe_string(API.ts_query_string_value_for_id(q.ptr, id, Ref{UInt32}()))
+
+function predicate(q::Query, m::QueryMatch, source::AbstractString)
+    len = Ref{UInt32}()
+    ptr = API.ts_query_predicates_for_pattern(q.ptr, m.obj.pattern_index, len)
+    if len[] > 0
+        func, args = "", []
+        for i in 1:len[]
+            step = unsafe_load(ptr, i)
+            if step.type === API.TSQueryPredicateStepTypeCapture
+                # Iterate over the captures rather than allocating a dict.
+                for address in 1:capture_count(m)
+                    capture = unsafe_load(m.obj.captures, address)
+                    if capture.index == step.value_id
+                        node = Node(capture.node)
+                        str = slice(source, node)
+                        push!(args, str)
+                        break
+                    end
+                end
+            elseif step.type === API.TSQueryPredicateStepTypeString
+                # Either a literal argument name, or predicate name.
+                str = query_string(q, step.value_id)
+                func == "" ? (func = str) : push!(args, str)
+            elseif step.type === API.TSQueryPredicateStepTypeDone
+                # This marks the end of an individual predicate. Check whether
+                # we actually have enough arguments to call the predicate and
+                # then continue.
+                if length(args) != 2
+                    @warn "incorrect number of arguments to '$func', expected 2"
+                    return false
+                end
+                # Handle the following predicates. Source: tree-sitter rust lib.
+                #
+                #   - eq?
+                #   - not-eq?
+                #   - is?
+                #   - is-not?
+                #   - match?
+                #   - set!
+                #
+                result = if func == "eq?"
+                    left, right = args
+                    left == right
+                elseif func == "not-eq?"
+                    left, right = args
+                    left != right
+                elseif func == "is?"
+                    @warn "'$func' not implemented" # TODO
+                    false
+                elseif func == "is-not?"
+                    @warn "'$func' not implemented" # TODO
+                    false
+                elseif func == "match?"
+                    arg_1, arg_2 = args
+                    occursin(Regex(arg_2), arg_1)
+                elseif func == "set!"
+                    @warn "'$func' not implemented" # TODO
+                    false
+                else
+                    # Invalid predicate functions will fail with a warning:
+                    @warn "unknown predicate function '$func'"
+                    false
+                end
+                if result
+                    # Success, reset for the next predicate.
+                    func = ""
+                    empty!(args)
+                else
+                    # Failed to match the current predicate, so we can bale here.
+                    return false
+                end
+            else
+                # We really shouldn't get here if all is well.
+                error("unreachable reached")
+            end
+        end
+    end
+    return true
+end
+
+function each_capture(tree::Tree, query::Query, source::AbstractString)
+    return (c for m in eachmatch(query, tree) for c in captures(m) if predicate(query, m, source))
+end
+
+function tokens(parser::Parser, query::Query, source::AbstractString)
+    out = Tuple{String,String}[]
+    tree = parse(parser, source)
+    for m in eachmatch(query, tree)
+        if predicate(query, m, source)
+            for c in captures(m)
+                id = capture_name(query, c)
+                text = slice(source, c.node)
+                push!(out, (text, id))
+            end
+        end
+    end
+    return out
+end
