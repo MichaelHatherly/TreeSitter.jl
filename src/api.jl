@@ -611,19 +611,46 @@ import
     tree_sitter_typescript_jll
 
 const LANGUAGE_REGEX = r"^tree_sitter_(\w+)_jll$"
-const LANGUAGES = Dict{Symbol,Function}()
+const LANGUAGES = Dict{Symbol,Tuple{Function,String}}()
 for lang in filter(s -> occursin(LANGUAGE_REGEX, string(s)), names(@__MODULE__; imported=true))
     name = match(LANGUAGE_REGEX, string(lang))[1]
     func = Expr(:quote, Symbol(:tree_sitter_, name))
     lib = @eval $(Expr(:., lang, QuoteNode(Symbol(:libtreesitter_, name, :_path))))
+    queries_dir = joinpath(getfield(@__MODULE__, lang).artifact_dir, "queries")
     f = @eval $(Symbol(:tree_sitter_, name))() = ccall(($func, $lib), Ptr{TSLanguage}, ())
-    LANGUAGES[Symbol(name)] = f
+    LANGUAGES[Symbol(name)] = (f, queries_dir)
 end
 
 function lang_ptr(n::Symbol)
     haskey(LANGUAGES, n) || error("unknown language '$n'")
-    return get!(() -> LANGUAGES[n](), LANG_PTRS, n)
+    return get!(() -> LANGUAGES[n][1](), LANG_PTRS, n)
 end
 const LANG_PTRS = Dict{Symbol,Ptr{Cvoid}}()
+
+function lang_queries(n::Symbol)
+    haskey(LANGUAGES, n) || error("unknown language '$n'")
+    _, dir = LANGUAGES[n]
+    return get!(LANG_QUERIES, n) do
+        dict = Dict{String,String}()
+        # Custom/vendored queries that aren't available yet in the upstream
+        # packages are loaded first. Queries for a particular language are
+        # located in a subdirectory of src/queries named after the language.
+        custom = joinpath(@__DIR__, "queries", string(n))
+        dir = isdir(custom) ? custom : dir
+        if isdir(dir)
+            for file in readdir(dir)
+                path = joinpath(dir, file)
+                if isfile(path)
+                    name, ext = splitext(file)
+                    if ext == ".scm"
+                        dict[name] = read(path, String)
+                    end
+                end
+            end
+        end
+        return dict
+    end
+end
+const LANG_QUERIES = Dict{Symbol,Dict{String,String}}()
 
 end

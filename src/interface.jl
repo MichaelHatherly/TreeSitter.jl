@@ -111,10 +111,11 @@ mutable struct Query
     language::Language
     ptr::Ptr{API.TSQuery}
 
-    function Query(language::Language, source::AbstractString)
+    function Query(language::Language, source)
+        source_text = load_source(language, source)
         error_offset_ref = Ref{UInt32}()
         error_type_ref = Ref{API.TSQueryError}()
-        ptr = API.ts_query_new(language.ptr, String(source), sizeof(source), error_offset_ref, error_type_ref)
+        ptr = API.ts_query_new(language.ptr, String(source_text), sizeof(source_text), error_offset_ref, error_type_ref)
         if ptr === C_NULL
             type =
                 error_type_ref[] === API.TSQueryErrorSyntax ? "syntax" :
@@ -130,7 +131,17 @@ mutable struct Query
             return query
         end
     end
-    Query(language::Symbol, source::AbstractString) = Query(Language(language), source)
+    Query(language::Symbol, source) = Query(Language(language), source)
+
+    function load_source(lang::Language, files)
+        queries = API.lang_queries(lang.name)
+        out = IOBuffer()
+        for file in files
+            println(out, get(queries, file, ""))
+        end
+        return String(take!(out))
+    end
+    load_source(::Language, source::AbstractString) = source
 end
 Base.show(io::IO, q::Query) = print(io, "Query(", q.language, ")")
 

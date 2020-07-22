@@ -139,4 +139,26 @@ using TreeSitter, Test
         @test out[3] == ("lowercase", "x")
         @test out[4] == ("lowercase", "x")
     end
+    @testset "Queries" begin
+        p = Parser(:c)
+        source =
+        """
+        int main(void) {
+            // comment
+        }
+        """
+        tree = parse(p, source)
+        q = Query(:c, ["highlights"])
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            id = TreeSitter.capture_name(q, capture)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, (id, literal))
+        end
+        @test out[1] == ("type", "int")
+        @test out[2] == ("function", "main")
+        @test out[3] == ("variable", "main")
+        @test out[4] == ("type", "void")
+        @test out[5] == ("comment", "// comment")
+    end
 end
