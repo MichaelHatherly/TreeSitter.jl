@@ -110,4 +110,33 @@ using TreeSitter, Test
             @test string(tree) == "(program (lexical_declaration (variable_declarator name: (identifier) type: (type_annotation (array_type (predefined_type))) value: (array (number)))))"
         end
     end
+    @testset "Captures & Predicates" begin
+        p = Parser(:julia)
+        source =
+        """
+        const X = 1
+        f(x) = x
+        """
+        tree = parse(p, source)
+        q = query```
+        (
+            (identifier) @lowercase
+            (#match? @lowercase "^[a-z]+$")
+        )
+        (
+            (identifier) @uppercase
+            (#match? @uppercase "^[A-Z]+$")
+        )
+        ```julia
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            id = TreeSitter.capture_name(q, capture)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, (id, literal))
+        end
+        @test out[1] == ("uppercase", "X")
+        @test out[2] == ("lowercase", "f")
+        @test out[3] == ("lowercase", "x")
+        @test out[4] == ("lowercase", "x")
+    end
 end
