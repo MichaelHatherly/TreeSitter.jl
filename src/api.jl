@@ -1,42 +1,10 @@
 module API
 
-using CEnum, Libdl, Pkg.Artifacts
+import tree_sitter_jll
 
-# Libraries
+using CEnum
 
-const libtreesitter = "libtreesitter"
-const LANGUAGES = Set([
-    :bash,
-    :c,
-    :cpp,
-    :go,
-    :html,
-    :java,
-    :javascript,
-    :json,
-    :julia,
-    :php,
-    :python,
-    :ruby,
-    :rust,
-    :typescript,
-])
-
-const ARTIFACTS_TOML = joinpath(@__DIR__, "..", "Artifacts.toml")
-const LIB_SUBDIR = Sys.iswindows() ? "bin" : "lib"
-
-function __init__()
-    # Runtime library.
-    meta = artifact_meta("tree_sitter", ARTIFACTS_TOML)
-    path = artifact_path(Base.SHA1(meta["git-tree-sha1"]))
-    push!(DL_LOAD_PATH, joinpath(path, LIB_SUBDIR))
-    # Language libraries.
-    for language in LANGUAGES
-        meta = artifact_meta("tree_sitter_$language", ARTIFACTS_TOML)
-        path = artifact_path(Base.SHA1(meta["git-tree-sha1"]))
-        push!(DL_LOAD_PATH, joinpath(path, LIB_SUBDIR))
-    end
-end
+const libtreesitter = tree_sitter_jll.libtreesitter_path
 
 # Structs
 
@@ -624,17 +592,38 @@ function ts_language_symbol_type(lang, sym)
     ccall((:ts_language_symbol_type, libtreesitter), TSSymbolType, (Ptr{TSLanguage}, TSSymbol), lang, sym)
 end
 
-function ts_language_version(arg1)
-    ccall((:ts_language_version, libtreesitter), UInt32, (Ptr{TSLanguage},), arg1)
-end
-
 # Language
 
-function lang_ptr(name::Symbol)
-    name in LANGUAGES || error("unknown language '$name'")
-    handle = get!(() -> dlopen("libtreesitter_$name"), LANG_PTRS, name)
-    return ccall(dlsym(handle, Symbol(:tree_sitter_, name)), Ptr{API.TSLanguage}, ())
+import
+    tree_sitter_bash_jll,
+    tree_sitter_c_jll,
+    tree_sitter_cpp_jll,
+    tree_sitter_go_jll,
+    tree_sitter_html_jll,
+    tree_sitter_java_jll,
+    tree_sitter_javascript_jll,
+    tree_sitter_json_jll,
+    tree_sitter_julia_jll,
+    tree_sitter_php_jll,
+    tree_sitter_python_jll,
+    tree_sitter_ruby_jll,
+    tree_sitter_rust_jll,
+    tree_sitter_typescript_jll
+
+const LANGUAGE_REGEX = r"^tree_sitter_(\w+)_jll$"
+const LANGUAGES = Dict{Symbol,Function}()
+for lang in filter(s -> occursin(LANGUAGE_REGEX, string(s)), names(@__MODULE__; imported=true))
+    name = match(LANGUAGE_REGEX, string(lang))[1]
+    func = Expr(:quote, Symbol(:tree_sitter_, name))
+    lib = @eval $(Expr(:., lang, QuoteNode(Symbol(:libtreesitter_, name, :_path))))
+    f = @eval $(Symbol(:tree_sitter_, name))() = ccall(($func, $lib), Ptr{TSLanguage}, ())
+    LANGUAGES[Symbol(name)] = f
 end
-const LANG_PTRS = Dict{Symbol, Ptr{Cvoid}}()
+
+function lang_ptr(n::Symbol)
+    haskey(LANGUAGES, n) || error("unknown language '$n'")
+    return get!(() -> LANGUAGES[n](), LANG_PTRS, n)
+end
+const LANG_PTRS = Dict{Symbol,Ptr{Cvoid}}()
 
 end
