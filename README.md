@@ -83,5 +83,6 @@ node = (source_file (call_expression (identifier) (argument_list (identifier))))
   - `:rust`
   - `:typescript`
 
-Additional languages can be added by writing new build scripts for
-[tree-sitter-binaries](https://github.com/MichaelHatherly/tree-sitter-binaries).
+Additional languages can be added by writing new `jll` packages to wrap the
+upstream parsers: see [Yggdrasil](https://github.com/JuliaPackaging/Yggdrasil)
+for details.
