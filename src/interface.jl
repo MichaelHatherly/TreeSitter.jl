@@ -1,4 +1,5 @@
-#
+using AbstractTrees
+
 # Language
 #
 
@@ -46,7 +47,7 @@ mutable struct Tree
         return tree
     end
 end
-Base.show(io::IO, t::Tree) = show(io, root(t))
+Base.show(io::IO, t::Tree) = show(io, AbstractTrees.print_tree(root(t)))
 
 root(t::Tree) = Node(API.ts_tree_root_node(t.ptr))
 
@@ -56,32 +57,34 @@ traverse(f, tree::Tree, iter=children) = traverse(f, root(tree), iter)
 # Node
 #
 
-struct Node
+struct Node{T}
     ptr::API.TSNode
-    Node(ptr::API.TSNode) = new(ptr)
+    Node(ptr::API.TSNode) = new{Symbol(node_type(ptr))}(ptr)
 end
-Base.show(io::IO, n::Node) = print(io, node_string(n))
+Base.show(io::IO, n::Node{T}) where T = print(io, "$(typeof(n))")
 
-node_string(n::Node) = unsafe_string(API.ts_node_string(n.ptr))
-node_symbol(n::Node) = API.ts_node_symbol(n.ptr)
-node_type(n::Node) = unsafe_string(API.ts_node_type(n.ptr))
+node_string(n::Node{T}) where T = unsafe_string(API.ts_node_string(n.ptr))
+node_symbol(n::Node{T}) where T = API.ts_node_symbol(n.ptr)
+node_type(n::Node{T}) where T = unsafe_string(API.ts_node_type(n.ptr))
+node_type(n::API.TSNode) = unsafe_string(API.ts_node_type(n))
 
-is_null(n::Node) = API.ts_node_is_null(n.ptr)
-is_named(n::Node) = API.ts_node_is_named(n.ptr)
-is_missing(n::Node) = API.ts_node_is_missing(n.ptr)
-is_extra(n::Node) = API.ts_node_is_extra(n.ptr)
-is_leaf(n::Node) = iszero(count_nodes(n))
+is_null(n::Node{T}) where T = API.ts_node_is_null(n.ptr)
+is_named(n::Node{T}) where T = API.ts_node_is_named(n.ptr)
+is_missing(n::Node{T}) where T = API.ts_node_is_missing(n.ptr)
+is_extra(n::Node{T}) where T = API.ts_node_is_extra(n.ptr)
+is_leaf(n::Node{T}) where T = iszero(count_nodes(n))
 
-count_nodes(n::Node) = Int(API.ts_node_child_count(n.ptr))
-count_named_nodes(n::Node) = Int(API.ts_node_named_child_count(n.ptr))
+count_nodes(n::Node{T}) where T = Int(API.ts_node_child_count(n.ptr))
+count_named_nodes(n::Node{T}) where T = Int(API.ts_node_named_child_count(n.ptr))
 
-child(n::Node, nth::Integer) = Node(API.ts_node_child(n.ptr, nth-1))
-named_child(n::Node, nth::Integer) = Node(API.ts_node_named_child(n.ptr, nth-1))
+child(n::Node{T}, nth::Integer) where T = Node(API.ts_node_child(n.ptr, nth-1))
+named_child(n::Node{T}, nth::Integer) where T = Node(API.ts_node_named_child(n.ptr, nth-1))
 
-children(n::Node) = (child(n, ind) for ind = 1:count_nodes(n))
-named_children(n::Node) = (named_child(n, ind) for ind = 1:count_named_nodes(n))
+children(n::Node{T}) where T = (child(n, ind) for ind = 1:count_nodes(n))
+AbstractTrees.children(n::Node{T}) where T = collect(children(n))
+named_children(n::Node{T}) where T = (named_child(n, ind) for ind = 1:count_named_nodes(n))
 
-function traverse(f, n::Node, iter=children)
+function traverse(f, n::Node{T}, iter=children) where T
     f(n, true)
     for child in iter(n)
         traverse(f, child, iter)
@@ -90,14 +93,14 @@ function traverse(f, n::Node, iter=children)
     return nothing
 end
 
-Base.:(==)(left::Node, right::Node) = API.ts_node_eq(left.ptr, right.ptr)
+Base.:(==)(left::Node{T}, right::Node{T}) where T = API.ts_node_eq(left.ptr, right.ptr)
 
-byte_range(n::Node) = (Int(API.ts_node_start_byte(n.ptr)) + 1, Int(API.ts_node_end_byte(n.ptr)))
+byte_range(n::Node{T}) where T = (Int(API.ts_node_start_byte(n.ptr)) + 1, Int(API.ts_node_end_byte(n.ptr)))
 
-slice(src::AbstractString, n::Node) = slice(src, byte_range(n))
+slice(src::AbstractString, n::Node{T}) where T = slice(src, byte_range(n))
 slice(src::AbstractString, (from, to)) = SubString(src, from, thisind(src, to))
 
-child(n::Node, name::AbstractString) = Node(API.ts_node_child_by_field_name(n.ptr, String(name), sizeof(name)))
+child(n::Node{T}, name::AbstractString) where T = Node(API.ts_node_child_by_field_name(n.ptr, String(name), sizeof(name)))
 
 #
 # Query
