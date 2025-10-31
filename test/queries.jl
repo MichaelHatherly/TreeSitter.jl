@@ -111,3 +111,12 @@ end
     @test out[4] == ("type", "void")
     @test out[5] == ("comment", "// comment")
 end
+
+@testset "Query Syntax Errors" begin
+    @testset "Invalid syntax" begin
+        # Malformed query syntax should throw QueryException
+        @test_throws TreeSitter.QueryException query```
+        (invalid_node_type_that_doesnt_exist) @x
+        ```julia
+    end
+end

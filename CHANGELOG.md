@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Streamline CI test matrix and add package caching [#26]
 - Update CEnum compatibility to 0.5 [#24]
 - Reorganize test suite into focused test files and improve test coverage [#31]
+- Improve test coverage for error handling paths [#32]
 
 ### Fixed
 
@@ -48,3 +49,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#29]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/29
 [#30]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/30
 [#31]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/31
+[#32]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/32
