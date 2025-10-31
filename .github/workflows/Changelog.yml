@@ -1,0 +1,38 @@
+name: Changelog
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate changelog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1'
+
+      - name: Install changelog dependencies
+        run: julia --project=.ci -e 'using Pkg; Pkg.instantiate()'
+
+      - name: Check CHANGELOG.md exists
+        run: test -f CHANGELOG.md
+
+      - name: Validate changelog links are up-to-date
+        run: |
+          julia --project=.ci .ci/changelog.jl
+          if ! git diff --exit-code CHANGELOG.md; then
+            echo "❌ Changelog links are out of date!"
+            echo "Please run: just changelog-links"
+            exit 1
+          fi
+          echo "✅ Changelog links are up-to-date"
