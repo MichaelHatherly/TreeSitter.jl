@@ -18,9 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade tree-sitter parsers to latest versions [#25]
 - Streamline CI test matrix and add package caching [#26]
 - Update CEnum compatibility to 0.5 [#24]
+- Reorganize test suite into focused test files and improve test coverage [#31]
 
 ### Fixed
 
+- Fix segfaults by maintaining tree references in Node objects [#31]
 - Fix outdated badges and codecov upload in documentation [#27]
 
 ## [v0.1.0] - 2020-07-15
@@ -45,3 +47,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#28]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/28
 [#29]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/29
 [#30]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/30
+[#31]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/31

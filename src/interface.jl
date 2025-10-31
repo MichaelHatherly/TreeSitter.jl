@@ -49,7 +49,7 @@ mutable struct Tree
 end
 Base.show(io::IO, t::Tree) = show(io, root(t))
 
-root(t::Tree) = Node(API.ts_tree_root_node(t.ptr))
+root(t::Tree) = Node(API.ts_tree_root_node(t.ptr), t)
 
 traverse(f, tree::Tree, iter = children) = traverse(f, root(tree), iter)
 
@@ -59,13 +59,18 @@ traverse(f, tree::Tree, iter = children) = traverse(f, root(tree), iter)
 
 struct Node
     ptr::API.TSNode
-    Node(ptr::API.TSNode) = new(ptr)
+    tree::Tree
+    Node(ptr::API.TSNode, tree::Tree) = new(ptr, tree)
 end
+
+ensure_not_null(n::Node) =
+    is_null(n) ? throw(ArgumentError("TreeSitter: node is null")) : nothing
+
 Base.show(io::IO, n::Node) = print(io, node_string(n))
 
-node_string(n::Node) = unsafe_string(API.ts_node_string(n.ptr))
-node_symbol(n::Node) = API.ts_node_symbol(n.ptr)
-node_type(n::Node) = unsafe_string(API.ts_node_type(n.ptr))
+node_string(n::Node) = (ensure_not_null(n); unsafe_string(API.ts_node_string(n.ptr)))
+node_symbol(n::Node) = (ensure_not_null(n); API.ts_node_symbol(n.ptr))
+node_type(n::Node) = (ensure_not_null(n); unsafe_string(API.ts_node_type(n.ptr)))
 
 is_null(n::Node) = API.ts_node_is_null(n.ptr)
 is_named(n::Node) = API.ts_node_is_named(n.ptr)
@@ -76,8 +81,8 @@ is_leaf(n::Node) = iszero(count_nodes(n))
 count_nodes(n::Node) = Int(API.ts_node_child_count(n.ptr))
 count_named_nodes(n::Node) = Int(API.ts_node_named_child_count(n.ptr))
 
-child(n::Node, nth::Integer) = Node(API.ts_node_child(n.ptr, nth-1))
-named_child(n::Node, nth::Integer) = Node(API.ts_node_named_child(n.ptr, nth-1))
+child(n::Node, nth::Integer) = Node(API.ts_node_child(n.ptr, nth-1), n.tree)
+named_child(n::Node, nth::Integer) = Node(API.ts_node_named_child(n.ptr, nth-1), n.tree)
 
 children(n::Node) = (child(n, ind) for ind = 1:count_nodes(n))
 named_children(n::Node) = (named_child(n, ind) for ind = 1:count_named_nodes(n))
@@ -99,8 +104,29 @@ byte_range(n::Node) =
 slice(src::AbstractString, n::Node) = slice(src, byte_range(n))
 slice(src::AbstractString, (from, to)) = SubString(src, from, thisind(src, to))
 
-child(n::Node, name::AbstractString) =
-    Node(API.ts_node_child_by_field_name(n.ptr, String(name), sizeof(name)))
+function child(n::Node, name::AbstractString)
+    result =
+        Node(API.ts_node_child_by_field_name(n.ptr, String(name), sizeof(name)), n.tree)
+    if is_null(result)
+        throw(
+            ArgumentError(
+                "TreeSitter: field '$name' not found on node of type '$(node_type(n))'",
+            ),
+        )
+    end
+    return result
+end
+
+# Navigation
+parent(n::Node) = Node(API.ts_node_parent(n.ptr), n.tree)
+next_sibling(n::Node) = Node(API.ts_node_next_sibling(n.ptr), n.tree)
+prev_sibling(n::Node) = Node(API.ts_node_prev_sibling(n.ptr), n.tree)
+next_named_sibling(n::Node) = Node(API.ts_node_next_named_sibling(n.ptr), n.tree)
+prev_named_sibling(n::Node) = Node(API.ts_node_prev_named_sibling(n.ptr), n.tree)
+
+# Position info
+start_point(n::Node) = API.ts_node_start_point(n.ptr)
+end_point(n::Node) = API.ts_node_end_point(n.ptr)
 
 #
 # Query
@@ -164,18 +190,20 @@ string_count(q::Query) = Int(API.ts_query_string_count(q.ptr))
 
 mutable struct QueryCursor
     ptr::Ptr{API.TSQueryCursor}
+    tree::Union{Tree,Nothing}
 
     function QueryCursor()
         ptr = API.ts_query_cursor_new()
-        cursor = new(ptr)
+        cursor = new(ptr, nothing)
         finalizer(c -> API.ts_query_cursor_delete(c.ptr), cursor)
         return cursor
     end
 end
 Base.show(io::IO, ::QueryCursor) = print(io, "QueryCursor()")
 
-exec(c::QueryCursor, q::Query, n::Node) = (API.ts_query_cursor_exec(c.ptr, q.ptr, n.ptr); c)
-exec(c::QueryCursor, q::Query, t::Tree) = (exec(c, q, root(t)); c)
+exec(c::QueryCursor, q::Query, n::Node) =
+    (c.tree = n.tree; API.ts_query_cursor_exec(c.ptr, q.ptr, n.ptr); c)
+exec(c::QueryCursor, q::Query, t::Tree) = (c.tree = t; exec(c, q, root(t)); c)
 
 Base.eachmatch(query::Query, tree::Tree) = exec(QueryCursor(), query, tree)
 
@@ -186,6 +214,7 @@ end
 
 mutable struct QueryMatch
     obj::API.TSQueryMatch
+    tree::Tree
 end
 
 capture_count(qm::QueryMatch) = Int(qm.obj.capture_count)
@@ -193,7 +222,7 @@ capture_count(qm::QueryMatch) = Int(qm.obj.capture_count)
 function next_match(cursor::QueryCursor)
     match_ref = Ref{API.TSQueryMatch}()
     success = API.ts_query_cursor_next_match(cursor.ptr, match_ref)
-    return success ? QueryMatch(match_ref[]) : nothing
+    return success ? QueryMatch(match_ref[], cursor.tree) : nothing
 end
 
 struct QueryCapture
@@ -204,7 +233,7 @@ end
 function captures(qm::QueryMatch)
     fn = function (ith)
         ptr = unsafe_load(qm.obj.captures, ith)
-        node = Node(ptr.node)
+        node = Node(ptr.node, qm.tree)
         return QueryCapture(node, ptr.index)
     end
     return (fn(i) for i = 1:capture_count(qm))
@@ -229,7 +258,7 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                 for address = 1:capture_count(m)
                     capture = unsafe_load(m.obj.captures, address)
                     if capture.index == step.value_id
-                        node = Node(capture.node)
+                        node = Node(capture.node, m.tree)
                         str = slice(source, node)
                         push!(args, str)
                         break
