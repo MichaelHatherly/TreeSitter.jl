@@ -3,8 +3,8 @@
 *Julia bindings for [tree-sitter](https://github.com/tree-sitter/tree-sitter) &mdash;
 "An incremental parsing system for programming tools."*
 
-[![Build Status](https://travis-ci.org/MichaelHatherly/TreeSitter.jl.svg?branch=1.4)](https://travis-ci.org/MichaelHatherly/TreeSitter.jl)
-[![Codecov](https://codecov.io/gh/MichaelHatherly/TreeSitter.jl/branch/1.4/graph/badge.svg)](https://codecov.io/gh/MichaelHatherly/TreeSitter.jl)
+[![CI](https://github.com/MichaelHatherly/TreeSitter.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/MichaelHatherly/TreeSitter.jl/actions/workflows/CI.yml)
+[![Codecov](https://codecov.io/gh/MichaelHatherly/TreeSitter.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/MichaelHatherly/TreeSitter.jl)
 
 ## Installation
 
