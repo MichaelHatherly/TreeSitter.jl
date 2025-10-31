@@ -8,10 +8,10 @@
 
 ## Installation
 
-This package is not registered yet and so can be installed using:
+This package is registered in the Julia General registry and can be installed using:
 
 ```
-pkg> add https://github.com/MichaelHatherly/TreeSitter.jl
+pkg> add TreeSitter
 ```
 
 ## Usage
@@ -28,22 +28,27 @@ julia> ast = parse(c, "int x;")
 julia> json = Parser(:json)
 Parser(Language(:json))
 
-julia> ast = parse(json, "{1: [2]}")
-(document (object (pair key: (number) value: (array (number)))))
+julia> ast = parse(json, "{\"key\": [1, 2]}")
+(document (object (pair key: (string (string_content)) value: (array (number) (number)))))
 
 julia> traverse(ast) do node, enter
            if enter
                @show node
            end
        end
-node = (document (object (pair key: (number) value: (array (number)))))
-node = (object (pair key: (number) value: (array (number))))
+node = (document (object (pair key: (string (string_content)) value: (array (number) (number)))))
+node = (object (pair key: (string (string_content)) value: (array (number) (number))))
 node = ("{")
-node = (pair key: (number) value: (array (number)))
-node = (number)
+node = (pair key: (string (string_content)) value: (array (number) (number)))
+node = (string (string_content))
+node = ("\"")
+node = (string_content)
+node = ("\"")
 node = (":")
-node = (array (number))
+node = (array (number) (number))
 node = ("[")
+node = (number)
+node = (",")
 node = (number)
 node = ("]")
 node = ("}")

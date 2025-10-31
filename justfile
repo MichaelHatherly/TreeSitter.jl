@@ -7,7 +7,7 @@ changelog-install:
     julia --project=.ci -e 'using Pkg; Pkg.instantiate()'
 
 # Update changelog link references
-changelog-links:
+changelog:
     julia --project=.ci .ci/changelog.jl
 
 # Format code with JuliaFormatter
