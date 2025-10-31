@@ -114,6 +114,18 @@ end
         params = TreeSitter.child(func_def, "parametere")
         @test TreeSitter.node_type(params) == "parameter_list"
     end
+
+    @testset "Invalid field name" begin
+        p = Parser(:c)
+        tree = parse(p, "int main(void) { return 0; }")
+        root_node = TreeSitter.root(tree)
+
+        func_def = TreeSitter.child(root_node, 1)
+        @test TreeSitter.node_type(func_def) == "function_definition"
+
+        # Try to access a non-existent field
+        @test_throws ArgumentError TreeSitter.child(func_def, "nonexistent_field")
+    end
 end
 
 @testset "Node Equality" begin
