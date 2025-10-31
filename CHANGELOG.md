@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Add code formatting enforcement to CI and format codebase [#29]
 - Upgrade tree-sitter parsers to latest versions [#25]
 - Streamline CI test matrix and add package caching [#26]
 - Update CEnum compatibility to 0.5 [#24]
@@ -41,3 +42,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#26]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/26
 [#27]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/27
 [#28]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/28
+[#29]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/29

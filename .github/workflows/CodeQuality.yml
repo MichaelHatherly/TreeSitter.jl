@@ -1,4 +1,4 @@
-name: Changelog
+name: Code Quality
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate changelog
+    name: Validate code quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
         with:
           version: '1'
 
-      - name: Install changelog dependencies
+      - name: Install dependencies
         run: julia --project=.ci -e 'using Pkg; Pkg.instantiate()'
 
       - name: Check CHANGELOG.md exists
@@ -36,3 +36,13 @@ jobs:
             exit 1
           fi
           echo "✅ Changelog links are up-to-date"
+
+      - name: Check code formatting
+        run: |
+          julia --project=.ci -e 'using JuliaFormatter; format(".")'
+          if ! git diff --exit-code; then
+            echo "❌ Code is not formatted!"
+            echo "Please run: just format"
+            exit 1
+          fi
+          echo "✅ Code is properly formatted"
