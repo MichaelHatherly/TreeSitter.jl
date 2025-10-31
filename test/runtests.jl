@@ -42,7 +42,7 @@ using TreeSitter, Test
         @testset "bash" begin
             p = Parser(:bash)
             tree = parse(p, "echo {1..10}")
-            @test string(tree) == "(program (command name: (command_name (word)) argument: (concatenation (word))))"
+            @test string(tree) == "(program (command name: (command_name (word)) argument: (brace_expression (number) (number))))"
         end
         @testset "c" begin
             p = Parser(:c)
@@ -56,18 +56,18 @@ using TreeSitter, Test
         end
         @testset "go" begin
             p = Parser(:go)
-            tree = parse(p, "var x := []int{1}")
-            @test string(tree) == "(source_file (var_declaration (var_spec name: (identifier) (ERROR) type: (slice_type element: (type_identifier)))) (ERROR (int_literal)))"
+            tree = parse(p, "var x = []int{1}")
+            @test string(tree) == "(source_file (var_declaration (var_spec name: (identifier) value: (expression_list (composite_literal type: (slice_type element: (type_identifier)) body: (literal_value (literal_element (int_literal))))))))"
         end
         @testset "html" begin
             p = Parser(:html)
             tree = parse(p, "<h1>header</h1>")
-            @test string(tree) == "(fragment (element (start_tag (tag_name)) (text) (end_tag (tag_name))))"
+            @test string(tree) == "(document (element (start_tag (tag_name)) (text) (end_tag (tag_name))))"
         end
         @testset "java" begin
             p = Parser(:java)
             tree = parse(p, "public static void f() {}")
-            @test string(tree) == "(program (local_variable_declaration_statement (local_variable_declaration (modifiers) type: (void_type) declarator: (variable_declarator name: (identifier))) (MISSING \";\")) (ERROR (formal_parameters)) (block))"
+            @test string(tree) == "(program (method_declaration (modifiers) type: (void_type) name: (identifier) parameters: (formal_parameters) body: (block)))"
         end
         @testset "javascript" begin
             p = Parser(:javascript)
@@ -76,8 +76,8 @@ using TreeSitter, Test
         end
         @testset "json" begin
             p = Parser(:json)
-            tree = parse(p, "{1: 1}")
-            @test string(tree) == "(document (object (pair key: (number) value: (number))))"
+            tree = parse(p, "{\"key\": 1}")
+            @test string(tree) == "(document (object (pair key: (string (string_content)) value: (number))))"
         end
         @testset "julia" begin
             p = Parser(:julia)
@@ -87,7 +87,7 @@ using TreeSitter, Test
         @testset "php" begin
             p = Parser(:php)
             tree = parse(p, "<?php\n\$x = 1;\n?>")
-            @test string(tree) == "(program (php_tag) (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))) (text_interpolation))"
+            @test string(tree) == "(program (php_tag) (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))) (text_interpolation (php_end_tag)))"
         end
         @testset "python" begin
             p = Parser(:python)
@@ -97,7 +97,7 @@ using TreeSitter, Test
         @testset "ruby" begin
             p = Parser(:ruby)
             tree = parse(p, "\"Hello\".method(:class).class")
-            @test string(tree) == "(program (call receiver: (method_call method: (call receiver: (string) method: (identifier)) arguments: (argument_list (symbol))) method: (identifier)))"
+            @test string(tree) == "(program (call receiver: (call receiver: (string (string_content)) method: (identifier) arguments: (argument_list (simple_symbol))) method: (identifier)))"
         end
         @testset "rust" begin
             p = Parser(:rust)
