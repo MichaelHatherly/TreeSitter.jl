@@ -151,7 +151,7 @@ struct TSInputEdit
 end
 
 struct TSNode
-    context::NTuple{4, UInt32}
+    context::NTuple{4,UInt32}
     id::Ptr{Cvoid}
     tree::Ptr{TSTree}
 end
@@ -159,7 +159,7 @@ end
 struct TSTreeCursor
     tree::Ptr{Cvoid}
     id::Ptr{Cvoid}
-    context::NTuple{2, UInt32}
+    context::NTuple{2,UInt32}
 end
 
 struct TSQueryCapture
@@ -228,7 +228,13 @@ function ts_parser_delete(self)
 end
 
 function ts_parser_set_language(self, lang)
-    ccall((:ts_parser_set_language, libtreesitter), Cint, (Ptr{TSParser}, Ptr{TSLanguage}), self, lang)
+    ccall(
+        (:ts_parser_set_language, libtreesitter),
+        Cint,
+        (Ptr{TSParser}, Ptr{TSLanguage}),
+        self,
+        lang,
+    )
 end
 
 function ts_parser_language(self)
@@ -240,19 +246,49 @@ function ts_parser_set_included_ranges()
 end
 
 function ts_parser_included_ranges(self, length)
-    ccall((:ts_parser_included_ranges, libtreesitter), Ptr{TSRange}, (Ptr{TSParser}, Ptr{UInt32}), self, length)
+    ccall(
+        (:ts_parser_included_ranges, libtreesitter),
+        Ptr{TSRange},
+        (Ptr{TSParser}, Ptr{UInt32}),
+        self,
+        length,
+    )
 end
 
 function ts_parser_parse(self, old_tree, input)
-    ccall((:ts_parser_parse, libtreesitter), Ptr{TSTree}, (Ptr{TSParser}, Ptr{TSTree}, TSInput), self, old_tree, input)
+    ccall(
+        (:ts_parser_parse, libtreesitter),
+        Ptr{TSTree},
+        (Ptr{TSParser}, Ptr{TSTree}, TSInput),
+        self,
+        old_tree,
+        input,
+    )
 end
 
 function ts_parser_parse_string(self, old_tree, string, length)
-    ccall((:ts_parser_parse_string, libtreesitter), Ptr{TSTree}, (Ptr{TSParser}, Ptr{TSTree}, Cstring, UInt32), self, old_tree, string, length)
+    ccall(
+        (:ts_parser_parse_string, libtreesitter),
+        Ptr{TSTree},
+        (Ptr{TSParser}, Ptr{TSTree}, Cstring, UInt32),
+        self,
+        old_tree,
+        string,
+        length,
+    )
 end
 
 function ts_parser_parse_string_encoding(self, old_tree, string, length, encoding)
-    ccall((:ts_parser_parse_string_encoding, libtreesitter), Ptr{TSTree}, (Ptr{TSParser}, Ptr{TSTree}, Cstring, UInt32, TSInputEncoding), self, old_tree, string, length, encoding)
+    ccall(
+        (:ts_parser_parse_string_encoding, libtreesitter),
+        Ptr{TSTree},
+        (Ptr{TSParser}, Ptr{TSTree}, Cstring, UInt32, TSInputEncoding),
+        self,
+        old_tree,
+        string,
+        length,
+        encoding,
+    )
 end
 
 function ts_parser_reset(self)
@@ -260,7 +296,13 @@ function ts_parser_reset(self)
 end
 
 function ts_parser_set_timeout_micros(self, timeout)
-    ccall((:ts_parser_set_timeout_micros, libtreesitter), Cvoid, (Ptr{TSParser}, UInt64), self, timeout)
+    ccall(
+        (:ts_parser_set_timeout_micros, libtreesitter),
+        Cvoid,
+        (Ptr{TSParser}, UInt64),
+        self,
+        timeout,
+    )
 end
 
 function ts_parser_timeout_micros(self)
@@ -268,7 +310,13 @@ function ts_parser_timeout_micros(self)
 end
 
 function ts_parser_set_cancellation_flag(self, flag)
-    ccall((:ts_parser_set_cancellation_flag, libtreesitter), Cvoid, (Ptr{TSParser}, Ptr{Cint}), self, flag)
+    ccall(
+        (:ts_parser_set_cancellation_flag, libtreesitter),
+        Cvoid,
+        (Ptr{TSParser}, Ptr{Cint}),
+        self,
+        flag,
+    )
 end
 
 function ts_parser_cancellation_flag()
@@ -276,7 +324,13 @@ function ts_parser_cancellation_flag()
 end
 
 function ts_parser_set_logger(self, logger)
-    ccall((:ts_parser_set_logger, libtreesitter), Cvoid, (Ptr{TSParser}, TSLogger), self, logger)
+    ccall(
+        (:ts_parser_set_logger, libtreesitter),
+        Cvoid,
+        (Ptr{TSParser}, TSLogger),
+        self,
+        logger,
+    )
 end
 
 function ts_parser_logger(self)
@@ -284,7 +338,13 @@ function ts_parser_logger(self)
 end
 
 function ts_parser_print_dot_graphs(self, file)
-    ccall((:ts_parser_print_dot_graphs, libtreesitter), Cvoid, (Ptr{TSParser}, Cint), self, file)
+    ccall(
+        (:ts_parser_print_dot_graphs, libtreesitter),
+        Cvoid,
+        (Ptr{TSParser}, Cint),
+        self,
+        file,
+    )
 end
 
 function ts_tree_copy(self)
@@ -304,11 +364,24 @@ function ts_tree_language(arg1)
 end
 
 function ts_tree_edit(self, edit)
-    ccall((:ts_tree_edit, libtreesitter), Cvoid, (Ptr{TSTree}, Ptr{TSInputEdit}), self, edit)
+    ccall(
+        (:ts_tree_edit, libtreesitter),
+        Cvoid,
+        (Ptr{TSTree}, Ptr{TSInputEdit}),
+        self,
+        edit,
+    )
 end
 
 function ts_tree_get_changed_ranges(old_tree, new_tree, length)
-    ccall((:ts_tree_get_changed_ranges, libtreesitter), Ptr{TSRange}, (Ptr{TSTree}, Ptr{TSTree}, Ptr{UInt32}), old_tree, new_tree, length)
+    ccall(
+        (:ts_tree_get_changed_ranges, libtreesitter),
+        Ptr{TSRange},
+        (Ptr{TSTree}, Ptr{TSTree}, Ptr{UInt32}),
+        old_tree,
+        new_tree,
+        length,
+    )
 end
 
 # TODO: handle FILE.
@@ -389,11 +462,24 @@ function ts_node_named_child_count(self)
 end
 
 function ts_node_child_by_field_name(self, field_name, field_name_length)
-    ccall((:ts_node_child_by_field_name, libtreesitter), TSNode, (TSNode, Cstring, UInt32), self, field_name, field_name_length)
+    ccall(
+        (:ts_node_child_by_field_name, libtreesitter),
+        TSNode,
+        (TSNode, Cstring, UInt32),
+        self,
+        field_name,
+        field_name_length,
+    )
 end
 
 function ts_node_child_by_field_id(self, field_id)
-    ccall((:ts_node_child_by_field_id, libtreesitter), TSNode, (TSNode, TSFieldId), self, field_id)
+    ccall(
+        (:ts_node_child_by_field_id, libtreesitter),
+        TSNode,
+        (TSNode, TSFieldId),
+        self,
+        field_id,
+    )
 end
 
 function ts_node_next_sibling(self)
@@ -413,31 +499,77 @@ function ts_node_prev_named_sibling(self)
 end
 
 function ts_node_first_child_for_byte(self, byte)
-    ccall((:ts_node_first_child_for_byte, libtreesitter), TSNode, (TSNode, UInt32), self, byte)
+    ccall(
+        (:ts_node_first_child_for_byte, libtreesitter),
+        TSNode,
+        (TSNode, UInt32),
+        self,
+        byte,
+    )
 end
 
 function ts_node_first_named_child_for_byte(self, byte)
-    ccall((:ts_node_first_named_child_for_byte, libtreesitter), TSNode, (TSNode, UInt32), self, byte)
+    ccall(
+        (:ts_node_first_named_child_for_byte, libtreesitter),
+        TSNode,
+        (TSNode, UInt32),
+        self,
+        byte,
+    )
 end
 
 function ts_node_descendant_for_byte_range(self, byte_from, byte_to)
-    ccall((:ts_node_descendant_for_byte_range, libtreesitter), TSNode, (TSNode, UInt32, UInt32), self, byte_from, byte_to)
+    ccall(
+        (:ts_node_descendant_for_byte_range, libtreesitter),
+        TSNode,
+        (TSNode, UInt32, UInt32),
+        self,
+        byte_from,
+        byte_to,
+    )
 end
 
 function ts_node_descendant_for_point_range(self, point_from, point_to)
-    ccall((:ts_node_descendant_for_point_range, libtreesitter), TSNode, (TSNode, TSPoint, TSPoint), self, point_from, point_to)
+    ccall(
+        (:ts_node_descendant_for_point_range, libtreesitter),
+        TSNode,
+        (TSNode, TSPoint, TSPoint),
+        self,
+        point_from,
+        point_to,
+    )
 end
 
 function ts_node_named_descendant_for_byte_range(self, byte_from, byte_to)
-    ccall((:ts_node_named_descendant_for_byte_range, libtreesitter), TSNode, (TSNode, UInt32, UInt32), self, byte_from, byte_to)
+    ccall(
+        (:ts_node_named_descendant_for_byte_range, libtreesitter),
+        TSNode,
+        (TSNode, UInt32, UInt32),
+        self,
+        byte_from,
+        byte_to,
+    )
 end
 
 function ts_node_named_descendant_for_point_range(self, point_from, point_to)
-    ccall((:ts_node_named_descendant_for_point_range, libtreesitter), TSNode, (TSNode, TSPoint, TSPoint), self, point_from, point_to)
+    ccall(
+        (:ts_node_named_descendant_for_point_range, libtreesitter),
+        TSNode,
+        (TSNode, TSPoint, TSPoint),
+        self,
+        point_from,
+        point_to,
+    )
 end
 
 function ts_node_edit(arg1, arg2)
-    ccall((:ts_node_edit, libtreesitter), Cvoid, (Ptr{TSNode}, Ptr{TSInputEdit}), arg1, arg2)
+    ccall(
+        (:ts_node_edit, libtreesitter),
+        Cvoid,
+        (Ptr{TSNode}, Ptr{TSInputEdit}),
+        arg1,
+        arg2,
+    )
 end
 
 function ts_node_eq(left, right)
@@ -453,19 +585,40 @@ function ts_tree_cursor_delete(cursor)
 end
 
 function ts_tree_cursor_reset(cursor, node)
-    ccall((:ts_tree_cursor_reset, libtreesitter), Cvoid, (Ptr{TSTreeCursor}, TSNode), cursor, node)
+    ccall(
+        (:ts_tree_cursor_reset, libtreesitter),
+        Cvoid,
+        (Ptr{TSTreeCursor}, TSNode),
+        cursor,
+        node,
+    )
 end
 
 function ts_tree_cursor_current_node(cursor)
-    ccall((:ts_tree_cursor_current_node, libtreesitter), TSNode, (Ptr{TSTreeCursor},), cursor)
+    ccall(
+        (:ts_tree_cursor_current_node, libtreesitter),
+        TSNode,
+        (Ptr{TSTreeCursor},),
+        cursor,
+    )
 end
 
 function ts_tree_cursor_current_field_name(cursor)
-    ccall((:ts_tree_cursor_current_field_name, libtreesitter), Cstring, (Ptr{TSTreeCursor},), cursor)
+    ccall(
+        (:ts_tree_cursor_current_field_name, libtreesitter),
+        Cstring,
+        (Ptr{TSTreeCursor},),
+        cursor,
+    )
 end
 
 function ts_tree_cursor_current_field_id(cursor)
-    ccall((:ts_tree_cursor_current_field_id, libtreesitter), TSFieldId, (Ptr{TSTreeCursor},), cursor)
+    ccall(
+        (:ts_tree_cursor_current_field_id, libtreesitter),
+        TSFieldId,
+        (Ptr{TSTreeCursor},),
+        cursor,
+    )
 end
 
 function ts_tree_cursor_goto_parent(cursor)
@@ -473,15 +626,31 @@ function ts_tree_cursor_goto_parent(cursor)
 end
 
 function ts_tree_cursor_goto_next_sibling(cursor)
-    ccall((:ts_tree_cursor_goto_next_sibling, libtreesitter), Cint, (Ptr{TSTreeCursor},), cursor)
+    ccall(
+        (:ts_tree_cursor_goto_next_sibling, libtreesitter),
+        Cint,
+        (Ptr{TSTreeCursor},),
+        cursor,
+    )
 end
 
 function ts_tree_cursor_goto_first_child(cursor)
-    ccall((:ts_tree_cursor_goto_first_child, libtreesitter), Cint, (Ptr{TSTreeCursor},), cursor)
+    ccall(
+        (:ts_tree_cursor_goto_first_child, libtreesitter),
+        Cint,
+        (Ptr{TSTreeCursor},),
+        cursor,
+    )
 end
 
 function ts_tree_cursor_goto_first_child_for_byte(cursor, byte)
-    ccall((:ts_tree_cursor_goto_first_child_for_byte, libtreesitter), Int64, (Ptr{TSTreeCursor}, UInt32), cursor, byte)
+    ccall(
+        (:ts_tree_cursor_goto_first_child_for_byte, libtreesitter),
+        Int64,
+        (Ptr{TSTreeCursor}, UInt32),
+        cursor,
+        byte,
+    )
 end
 
 function ts_tree_cursor_copy(cursor)
@@ -489,7 +658,16 @@ function ts_tree_cursor_copy(cursor)
 end
 
 function ts_query_new(language, source, source_len, error_offset, error_type)
-    ccall((:ts_query_new, libtreesitter), Ptr{TSQuery}, (Ptr{TSLanguage}, Cstring, UInt32, Ptr{UInt32}, Ptr{TSQueryError}), language, source, source_len, error_offset, error_type)
+    ccall(
+        (:ts_query_new, libtreesitter),
+        Ptr{TSQuery},
+        (Ptr{TSLanguage}, Cstring, UInt32, Ptr{UInt32}, Ptr{TSQueryError}),
+        language,
+        source,
+        source_len,
+        error_offset,
+        error_type,
+    )
 end
 
 function ts_query_delete(query)
@@ -509,27 +687,67 @@ function ts_query_string_count(query)
 end
 
 function ts_query_start_byte_for_pattern(query, pattern)
-    ccall((:ts_query_start_byte_for_pattern, libtreesitter), UInt32, (Ptr{TSQuery}, UInt32), query, pattern)
+    ccall(
+        (:ts_query_start_byte_for_pattern, libtreesitter),
+        UInt32,
+        (Ptr{TSQuery}, UInt32),
+        query,
+        pattern,
+    )
 end
 
 function ts_query_predicates_for_pattern(query, pattern_index, length)
-    ccall((:ts_query_predicates_for_pattern, libtreesitter), Ptr{TSQueryPredicateStep}, (Ptr{TSQuery}, UInt32, Ptr{UInt32}), query, pattern_index, length)
+    ccall(
+        (:ts_query_predicates_for_pattern, libtreesitter),
+        Ptr{TSQueryPredicateStep},
+        (Ptr{TSQuery}, UInt32, Ptr{UInt32}),
+        query,
+        pattern_index,
+        length,
+    )
 end
 
 function ts_query_capture_name_for_id(query, id, length)
-    ccall((:ts_query_capture_name_for_id, libtreesitter), Cstring, (Ptr{TSQuery}, UInt32, Ptr{UInt32}), query, id, length)
+    ccall(
+        (:ts_query_capture_name_for_id, libtreesitter),
+        Cstring,
+        (Ptr{TSQuery}, UInt32, Ptr{UInt32}),
+        query,
+        id,
+        length,
+    )
 end
 
 function ts_query_string_value_for_id(query, id, length)
-    ccall((:ts_query_string_value_for_id, libtreesitter), Cstring, (Ptr{TSQuery}, UInt32, Ptr{UInt32}), query, id, length)
+    ccall(
+        (:ts_query_string_value_for_id, libtreesitter),
+        Cstring,
+        (Ptr{TSQuery}, UInt32, Ptr{UInt32}),
+        query,
+        id,
+        length,
+    )
 end
 
 function ts_query_disable_capture(arg1, arg2, arg3)
-    ccall((:ts_query_disable_capture, libtreesitter), Cvoid, (Ptr{TSQuery}, Cstring, UInt32), arg1, arg2, arg3)
+    ccall(
+        (:ts_query_disable_capture, libtreesitter),
+        Cvoid,
+        (Ptr{TSQuery}, Cstring, UInt32),
+        arg1,
+        arg2,
+        arg3,
+    )
 end
 
 function ts_query_disable_pattern(arg1, arg2)
-    ccall((:ts_query_disable_pattern, libtreesitter), Cvoid, (Ptr{TSQuery}, UInt32), arg1, arg2)
+    ccall(
+        (:ts_query_disable_pattern, libtreesitter),
+        Cvoid,
+        (Ptr{TSQuery}, UInt32),
+        arg1,
+        arg2,
+    )
 end
 
 function ts_query_cursor_new()
@@ -541,23 +759,56 @@ function ts_query_cursor_delete(cursor)
 end
 
 function ts_query_cursor_exec(cursor, query, node)
-    ccall((:ts_query_cursor_exec, libtreesitter), Cvoid, (Ptr{TSQueryCursor}, Ptr{TSQuery}, TSNode), cursor, query, node)
+    ccall(
+        (:ts_query_cursor_exec, libtreesitter),
+        Cvoid,
+        (Ptr{TSQueryCursor}, Ptr{TSQuery}, TSNode),
+        cursor,
+        query,
+        node,
+    )
 end
 
 function ts_query_cursor_set_byte_range(arg1, arg2, arg3)
-    ccall((:ts_query_cursor_set_byte_range, libtreesitter), Cvoid, (Ptr{TSQueryCursor}, UInt32, UInt32), arg1, arg2, arg3)
+    ccall(
+        (:ts_query_cursor_set_byte_range, libtreesitter),
+        Cvoid,
+        (Ptr{TSQueryCursor}, UInt32, UInt32),
+        arg1,
+        arg2,
+        arg3,
+    )
 end
 
 function ts_query_cursor_set_point_range(arg1, arg2, arg3)
-    ccall((:ts_query_cursor_set_point_range, libtreesitter), Cvoid, (Ptr{TSQueryCursor}, TSPoint, TSPoint), arg1, arg2, arg3)
+    ccall(
+        (:ts_query_cursor_set_point_range, libtreesitter),
+        Cvoid,
+        (Ptr{TSQueryCursor}, TSPoint, TSPoint),
+        arg1,
+        arg2,
+        arg3,
+    )
 end
 
 function ts_query_cursor_next_match(cursor, match)
-    ccall((:ts_query_cursor_next_match, libtreesitter), Bool, (Ptr{TSQueryCursor}, Ptr{TSQueryMatch},), cursor, match)
+    ccall(
+        (:ts_query_cursor_next_match, libtreesitter),
+        Bool,
+        (Ptr{TSQueryCursor}, Ptr{TSQueryMatch}),
+        cursor,
+        match,
+    )
 end
 
 function ts_query_cursor_remove_match(arg1, id)
-    ccall((:ts_query_cursor_remove_match, libtreesitter), Cvoid, (Ptr{TSQueryCursor}, UInt32), arg1, id)
+    ccall(
+        (:ts_query_cursor_remove_match, libtreesitter),
+        Cvoid,
+        (Ptr{TSQueryCursor}, UInt32),
+        arg1,
+        id,
+    )
 end
 
 function ts_query_cursor_next_capture()
@@ -569,11 +820,25 @@ function ts_language_symbol_count(lang)
 end
 
 function ts_language_symbol_name(lang, sym)
-    ccall((:ts_language_symbol_name, libtreesitter), Cstring, (Ptr{TSLanguage}, TSSymbol), lang, sym)
+    ccall(
+        (:ts_language_symbol_name, libtreesitter),
+        Cstring,
+        (Ptr{TSLanguage}, TSSymbol),
+        lang,
+        sym,
+    )
 end
 
 function ts_language_symbol_for_name(lang, string, length, is_named)
-    ccall((:ts_language_symbol_for_name, libtreesitter), TSSymbol, (Ptr{TSLanguage}, Cstring, UInt32, Cint), lang, string, length, is_named)
+    ccall(
+        (:ts_language_symbol_for_name, libtreesitter),
+        TSSymbol,
+        (Ptr{TSLanguage}, Cstring, UInt32, Cint),
+        lang,
+        string,
+        length,
+        is_named,
+    )
 end
 
 function ts_language_field_count(lang)
@@ -581,21 +846,39 @@ function ts_language_field_count(lang)
 end
 
 function ts_language_field_name_for_id(lang, field_id)
-    ccall((:ts_language_field_name_for_id, libtreesitter), Cstring, (Ptr{TSLanguage}, TSFieldId), lang, field_id)
+    ccall(
+        (:ts_language_field_name_for_id, libtreesitter),
+        Cstring,
+        (Ptr{TSLanguage}, TSFieldId),
+        lang,
+        field_id,
+    )
 end
 
 function ts_language_field_id_for_name(lang, name, name_length)
-    ccall((:ts_language_field_id_for_name, libtreesitter), TSFieldId, (Ptr{TSLanguage}, Cstring, UInt32), lang, name, name_length)
+    ccall(
+        (:ts_language_field_id_for_name, libtreesitter),
+        TSFieldId,
+        (Ptr{TSLanguage}, Cstring, UInt32),
+        lang,
+        name,
+        name_length,
+    )
 end
 
 function ts_language_symbol_type(lang, sym)
-    ccall((:ts_language_symbol_type, libtreesitter), TSSymbolType, (Ptr{TSLanguage}, TSSymbol), lang, sym)
+    ccall(
+        (:ts_language_symbol_type, libtreesitter),
+        TSSymbolType,
+        (Ptr{TSLanguage}, TSSymbol),
+        lang,
+        sym,
+    )
 end
 
 # Language
 
-import
-    tree_sitter_bash_jll,
+import tree_sitter_bash_jll,
     tree_sitter_c_jll,
     tree_sitter_cpp_jll,
     tree_sitter_go_jll,
@@ -612,7 +895,8 @@ import
 
 const LANGUAGE_REGEX = r"^tree_sitter_(\w+)_jll$"
 const LANGUAGES = Dict{Symbol,Tuple{Function,String}}()
-for lang in filter(s -> occursin(LANGUAGE_REGEX, string(s)), names(@__MODULE__; imported=true))
+for lang in
+    filter(s -> occursin(LANGUAGE_REGEX, string(s)), names(@__MODULE__; imported = true))
     name = match(LANGUAGE_REGEX, string(lang))[1]
     func = Expr(:quote, Symbol(:tree_sitter_, name))
     lib = @eval $(Expr(:., lang, QuoteNode(Symbol(:libtreesitter_, name, :_path))))

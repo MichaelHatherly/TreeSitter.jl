@@ -32,7 +32,8 @@ function set_language!(parser::Parser, language::Language)
     return parser
 end
 
-Base.parse(p::Parser, text::AbstractString) = Tree(API.ts_parser_parse_string(p.ptr, C_NULL, text, sizeof(text)))
+Base.parse(p::Parser, text::AbstractString) =
+    Tree(API.ts_parser_parse_string(p.ptr, C_NULL, text, sizeof(text)))
 
 #
 # Tree
@@ -50,7 +51,7 @@ Base.show(io::IO, t::Tree) = show(io, root(t))
 
 root(t::Tree) = Node(API.ts_tree_root_node(t.ptr))
 
-traverse(f, tree::Tree, iter=children) = traverse(f, root(tree), iter)
+traverse(f, tree::Tree, iter = children) = traverse(f, root(tree), iter)
 
 #
 # Node
@@ -81,7 +82,7 @@ named_child(n::Node, nth::Integer) = Node(API.ts_node_named_child(n.ptr, nth-1))
 children(n::Node) = (child(n, ind) for ind = 1:count_nodes(n))
 named_children(n::Node) = (named_child(n, ind) for ind = 1:count_named_nodes(n))
 
-function traverse(f, n::Node, iter=children)
+function traverse(f, n::Node, iter = children)
     f(n, true)
     for child in iter(n)
         traverse(f, child, iter)
@@ -92,12 +93,14 @@ end
 
 Base.:(==)(left::Node, right::Node) = API.ts_node_eq(left.ptr, right.ptr)
 
-byte_range(n::Node) = (Int(API.ts_node_start_byte(n.ptr)) + 1, Int(API.ts_node_end_byte(n.ptr)))
+byte_range(n::Node) =
+    (Int(API.ts_node_start_byte(n.ptr)) + 1, Int(API.ts_node_end_byte(n.ptr)))
 
 slice(src::AbstractString, n::Node) = slice(src, byte_range(n))
 slice(src::AbstractString, (from, to)) = SubString(src, from, thisind(src, to))
 
-child(n::Node, name::AbstractString) = Node(API.ts_node_child_by_field_name(n.ptr, String(name), sizeof(name)))
+child(n::Node, name::AbstractString) =
+    Node(API.ts_node_child_by_field_name(n.ptr, String(name), sizeof(name)))
 
 #
 # Query
@@ -115,7 +118,13 @@ mutable struct Query
         source_text = load_source(language, source)
         error_offset_ref = Ref{UInt32}()
         error_type_ref = Ref{API.TSQueryError}()
-        ptr = API.ts_query_new(language.ptr, String(source_text), sizeof(source_text), error_offset_ref, error_type_ref)
+        ptr = API.ts_query_new(
+            language.ptr,
+            String(source_text),
+            sizeof(source_text),
+            error_offset_ref,
+            error_type_ref,
+        )
         if ptr === C_NULL
             type =
                 error_type_ref[] === API.TSQueryErrorSyntax ? "syntax" :
@@ -145,7 +154,7 @@ mutable struct Query
 end
 Base.show(io::IO, q::Query) = print(io, "Query(", q.language, ")")
 
-macro query_cmd(body, language=error("no language provided in query"))
+macro query_cmd(body, language = error("no language provided in query"))
     return :(Query($(esc(Meta.quot(Symbol(language)))), $(esc(body))))
 end
 
@@ -170,7 +179,7 @@ exec(c::QueryCursor, q::Query, t::Tree) = (exec(c, q, root(t)); c)
 
 Base.eachmatch(query::Query, tree::Tree) = exec(QueryCursor(), query, tree)
 
-function Base.iterate(cursor::QueryCursor, state=nothing)
+function Base.iterate(cursor::QueryCursor, state = nothing)
     result = next_match(cursor)
     return result === nothing ? nothing : (result, nothing)
 end
@@ -205,18 +214,19 @@ function capture_name(q::Query, qc::QueryCapture)
     unsafe_string(API.ts_query_capture_name_for_id(q.ptr, qc.id, Ref{UInt32}()))
 end
 
-query_string(q, id) = unsafe_string(API.ts_query_string_value_for_id(q.ptr, id, Ref{UInt32}()))
+query_string(q, id) =
+    unsafe_string(API.ts_query_string_value_for_id(q.ptr, id, Ref{UInt32}()))
 
 function predicate(q::Query, m::QueryMatch, source::AbstractString)
     len = Ref{UInt32}()
     ptr = API.ts_query_predicates_for_pattern(q.ptr, m.obj.pattern_index, len)
     if len[] > 0
         func, args = "", []
-        for i in 1:len[]
+        for i = 1:len[]
             step = unsafe_load(ptr, i)
             if step.type === API.TSQueryPredicateStepTypeCapture
                 # Iterate over the captures rather than allocating a dict.
-                for address in 1:capture_count(m)
+                for address = 1:capture_count(m)
                     capture = unsafe_load(m.obj.captures, address)
                     if capture.index == step.value_id
                         node = Node(capture.node)
@@ -287,7 +297,10 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
 end
 
 function each_capture(tree::Tree, query::Query, source::AbstractString)
-    return (c for m in eachmatch(query, tree) for c in captures(m) if predicate(query, m, source))
+    return (
+        c for m in eachmatch(query, tree) for
+        c in captures(m) if predicate(query, m, source)
+    )
 end
 
 function tokens(parser::Parser, query::Query, source::AbstractString)
