@@ -60,7 +60,7 @@ end
         p = Parser(:julia)
         tree = parse(p, "f(x::Int) = x + 1")
         @test string(tree) ==
-              "(source_file (assignment_expression (call_expression (identifier) (argument_list (typed_expression (identifier) (identifier)))) (binary_expression (identifier) (number))))"
+              "(source_file (assignment (call_expression (identifier) (argument_list (typed_expression (identifier) (identifier)))) (operator) (binary_expression (identifier) (operator) (integer_literal))))"
     end
     @testset "php" begin
         p = Parser(:php)

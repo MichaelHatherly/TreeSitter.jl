@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `any-of?` and `has-ancestor?` query predicates with argument validation [#33]
 - Add changelog tooling with automated link generation and CI validation [#28]
 
 ### Changed
 
+- Update Julia grammar from 0.19 to 0.23 with revised node types [#33]
 - Update README with installation instructions and current parser examples [#30]
 - Add code formatting enforcement to CI and format codebase [#29]
 - Upgrade tree-sitter parsers to latest versions [#25]
@@ -50,3 +52,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#30]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/30
 [#31]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/31
 [#32]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/32
+[#33]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/33
