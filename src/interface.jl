@@ -250,7 +250,7 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
     len = Ref{UInt32}()
     ptr = API.ts_query_predicates_for_pattern(q.ptr, m.obj.pattern_index, len)
     if len[] > 0
-        func, args = "", []
+        func, args, nodes = "", [], []
         for i = 1:len[]
             step = unsafe_load(ptr, i)
             if step.type === API.TSQueryPredicateStepTypeCapture
@@ -261,6 +261,7 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                         node = Node(capture.node, m.tree)
                         str = slice(source, node)
                         push!(args, str)
+                        push!(nodes, node)
                         break
                     end
                 end
@@ -272,10 +273,7 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                 # This marks the end of an individual predicate. Check whether
                 # we actually have enough arguments to call the predicate and
                 # then continue.
-                if length(args) != 2
-                    @warn "incorrect number of arguments to '$func', expected 2"
-                    return false
-                end
+
                 # Handle the following predicates. Source: tree-sitter rust lib.
                 #
                 #   - eq?
@@ -283,14 +281,61 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                 #   - is?
                 #   - is-not?
                 #   - match?
+                #   - any-of?
                 #   - set!
                 #
                 result = if func == "eq?"
-                    left, right = args
-                    left == right
+                    if length(args) != 2
+                        @warn "incorrect number of arguments to '$func', expected 2"
+                        false
+                    else
+                        left, right = args
+                        left == right
+                    end
                 elseif func == "not-eq?"
-                    left, right = args
-                    left != right
+                    if length(args) != 2
+                        @warn "incorrect number of arguments to '$func', expected 2"
+                        false
+                    else
+                        left, right = args
+                        left != right
+                    end
+                elseif func == "any-of?"
+                    if length(args) < 2
+                        @warn "incorrect number of arguments to '$func', expected at least 2"
+                        false
+                    else
+                        # First arg is the capture value, rest are possible matches
+                        capture_value = args[1]
+                        any(arg -> arg == capture_value, args[2:end])
+                    end
+                elseif func == "has-ancestor?"
+                    if length(args) < 2
+                        @warn "incorrect number of arguments to '$func', expected at least 2"
+                        false
+                    else
+                        # First arg is the captured node (we need the node, not its text)
+                        # Rest are node type names to check for in ancestors
+                        if isempty(nodes)
+                            @warn "'$func' requires access to node structure"
+                            false
+                        else
+                            captured_node = nodes[1]
+                            ancestor_types = args[2:end]
+
+                            # Walk up the tree checking each ancestor
+                            current = parent(captured_node)
+                            found = false
+                            while !is_null(current)
+                                if node_type(current) in ancestor_types
+                                    found = true
+                                    break
+                                end
+                                current = parent(current)
+                            end
+                            found
+                        end
+                    end
                 elseif func == "is?"
                     @warn "'$func' not implemented" # TODO
                     false
@@ -298,8 +343,13 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                     @warn "'$func' not implemented" # TODO
                     false
                 elseif func == "match?"
-                    arg_1, arg_2 = args
-                    occursin(Regex(arg_2), arg_1)
+                    if length(args) != 2
+                        @warn "incorrect number of arguments to '$func', expected 2"
+                        false
+                    else
+                        arg_1, arg_2 = args
+                        occursin(Regex(arg_2), arg_1)
+                    end
                 elseif func == "set!"
                     @warn "'$func' not implemented" # TODO
                     false
@@ -312,6 +362,7 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                     # Success, reset for the next predicate.
                     func = ""
                     empty!(args)
+                    empty!(nodes)
                 else
                     # Failed to match the current predicate, so we can bale here.
                     return false

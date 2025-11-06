@@ -88,6 +88,74 @@
         @test "helper" in method_names
         @test !("constructor" in method_names)
     end
+
+    @testset "any-of? predicate" begin
+        p = Parser(:c)
+        source = """
+        int foo() { return 0; }
+        void bar() { return; }
+        char baz() { return 'x'; }
+        float qux() { return 1.0; }
+        """
+        tree = parse(p, source)
+
+        # Match function declarations with return type 'int', 'void', or 'char'
+        q = query```
+        (function_definition
+          type: (primitive_type) @type
+          (#any-of? @type "int" "void" "char"))
+        ```c
+
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            id = TreeSitter.capture_name(q, capture)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, (id, literal))
+        end
+
+        # Should match 'int', 'void', and 'char', but not 'float'
+        @test length(out) == 3
+        types = [t[2] for t in out]
+        @test "int" in types
+        @test "void" in types
+        @test "char" in types
+        @test !("float" in types)
+    end
+
+    @testset "has-ancestor? predicate" begin
+        p = Parser(:julia)
+        # Julia code with 'begin' and 'end' in different contexts
+        # In index expressions like a[begin:end], they should be captured
+        # In other contexts (like begin/end blocks or standalone ranges), they should not
+        source = """
+        x = a[begin:end]
+        y = begin:end
+        begin
+            z = 1
+        end
+        """
+
+        # Query that uses has-ancestor? to match begin/end only in index_expression
+        q = query```
+        ((identifier) @indexer
+          (#any-of? @indexer "begin" "end")
+          (#has-ancestor? @indexer index_expression))
+        ```julia
+
+        tree = parse(p, source)
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            id = TreeSitter.capture_name(q, capture)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, (id, literal))
+        end
+
+        # Should only match 'begin' and 'end' inside a[begin:end]
+        # Not in the standalone range 'begin:end' or the begin/end block keywords
+        @test length(out) == 2
+        @test ("indexer", "begin") in out
+        @test ("indexer", "end") in out
+    end
 end
 
 @testset "Loading Query Files" begin

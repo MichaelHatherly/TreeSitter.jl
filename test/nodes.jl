@@ -7,7 +7,7 @@
         # Structural nodes should be named
         @test TreeSitter.is_named(root_node)  # source_file
         array_node = TreeSitter.child(root_node, 1)
-        @test TreeSitter.is_named(array_node)  # array_expression
+        @test TreeSitter.is_named(array_node)  # vector_expression
 
         # Punctuation should not be named
         bracket_open = TreeSitter.child(array_node, 1)
@@ -17,7 +17,7 @@
 
         # Numbers should be named
         num1 = TreeSitter.child(array_node, 2)
-        @test TreeSitter.is_named(num1)  # number
+        @test TreeSitter.is_named(num1)  # integer_literal
     end
 
     @testset "is_missing" begin
@@ -105,14 +105,21 @@ end
         func_def = TreeSitter.child(root_node, 1)
         @test TreeSitter.node_type(func_def) == "function_definition"
 
-        # Access name field
-        name_node = TreeSitter.child(func_def, "name")
+        # Structure: function_definition -> signature -> call_expression
+        signature = TreeSitter.child(func_def, 2)
+        @test TreeSitter.node_type(signature) == "signature"
+
+        call_expr = TreeSitter.child(signature, 1)
+        @test TreeSitter.node_type(call_expr) == "call_expression"
+
+        # Get function name from call_expression
+        name_node = TreeSitter.child(call_expr, 1)
         @test TreeSitter.node_type(name_node) == "identifier"
         @test TreeSitter.slice("function add(x, y)\n    x + y\nend", name_node) == "add"
 
-        # Access parameters field (note: grammar has typo "parametere")
-        params = TreeSitter.child(func_def, "parametere")
-        @test TreeSitter.node_type(params) == "parameter_list"
+        # Get parameters from call_expression
+        params = TreeSitter.child(call_expr, 2)
+        @test TreeSitter.node_type(params) == "argument_list"
     end
 
     @testset "Invalid field name" begin
@@ -176,7 +183,7 @@ end
 
     # Get first number
     first_num = TreeSitter.child(array_node, 2)  # First number node
-    @test TreeSitter.node_type(first_num) == "number"
+    @test TreeSitter.node_type(first_num) == "integer_literal"
     @test TreeSitter.slice("[1, 2, 3]", first_num) == "1"
 
     # Navigate to next sibling (comma)
@@ -185,7 +192,7 @@ end
 
     # Navigate to next sibling (second number)
     second_num = TreeSitter.next_sibling(next_node)
-    @test TreeSitter.node_type(second_num) == "number"
+    @test TreeSitter.node_type(second_num) == "integer_literal"
     @test TreeSitter.slice("[1, 2, 3]", second_num) == "2"
 
     # Navigate back via prev_sibling
@@ -194,11 +201,11 @@ end
 
     # Test named sibling navigation
     third_num = TreeSitter.next_named_sibling(second_num)
-    @test TreeSitter.node_type(third_num) == "number"
+    @test TreeSitter.node_type(third_num) == "integer_literal"
     @test TreeSitter.slice("[1, 2, 3]", third_num) == "3"
 
     prev_named = TreeSitter.prev_named_sibling(third_num)
-    @test TreeSitter.node_type(prev_named) == "number"
+    @test TreeSitter.node_type(prev_named) == "integer_literal"
     @test TreeSitter.slice("[1, 2, 3]", prev_named) == "2"
 end
 
