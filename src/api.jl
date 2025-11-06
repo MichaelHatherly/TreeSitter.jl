@@ -1,5 +1,6 @@
 module API
 
+import TreeSitter
 import tree_sitter_jll
 
 using CEnum
@@ -887,18 +888,29 @@ function extract_lang_name(jll_mod::Module)
     return Symbol(m.captures[1])
 end
 
-function get_lang_ptr(jll_mod::Module)
-    lang_name = string(extract_lang_name(jll_mod))
+function get_lang_ptr(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
+    # Determine which parser to use
+    if variant === nothing
+        # Use default: extract from module name
+        parser_name = string(extract_lang_name(jll_mod))
+    else
+        # Use specified variant
+        parser_name = string(variant)
+    end
 
     # Get library handle from JLL module (already opened by JLL)
-    lib_handle_field = Symbol("libtreesitter_", lang_name, "_handle")
+    lib_handle_field = Symbol("libtreesitter_", parser_name, "_handle")
     if !isdefined(jll_mod, lib_handle_field)
-        error("JLL module $(nameof(jll_mod)) does not define field '$lib_handle_field'")
+        available = TreeSitter.list_parsers(jll_mod)
+        error(
+            "Parser variant ':$parser_name' not found in $(nameof(jll_mod)). " *
+            "Available parsers: $available",
+        )
     end
     lib_handle = getfield(jll_mod, lib_handle_field)
 
     # Get function pointer from the already-opened library
-    func_name = "tree_sitter_$lang_name"
+    func_name = "tree_sitter_$parser_name"
     func_ptr = dlsym(lib_handle, func_name)
 
     # Call to get TSLanguage pointer
@@ -907,12 +919,18 @@ function get_lang_ptr(jll_mod::Module)
     return lang_ptr
 end
 
-function load_queries(jll_mod::Module)
-    lang_name = string(extract_lang_name(jll_mod))
+function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
+    # Determine which parser variant to load queries for
+    if variant === nothing
+        parser_name = string(extract_lang_name(jll_mod))
+    else
+        parser_name = string(variant)
+    end
+
     dict = Dict{String,String}()
 
     # Check for custom/vendored queries first
-    custom = joinpath(@__DIR__, "queries", lang_name)
+    custom = joinpath(@__DIR__, "queries", parser_name)
 
     # Use custom queries if available, otherwise use JLL queries
     if isdir(custom)

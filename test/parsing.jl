@@ -100,6 +100,32 @@ end
         @test string(tree) ==
               "(program (php_tag) (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))) (text_interpolation (php_end_tag)))"
     end
+    @testset "php multi-parser" begin
+        # Test list_parsers
+        parsers = list_parsers(tree_sitter_php_jll)
+        @test :php in parsers
+        @test :php_only in parsers
+        @test length(parsers) == 2
+
+        # Test default parser (php)
+        p1 = Parser(tree_sitter_php_jll)
+        @test p1.language.name == :php
+        tree1 = parse(p1, "<?php\n\$x = 1;\n?>")
+        @test string(tree1) ==
+              "(program (php_tag) (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))) (text_interpolation (php_end_tag)))"
+
+        # Test php_only variant
+        p2 = Parser(tree_sitter_php_jll, :php_only)
+        @test p2.language.name == :php_only
+        tree2 = parse(p2, "\$x = 1;")
+        @test string(tree2) ==
+              "(program (expression_statement (assignment_expression left: (variable_name (name)) right: (integer))))"
+
+        # Test that parsers produce different results for same input
+        tree_default = parse(p1, "\$x = 1;")
+        tree_only = parse(p2, "\$x = 1;")
+        @test string(tree_default) != string(tree_only)
+    end
     @testset "python" begin
         p = Parser(:python)
         tree = parse(p, "1 < 2 and 2 < 3")

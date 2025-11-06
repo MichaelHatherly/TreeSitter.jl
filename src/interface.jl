@@ -2,15 +2,33 @@
 # Language
 #
 
+function list_parsers(jll_mod::Module)
+    # Scan the module for all libtreesitter_*_handle globals
+    parsers = Symbol[]
+    for name in names(jll_mod; all = true)
+        name_str = string(name)
+        if endswith(name_str, "_handle") && startswith(name_str, "libtreesitter_")
+            # Extract the parser name from "libtreesitter_<parser>_handle"
+            parser_name = name_str[15:(end-7)]  # Strip "libtreesitter_" and "_handle"
+            push!(parsers, Symbol(parser_name))
+        end
+    end
+    return sort!(parsers)
+end
+
 mutable struct Language
     name::Symbol
     ptr::Ptr{API.TSLanguage}
     queries::Dict{String,String}
 
-    function Language(jll_mod::Module)
-        name = API.extract_lang_name(jll_mod)
-        ptr = API.get_lang_ptr(jll_mod)
-        queries = API.load_queries(jll_mod)
+    function Language(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
+        if variant === nothing
+            name = API.extract_lang_name(jll_mod)
+        else
+            name = variant
+        end
+        ptr = API.get_lang_ptr(jll_mod, variant)
+        queries = API.load_queries(jll_mod, variant)
         new(name, ptr, queries)
     end
 
@@ -52,7 +70,8 @@ mutable struct Parser
         set_language!(parser, lang)
         return parser
     end
-    Parser(jll_mod::Module) = Parser(Language(jll_mod))
+    Parser(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing) =
+        Parser(Language(jll_mod, variant))
     Parser(name::Symbol) = Parser(Language(name))
 end
 Base.show(io::IO, p::Parser) = print(io, "Parser(", p.language, ")")
@@ -197,7 +216,8 @@ mutable struct Query
             return query
         end
     end
-    Query(jll_mod::Module, source) = Query(Language(jll_mod), source)
+    Query(jll_mod::Module, source, variant::Union{Symbol,Nothing} = nothing) =
+        Query(Language(jll_mod, variant), source)
     Query(language::Symbol, source) = Query(Language(language), source)
 
     function load_source(lang::Language, files)

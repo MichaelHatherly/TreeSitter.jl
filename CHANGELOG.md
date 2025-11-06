@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add multi-parser support for JLL packages with multiple language variants [#36]
 - Add AbstractTrees.jl integration for tree traversal and printing [#35]
 - Add `any-of?` and `has-ancestor?` query predicates with argument validation [#33]
 - Add changelog tooling with automated link generation and CI validation [#28]
@@ -57,3 +58,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#33]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/33
 [#34]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/34
 [#35]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/35
+[#36]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/36
