@@ -1,6 +1,8 @@
+import tree_sitter_julia_jll, tree_sitter_javascript_jll, tree_sitter_c_jll
+
 @testset "Captures & Predicates" begin
     @testset "match? predicate" begin
-        p = Parser(:julia)
+        p = Parser(tree_sitter_julia_jll)
         source = """
                  const X = 1
                  f(x) = x
@@ -29,7 +31,7 @@
     end
 
     @testset "eq? predicate" begin
-        p = Parser(:javascript)
+        p = Parser(tree_sitter_javascript_jll)
         source = """
         require('fs')
         import('path')
@@ -57,7 +59,7 @@
     end
 
     @testset "not-eq? predicate" begin
-        p = Parser(:javascript)
+        p = Parser(tree_sitter_javascript_jll)
         source = """
         class Foo {
           constructor() {}
@@ -90,7 +92,7 @@
     end
 
     @testset "any-of? predicate" begin
-        p = Parser(:c)
+        p = Parser(tree_sitter_c_jll)
         source = """
         int foo() { return 0; }
         void bar() { return; }
@@ -123,7 +125,7 @@
     end
 
     @testset "has-ancestor? predicate" begin
-        p = Parser(:julia)
+        p = Parser(tree_sitter_julia_jll)
         # Julia code with 'begin' and 'end' in different contexts
         # In index expressions like a[begin:end], they should be captured
         # In other contexts (like begin/end blocks or standalone ranges), they should not
@@ -159,14 +161,14 @@
 end
 
 @testset "Loading Query Files" begin
-    p = Parser(:c)
+    p = Parser(tree_sitter_c_jll)
     source = """
              int main(void) {
                  // comment
              }
              """
     tree = parse(p, source)
-    q = Query(:c, ["highlights"])
+    q = Query(tree_sitter_c_jll, ["highlights"])
     out = []
     for capture in TreeSitter.each_capture(tree, q, source)
         id = TreeSitter.capture_name(q, capture)

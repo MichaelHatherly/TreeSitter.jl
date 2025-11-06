@@ -3,6 +3,7 @@ module API
 import tree_sitter_jll
 
 using CEnum
+using Libdl
 
 const libtreesitter = tree_sitter_jll.libtreesitter_path
 
@@ -878,63 +879,63 @@ end
 
 # Language
 
-import tree_sitter_bash_jll,
-    tree_sitter_c_jll,
-    tree_sitter_cpp_jll,
-    tree_sitter_go_jll,
-    tree_sitter_html_jll,
-    tree_sitter_java_jll,
-    tree_sitter_javascript_jll,
-    tree_sitter_json_jll,
-    tree_sitter_julia_jll,
-    tree_sitter_php_jll,
-    tree_sitter_python_jll,
-    tree_sitter_ruby_jll,
-    tree_sitter_rust_jll,
-    tree_sitter_typescript_jll
-
-const LANGUAGE_REGEX = r"^tree_sitter_(\w+)_jll$"
-const LANGUAGES = Dict{Symbol,Tuple{Function,String}}()
-for lang in
-    filter(s -> occursin(LANGUAGE_REGEX, string(s)), names(@__MODULE__; imported = true))
-    name = match(LANGUAGE_REGEX, string(lang))[1]
-    func = Expr(:quote, Symbol(:tree_sitter_, name))
-    lib = @eval $(Expr(:., lang, QuoteNode(Symbol(:libtreesitter_, name, :_path))))
-    queries_dir = joinpath(getfield(@__MODULE__, lang).artifact_dir, "queries")
-    f = @eval $(Symbol(:tree_sitter_, name))() = ccall(($func, $lib), Ptr{TSLanguage}, ())
-    LANGUAGES[Symbol(name)] = (f, queries_dir)
+function extract_lang_name(jll_mod::Module)
+    mod_name = string(nameof(jll_mod))
+    m = match(r"^tree_sitter_(\w+)_jll$", mod_name)
+    m === nothing &&
+        error("Module name '$mod_name' does not match expected pattern 'tree_sitter_*_jll'")
+    return Symbol(m.captures[1])
 end
 
-function lang_ptr(n::Symbol)
-    haskey(LANGUAGES, n) || error("unknown language '$n'")
-    return get!(() -> LANGUAGES[n][1](), LANG_PTRS, n)
-end
-const LANG_PTRS = Dict{Symbol,Ptr{Cvoid}}()
+function get_lang_ptr(jll_mod::Module)
+    lang_name = string(extract_lang_name(jll_mod))
 
-function lang_queries(n::Symbol)
-    haskey(LANGUAGES, n) || error("unknown language '$n'")
-    _, dir = LANGUAGES[n]
-    return get!(LANG_QUERIES, n) do
-        dict = Dict{String,String}()
-        # Custom/vendored queries that aren't available yet in the upstream
-        # packages are loaded first. Queries for a particular language are
-        # located in a subdirectory of src/queries named after the language.
-        custom = joinpath(@__DIR__, "queries", string(n))
-        dir = isdir(custom) ? custom : dir
-        if isdir(dir)
-            for file in readdir(dir)
-                path = joinpath(dir, file)
-                if isfile(path)
-                    name, ext = splitext(file)
-                    if ext == ".scm"
-                        dict[name] = read(path, String)
-                    end
+    # Get library handle from JLL module (already opened by JLL)
+    lib_handle_field = Symbol("libtreesitter_", lang_name, "_handle")
+    if !isdefined(jll_mod, lib_handle_field)
+        error("JLL module $(nameof(jll_mod)) does not define field '$lib_handle_field'")
+    end
+    lib_handle = getfield(jll_mod, lib_handle_field)
+
+    # Get function pointer from the already-opened library
+    func_name = "tree_sitter_$lang_name"
+    func_ptr = dlsym(lib_handle, func_name)
+
+    # Call to get TSLanguage pointer
+    lang_ptr = ccall(func_ptr, Ptr{TSLanguage}, ())
+
+    return lang_ptr
+end
+
+function load_queries(jll_mod::Module)
+    lang_name = string(extract_lang_name(jll_mod))
+    dict = Dict{String,String}()
+
+    # Check for custom/vendored queries first
+    custom = joinpath(@__DIR__, "queries", lang_name)
+
+    # Use custom queries if available, otherwise use JLL queries
+    if isdir(custom)
+        dir = custom
+    elseif isdefined(jll_mod, :artifact_dir)
+        dir = joinpath(getfield(jll_mod, :artifact_dir), "queries")
+    else
+        return dict  # No queries available
+    end
+
+    if isdir(dir)
+        for file in readdir(dir)
+            path = joinpath(dir, file)
+            if isfile(path)
+                name, ext = splitext(file)
+                if ext == ".scm"
+                    dict[name] = read(path, String)
                 end
             end
         end
-        return dict
     end
+
+    return dict
 end
-const LANG_QUERIES = Dict{Symbol,Dict{String,String}}()
 
 end

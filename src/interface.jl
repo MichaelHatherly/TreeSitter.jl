@@ -5,7 +5,37 @@
 mutable struct Language
     name::Symbol
     ptr::Ptr{API.TSLanguage}
-    Language(name::Symbol) = new(name, API.lang_ptr(name))
+    queries::Dict{String,String}
+
+    function Language(jll_mod::Module)
+        name = API.extract_lang_name(jll_mod)
+        ptr = API.get_lang_ptr(jll_mod)
+        queries = API.load_queries(jll_mod)
+        new(name, ptr, queries)
+    end
+
+    function Language(name::Symbol)
+        Base.depwarn(
+            "Symbol-based Language construction is deprecated. " *
+            "Please pass the JLL module directly: Language(tree_sitter_$(name)_jll)",
+            :Language;
+            force = true,
+        )
+
+        # Look up the JLL module using Base.identify_package
+        pkg_name = "tree_sitter_$(name)_jll"
+        pkg_id = Base.identify_package(pkg_name)
+
+        if pkg_id === nothing
+            error(
+                "Language package '$pkg_name' not found. Please add and import it first:\n" *
+                "  using tree_sitter_$(name)_jll",
+            )
+        end
+
+        jll_mod = Base.root_module(pkg_id)
+        return Language(jll_mod)
+    end
 end
 Base.show(io::IO, l::Language) = print(io, "Language(", repr(l.name), ")")
 
@@ -22,6 +52,7 @@ mutable struct Parser
         set_language!(parser, lang)
         return parser
     end
+    Parser(jll_mod::Module) = Parser(Language(jll_mod))
     Parser(name::Symbol) = Parser(Language(name))
 end
 Base.show(io::IO, p::Parser) = print(io, "Parser(", p.language, ")")
@@ -81,8 +112,8 @@ is_leaf(n::Node) = iszero(count_nodes(n))
 count_nodes(n::Node) = Int(API.ts_node_child_count(n.ptr))
 count_named_nodes(n::Node) = Int(API.ts_node_named_child_count(n.ptr))
 
-child(n::Node, nth::Integer) = Node(API.ts_node_child(n.ptr, nth-1), n.tree)
-named_child(n::Node, nth::Integer) = Node(API.ts_node_named_child(n.ptr, nth-1), n.tree)
+child(n::Node, nth::Integer) = Node(API.ts_node_child(n.ptr, nth - 1), n.tree)
+named_child(n::Node, nth::Integer) = Node(API.ts_node_named_child(n.ptr, nth - 1), n.tree)
 
 children(n::Node) = (child(n, ind) for ind = 1:count_nodes(n))
 named_children(n::Node) = (named_child(n, ind) for ind = 1:count_named_nodes(n))
@@ -166,13 +197,13 @@ mutable struct Query
             return query
         end
     end
+    Query(jll_mod::Module, source) = Query(Language(jll_mod), source)
     Query(language::Symbol, source) = Query(Language(language), source)
 
     function load_source(lang::Language, files)
-        queries = API.lang_queries(lang.name)
         out = IOBuffer()
         for file in files
-            println(out, get(queries, file, ""))
+            println(out, get(lang.queries, file, ""))
         end
         return String(take!(out))
     end
@@ -181,7 +212,10 @@ end
 Base.show(io::IO, q::Query) = print(io, "Query(", q.language, ")")
 
 macro query_cmd(body, language = error("no language provided in query"))
-    return :(Query($(esc(Meta.quot(Symbol(language)))), $(esc(body))))
+    # Convert short name "julia" to module name :tree_sitter_julia_jll
+    modname = Symbol("tree_sitter_", language, "_jll")
+    # Look up in caller's scope
+    return :(Query($(esc(modname)), $(esc(body))))
 end
 
 pattern_count(q::Query) = Int(API.ts_query_pattern_count(q.ptr))

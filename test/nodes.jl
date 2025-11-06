@@ -1,6 +1,8 @@
+import tree_sitter_julia_jll, tree_sitter_c_jll, tree_sitter_javascript_jll
+
 @testset "Node Inspection" begin
     @testset "is_named" begin
-        p = Parser(:julia)
+        p = Parser(tree_sitter_julia_jll)
         tree = parse(p, "[1, 2]")
         root_node = TreeSitter.root(tree)
 
@@ -21,7 +23,7 @@
     end
 
     @testset "is_missing" begin
-        p = Parser(:c)
+        p = Parser(tree_sitter_c_jll)
         # Missing semicolon - creates ERROR and MISSING nodes
         tree = parse(p, "int x")
         root_node = TreeSitter.root(tree)
@@ -37,7 +39,7 @@
     end
 
     @testset "is_extra" begin
-        p = Parser(:c)
+        p = Parser(tree_sitter_c_jll)
         tree = parse(p, "int x; // comment")
 
         # Find comment node and verify it's marked as extra
@@ -54,7 +56,7 @@ end
 
 @testset "Field-Based Child Access" begin
     @testset "C function declaration" begin
-        p = Parser(:c)
+        p = Parser(tree_sitter_c_jll)
         tree = parse(p, "int main(void) { return 0; }")
         root_node = TreeSitter.root(tree)
 
@@ -75,7 +77,7 @@ end
     end
 
     @testset "JavaScript function declaration" begin
-        p = Parser(:javascript)
+        p = Parser(tree_sitter_javascript_jll)
         tree = parse(p, "function greet(name) { return name; }")
         root_node = TreeSitter.root(tree)
 
@@ -98,7 +100,7 @@ end
     end
 
     @testset "Julia function definition" begin
-        p = Parser(:julia)
+        p = Parser(tree_sitter_julia_jll)
         tree = parse(p, "function add(x, y)\n    x + y\nend")
         root_node = TreeSitter.root(tree)
 
@@ -123,7 +125,7 @@ end
     end
 
     @testset "Invalid field name" begin
-        p = Parser(:c)
+        p = Parser(tree_sitter_c_jll)
         tree = parse(p, "int main(void) { return 0; }")
         root_node = TreeSitter.root(tree)
 
@@ -136,7 +138,7 @@ end
 end
 
 @testset "Node Equality" begin
-    p = Parser(:julia)
+    p = Parser(tree_sitter_julia_jll)
     tree = parse(p, "f(x) = x")
     root_node = TreeSitter.root(tree)
 
@@ -156,7 +158,7 @@ end
 end
 
 @testset "Parent Navigation" begin
-    p = Parser(:c)
+    p = Parser(tree_sitter_c_jll)
     tree = parse(p, "int x = 1;")
     root_node = TreeSitter.root(tree)
 
@@ -175,7 +177,7 @@ end
 end
 
 @testset "Sibling Navigation" begin
-    p = Parser(:julia)
+    p = Parser(tree_sitter_julia_jll)
     tree = parse(p, "[1, 2, 3]")
     root_node = TreeSitter.root(tree)
 
@@ -210,7 +212,7 @@ end
 end
 
 @testset "TSPoint Positions" begin
-    p = Parser(:julia)
+    p = Parser(tree_sitter_julia_jll)
     source = "f(x) = x + 1"
     tree = parse(p, source)
     root_node = TreeSitter.root(tree)

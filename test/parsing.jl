@@ -1,7 +1,39 @@
+import tree_sitter_bash_jll,
+    tree_sitter_c_jll,
+    tree_sitter_cpp_jll,
+    tree_sitter_go_jll,
+    tree_sitter_html_jll,
+    tree_sitter_java_jll,
+    tree_sitter_javascript_jll,
+    tree_sitter_json_jll,
+    tree_sitter_julia_jll,
+    tree_sitter_php_jll,
+    tree_sitter_python_jll,
+    tree_sitter_ruby_jll,
+    tree_sitter_rust_jll,
+    tree_sitter_typescript_jll
+
+const LANGUAGE_JLLS = [
+    (:bash, tree_sitter_bash_jll),
+    (:c, tree_sitter_c_jll),
+    (:cpp, tree_sitter_cpp_jll),
+    (:go, tree_sitter_go_jll),
+    (:html, tree_sitter_html_jll),
+    (:java, tree_sitter_java_jll),
+    (:javascript, tree_sitter_javascript_jll),
+    (:json, tree_sitter_json_jll),
+    (:julia, tree_sitter_julia_jll),
+    (:php, tree_sitter_php_jll),
+    (:python, tree_sitter_python_jll),
+    (:ruby, tree_sitter_ruby_jll),
+    (:rust, tree_sitter_rust_jll),
+    (:typescript, tree_sitter_typescript_jll),
+]
+
 @testset "Load & Parse" begin
-    for lang in keys(TreeSitter.API.LANGUAGES)
-        @testset "$lang" begin
-            p = Parser(lang)
+    for (lang_name, lang_jll) in LANGUAGE_JLLS
+        @testset "$lang_name" begin
+            p = Parser(lang_jll)
             tree = parse(p, "")
             @test !isempty(string(tree))
         end
