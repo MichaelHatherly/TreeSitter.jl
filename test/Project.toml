@@ -1,4 +1,5 @@
 [deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 tree_sitter_bash_jll = "7332bcdc-bd2a-5999-b4fe-680b85f40771"
 tree_sitter_c_jll = "af41be9f-6c08-5eeb-b278-7a4b044e283f"

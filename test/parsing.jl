@@ -13,25 +13,25 @@ import tree_sitter_bash_jll,
     tree_sitter_rust_jll,
     tree_sitter_typescript_jll
 
-const LANGUAGE_JLLS = [
-    (:bash, tree_sitter_bash_jll),
-    (:c, tree_sitter_c_jll),
-    (:cpp, tree_sitter_cpp_jll),
-    (:go, tree_sitter_go_jll),
-    (:html, tree_sitter_html_jll),
-    (:java, tree_sitter_java_jll),
-    (:javascript, tree_sitter_javascript_jll),
-    (:json, tree_sitter_json_jll),
-    (:julia, tree_sitter_julia_jll),
-    (:php, tree_sitter_php_jll),
-    (:python, tree_sitter_python_jll),
-    (:ruby, tree_sitter_ruby_jll),
-    (:rust, tree_sitter_rust_jll),
-    (:typescript, tree_sitter_typescript_jll),
-]
-
 @testset "Load & Parse" begin
-    for (lang_name, lang_jll) in LANGUAGE_JLLS
+    language_jlls = [
+        (:bash, tree_sitter_bash_jll),
+        (:c, tree_sitter_c_jll),
+        (:cpp, tree_sitter_cpp_jll),
+        (:go, tree_sitter_go_jll),
+        (:html, tree_sitter_html_jll),
+        (:java, tree_sitter_java_jll),
+        (:javascript, tree_sitter_javascript_jll),
+        (:json, tree_sitter_json_jll),
+        (:julia, tree_sitter_julia_jll),
+        (:php, tree_sitter_php_jll),
+        (:python, tree_sitter_python_jll),
+        (:ruby, tree_sitter_ruby_jll),
+        (:rust, tree_sitter_rust_jll),
+        (:typescript, tree_sitter_typescript_jll),
+    ]
+
+    for (lang_name, lang_jll) in language_jlls
         @testset "$lang_name" begin
             p = Parser(lang_jll)
             tree = parse(p, "")
