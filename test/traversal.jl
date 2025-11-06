@@ -1,5 +1,7 @@
+import tree_sitter_julia_jll
+
 @testset "Tree Traversal" begin
-    p = Parser(:julia)
+    p = Parser(tree_sitter_julia_jll)
     tree = parse(p, "[1, 2]")
 
     out = String[]

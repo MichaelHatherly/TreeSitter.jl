@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Make language parsers opt-in by requiring explicit JLL imports instead of bundling all languages [#34]
 - Update Julia grammar from 0.19 to 0.23 with revised node types [#33]
 - Update README with installation instructions and current parser examples [#30]
 - Add code formatting enforcement to CI and format codebase [#29]
