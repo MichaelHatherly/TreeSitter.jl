@@ -5,4 +5,5 @@ using TreeSitter, Test
     include("traversal.jl")
     include("nodes.jl")
     include("queries.jl")
+    include("abstracttrees.jl")
 end

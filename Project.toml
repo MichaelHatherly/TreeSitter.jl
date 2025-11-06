@@ -4,11 +4,13 @@ authors = ["Michael Hatherly <michaelhatherly@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 tree_sitter_jll = "695101d5-1b81-5434-9529-70430e482717"
 
 [compat]
+AbstractTrees = "0.4"
 CEnum = "0.4, 0.5"
 Libdl = "1"
 julia = "1.6"
