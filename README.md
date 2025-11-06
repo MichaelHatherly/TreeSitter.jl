@@ -132,3 +132,37 @@ pkg> add tree_sitter_julia_jll tree_sitter_python_jll
 Additional languages can be added by writing new `jll` packages to wrap the
 upstream parsers: see [Yggdrasil](https://github.com/JuliaPackaging/Yggdrasil)
 for details.
+
+## Multiple Parsers per Language
+
+Some language packages provide multiple parser variants. For example, `tree_sitter_php_jll` provides both `php` (with HTML support) and `php_only` (pure PHP) parsers.
+
+Discover available parsers:
+```julia
+julia> using TreeSitter, tree_sitter_php_jll
+
+julia> list_parsers(tree_sitter_php_jll)
+2-element Vector{Symbol}:
+ :php
+ :php_only
+```
+
+Use a specific parser variant:
+```julia
+julia> # Default parser (php with HTML support)
+julia> p1 = Parser(tree_sitter_php_jll)
+Parser(Language(:php))
+
+julia> # PHP-only variant
+julia> p2 = Parser(tree_sitter_php_jll, :php_only)
+Parser(Language(:php_only))
+```
+
+The same variant parameter works for `Language` and `Query` constructors:
+```julia
+julia> lang = Language(tree_sitter_php_jll, :php_only)
+Language(:php_only)
+
+julia> query = Query(tree_sitter_php_jll, "(identifier) @id", :php_only)
+Query(Language(:php_only))
+```
