@@ -186,9 +186,24 @@ struct QueryException <: Exception
     msg::String
 end
 
+# Represents metadata attached to query patterns via #set! or property checks via #is?/#is-not?
+# Example: (#set! "priority" "100") creates QueryProperty("priority", "100", nothing)
+# capture_id is set when property applies to specific capture: (#set! @capture "key" "value")
+struct QueryProperty
+    key::String
+    value::Union{String,Nothing}  # Nothing for flag-style properties: (#set! "local")
+    capture_id::Union{Int,Nothing}  # Nothing for pattern-level, Int for capture-specific
+end
+
 mutable struct Query
     language::Language
     ptr::Ptr{API.TSQuery}
+    # Metadata storage: outer vector indexed by pattern (1-based), inner vector = all properties for that pattern
+    # Parsed once at construction from TSQueryPredicateStep arrays, enabling O(1) lookup by pattern index
+    # Separates metadata (#set!) from filtering predicates (#eq?, #match?) for correctness and performance
+    property_settings::Vector{Vector{QueryProperty}}  # #set! directives
+    property_predicates::Vector{Vector{Tuple{QueryProperty,Bool}}}  # #is?/#is-not? (Bool = positive/negative)
+    unknown_properties::Set{String}  # Track unimplemented properties for warning
 
     function Query(language::Language, source)
         source_text = load_source(language, source)
@@ -211,8 +226,28 @@ mutable struct Query
             offset = error_offset_ref[] + 1
             throw(QueryException("'$type' error starting at index $offset"))
         else
-            query = new(language, ptr)
+            # Initialize metadata storage: one inner vector per pattern for O(1) lookup
+            # Each pattern can have 0-N properties, stored in its inner vector
+            n_patterns = Int(API.ts_query_pattern_count(ptr))
+            property_settings = [QueryProperty[] for _ = 1:n_patterns]
+            property_predicates = [Tuple{QueryProperty,Bool}[] for _ = 1:n_patterns]
+            unknown_properties = Set{String}()
+            query = new(
+                language,
+                ptr,
+                property_settings,
+                property_predicates,
+                unknown_properties,
+            )
             finalizer(q -> API.ts_query_delete(q.ptr), query)
+            # Parse predicates once at construction for performance and correctness
+            # Separates metadata directives (#set!, #is?) from filtering predicates (#eq?, #match?)
+            parse_predicates!(query)
+            # Warn about unknown properties once at construction
+            if !isempty(query.unknown_properties)
+                props_str = join(sort(collect(query.unknown_properties)), ", ")
+                @warn "Query uses unimplemented properties that will be treated as no-ops: $props_str"
+            end
             return query
         end
     end
@@ -230,6 +265,139 @@ mutable struct Query
     load_source(::Language, source::AbstractString) = source
 end
 Base.show(io::IO, q::Query) = print(io, "Query(", q.language, ")")
+
+# Parse all predicates at query construction, separating metadata (#set!, #is?) from filtering predicates
+# Filtering predicates (#eq?, #match?, etc.) remain evaluated at match-time via predicate() function
+# This follows the Rust binding pattern for performance (parse once vs per-match) and correctness (#set! shouldn't filter)
+function parse_predicates!(q::Query)
+    n_patterns = pattern_count(q)
+
+    for pattern_idx = 1:n_patterns
+        len = Ref{UInt32}()
+        # Get predicate steps for this pattern (0-based C API)
+        ptr = API.ts_query_predicates_for_pattern(q.ptr, pattern_idx - 1, len)
+
+        if len[] > 0
+            # Parse predicate steps into structured metadata
+            # Steps alternate: predicate name (string), arguments (captures/strings), DONE marker
+            func = ""
+            args = String[]
+
+            for i = 1:len[]
+                step = unsafe_load(ptr, i)
+
+                if step.type === API.TSQueryPredicateStepTypeString
+                    # String argument or predicate name
+                    str = query_string(q, step.value_id)
+                    func == "" ? (func = str) : push!(args, str)
+
+                elseif step.type === API.TSQueryPredicateStepTypeCapture
+                    # Capture reference - store as "@capturename" for now
+                    # TODO: track capture indices for quantified predicates
+                    push!(args, "@capture_$(step.value_id)")
+
+                elseif step.type === API.TSQueryPredicateStepTypeDone
+                    # End of one predicate - route to appropriate storage
+                    if func == "set!"
+                        # Metadata directive: (#set! key value) or (#set! key)
+                        prop = parse_set_property(args)
+                        push!(q.property_settings[pattern_idx], prop)
+
+                    elseif func == "is?" || func == "is-not?"
+                        # Property assertion: (#is? @capture "property") or (#is-not? @capture "property")
+                        prop = parse_property_predicate(args)
+                        is_positive = (func == "is?")
+                        push!(q.property_predicates[pattern_idx], (prop, is_positive))
+                        # Track unknown properties for warning at construction
+                        if prop.key ∉ ("named", "missing", "extra", "local")
+                            push!(q.unknown_properties, prop.key)
+                        end
+                    end
+                    # Other predicates (#eq?, #match?, etc.) handled at match-time in predicate()
+
+                    # Reset for next predicate
+                    func = ""
+                    empty!(args)
+                end
+            end
+        end
+    end
+end
+
+# Parse #set! directive arguments into QueryProperty
+# Formats: (#set! "key" "value"), (#set! "key"), (#set! @capture "key" "value")
+function parse_set_property(args::Vector{String})
+    if isempty(args)
+        error("set! requires at least a key")
+    end
+
+    # Check if first arg is capture reference (@capture_N)
+    if startswith(args[1], "@capture_")
+        # Capture-specific: (#set! @capture "key" "value")
+        capture_id = parse(Int, args[1][10:end])  # Extract N from @capture_N
+        key = get(args, 2, nothing)
+        value = get(args, 3, nothing)
+        key === nothing && error("set! with capture requires key")
+        return QueryProperty(key, value, capture_id)
+    else
+        # Pattern-level: (#set! "key" "value")
+        key = args[1]
+        value = get(args, 2, nothing)
+        return QueryProperty(key, value, nothing)
+    end
+end
+
+# Parse #is?/#is-not? directive arguments into QueryProperty
+# Format: (#is? @capture "property") or (#is? @capture "property" "value")
+# First arg is always @capture reference, second is property name
+function parse_property_predicate(args::Vector{String})
+    if length(args) < 2
+        error("is?/is-not? requires @capture and property name")
+    end
+
+    # Extract capture ID from @capture_N
+    capture_id = startswith(args[1], "@capture_") ? parse(Int, args[1][10:end]) : nothing
+    key = args[2]
+    value = length(args) >= 3 ? args[3] : nothing
+
+    return QueryProperty(key, value, capture_id)
+end
+
+"""
+    property_settings(q::Query, pattern_index::Int) -> Vector{QueryProperty}
+
+Get all properties set by `(#set! key value)` directives for the given pattern (1-indexed).
+Returns empty vector if no properties set for this pattern.
+
+# Example
+```julia
+q = Query(:julia, \"\"\"
+    ((identifier) @var
+     (#set! "priority" "100")
+     (#set! "scope" "local"))
+\"\"\")
+props = property_settings(q, 1)  # [QueryProperty("priority", "100", nothing), ...]
+```
+"""
+property_settings(q::Query, pattern_index::Int) = q.property_settings[pattern_index]
+
+"""
+    property_predicates(q::Query, pattern_index::Int) -> Vector{Tuple{QueryProperty,Bool}}
+
+Get property assertions (`#is?`/`#is-not?`) for the given pattern (1-indexed).
+Bool indicates positive (true for `#is?`) or negative (false for `#is-not?`) assertion.
+Returns empty vector if no property assertions for this pattern.
+
+# Example
+```julia
+q = Query(:julia, \"\"\"
+    ((identifier) @var
+     (#is? @var "named"))
+\"\"\")
+props = property_predicates(q, 1)  # [(QueryProperty("named", nothing, nothing), true)]
+```
+"""
+property_predicates(q::Query, pattern_index::Int) = q.property_predicates[pattern_index]
 
 macro query_cmd(body, language = error("no language provided in query"))
     # Convert short name "julia" to module name :tree_sitter_julia_jll
@@ -282,19 +450,76 @@ end
 struct QueryCapture
     node::Node
     id::UInt32
+    pattern_index::UInt16  # Pattern this capture belongs to (for property lookup)
 end
 
 function captures(qm::QueryMatch)
     fn = function (ith)
         ptr = unsafe_load(qm.obj.captures, ith)
         node = Node(ptr.node, qm.tree)
-        return QueryCapture(node, ptr.index)
+        return QueryCapture(node, ptr.index, qm.obj.pattern_index)
     end
     return (fn(i) for i = 1:capture_count(qm))
 end
 
 function capture_name(q::Query, qc::QueryCapture)
     unsafe_string(API.ts_query_capture_name_for_id(q.ptr, qc.id, Ref{UInt32}()))
+end
+
+"""
+    property(q::Query, m::QueryMatch, key::String) -> Union{String,Nothing}
+
+Get a match-level property value, or `nothing` if not set.
+Convenience accessor for properties on QueryMatch.
+
+# Example
+```julia
+for m in eachmatch(query, tree)
+    priority = property(query, m, "priority")  # "100" or nothing
+end
+```
+"""
+function property(q::Query, m::QueryMatch, key::String)
+    props = property_settings(q, Int(m.obj.pattern_index) + 1)  # C uses 0-based
+    for prop in props
+        if prop.key == key && prop.capture_id === nothing
+            return prop.value
+        end
+    end
+    return nothing
+end
+
+"""
+    property(q::Query, c::QueryCapture, key::String) -> Union{String,Nothing}
+
+Get a capture-level property value, or `nothing` if not set.
+First checks for capture-specific properties, then falls back to pattern-level.
+
+# Example
+```julia
+for c in each_capture(tree, query, source)
+    scope = property(query, c, "scope")  # "local" or nothing
+end
+```
+"""
+function property(q::Query, c::QueryCapture, key::String)
+    props = property_settings(q, Int(c.pattern_index) + 1)  # C uses 0-based
+
+    # First check for capture-specific property
+    for prop in props
+        if prop.key == key && prop.capture_id == Int(c.id)
+            return prop.value
+        end
+    end
+
+    # Fall back to pattern-level property
+    for prop in props
+        if prop.key == key && prop.capture_id === nothing
+            return prop.value
+        end
+    end
+
+    return nothing
 end
 
 query_string(q, id) =
@@ -305,19 +530,34 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
     ptr = API.ts_query_predicates_for_pattern(q.ptr, m.obj.pattern_index, len)
     if len[] > 0
         func, args, nodes = "", [], []
+        # Track which args are captures and store ALL their values
+        capture_args = Dict{Int,Vector{String}}()  # arg_index => [all values for this capture]
+        capture_nodes = Dict{Int,Vector{Node}}()
+
         for i = 1:len[]
             step = unsafe_load(ptr, i)
             if step.type === API.TSQueryPredicateStepTypeCapture
-                # Iterate over the captures rather than allocating a dict.
+                # Collect ALL matching captures, not just first
+                arg_idx = length(args) + 1
+                values = String[]
+                nodes_for_capture = Node[]
+
                 for address = 1:capture_count(m)
                     capture = unsafe_load(m.obj.captures, address)
                     if capture.index == step.value_id
                         node = Node(capture.node, m.tree)
                         str = slice(source, node)
-                        push!(args, str)
-                        push!(nodes, node)
-                        break
+                        push!(values, str)
+                        push!(nodes_for_capture, node)
                     end
+                end
+
+                # Store first value in args for backwards compatibility with non-quantified predicates
+                if !isempty(values)
+                    push!(args, values[1])
+                    push!(nodes, nodes_for_capture[1])
+                    capture_args[arg_idx] = values
+                    capture_nodes[arg_idx] = nodes_for_capture
                 end
             elseif step.type === API.TSQueryPredicateStepTypeString
                 # Either a literal argument name, or predicate name.
@@ -391,11 +631,59 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                         end
                     end
                 elseif func == "is?"
-                    @warn "'$func' not implemented" # TODO
-                    false
+                    # Check if node has built-in property: named, missing, extra
+                    # Format: (#is? @capture "property") - property_name is second arg after capture
+                    if length(args) < 2
+                        @warn "incorrect number of arguments to '$func', expected @capture and property"
+                        false
+                    elseif isempty(nodes)
+                        @warn "'$func' requires access to node structure"
+                        false
+                    else
+                        node = nodes[1]
+                        property_name = args[2]  # Second arg is property name, first is capture text
+                        # Check built-in properties via C API
+                        if property_name == "named"
+                            is_named(node)
+                        elseif property_name == "missing"
+                            is_missing(node)
+                        elseif property_name == "extra"
+                            is_extra(node)
+                        else
+                            # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops
+                            # to preserve backwards compatibility with upstream queries. The property
+                            # assertion is still stored in property_predicates for inspection.
+                            # Returning true prevents filtering the pattern.
+                            true
+                        end
+                    end
                 elseif func == "is-not?"
-                    @warn "'$func' not implemented" # TODO
-                    false
+                    # Negated property check
+                    # Format: (#is-not? @capture "property") - property_name is second arg after capture
+                    if length(args) < 2
+                        @warn "incorrect number of arguments to '$func', expected @capture and property"
+                        false
+                    elseif isempty(nodes)
+                        @warn "'$func' requires access to node structure"
+                        false
+                    else
+                        node = nodes[1]
+                        property_name = args[2]  # Second arg is property name, first is capture text
+                        # Check negated built-in properties via C API
+                        if property_name == "named"
+                            !is_named(node)
+                        elseif property_name == "missing"
+                            !is_missing(node)
+                        elseif property_name == "extra"
+                            !is_extra(node)
+                        else
+                            # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops.
+                            # Returning true (property not set) preserves backwards compatibility with
+                            # upstream queries like (#is-not? local) which expect non-local identifiers
+                            # to match. The property assertion is stored in property_predicates.
+                            true
+                        end
+                    end
                 elseif func == "match?"
                     if length(args) != 2
                         @warn "incorrect number of arguments to '$func', expected 2"
@@ -404,9 +692,68 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                         arg_1, arg_2 = args
                         occursin(Regex(arg_2), arg_1)
                     end
+                elseif func == "not-match?"
+                    # Negated regex match
+                    if length(args) != 2
+                        @warn "incorrect number of arguments to '$func', expected 2"
+                        false
+                    else
+                        arg_1, arg_2 = args
+                        !occursin(Regex(arg_2), arg_1)
+                    end
+                elseif func == "any-eq?"
+                    # Quantified equality: check if ANY captured value equals ANY comparison value
+                    # Format: (#any-eq? @capture "value1" "value2" ...)
+                    if length(args) < 2
+                        @warn "incorrect number of arguments to '$func', expected at least 2"
+                        false
+                    else
+                        # Get all values for the first capture (which may be quantified)
+                        all_capture_values = get(capture_args, 1, [args[1]])
+                        comparison_values = args[2:end]
+                        # Check if ANY captured value equals ANY comparison value
+                        any(cv -> cv in comparison_values, all_capture_values)
+                    end
+                elseif func == "any-not-eq?"
+                    # Quantified inequality: check if ANY captured value doesn't equal ALL comparison values
+                    if length(args) < 2
+                        @warn "incorrect number of arguments to '$func', expected at least 2"
+                        false
+                    else
+                        all_capture_values = get(capture_args, 1, [args[1]])
+                        comparison_values = args[2:end]
+                        # Check if ANY captured value is not in comparison values
+                        any(cv -> cv ∉ comparison_values, all_capture_values)
+                    end
+                elseif func == "any-match?"
+                    # Quantified regex: check if ANY captured value matches regex
+                    # Format: (#any-match? @capture "pattern")
+                    if length(args) != 2
+                        @warn "incorrect number of arguments to '$func', expected 2"
+                        false
+                    else
+                        # Get all values for the first capture
+                        all_capture_values = get(capture_args, 1, [args[1]])
+                        pattern = Regex(args[2])
+                        # Check if ANY value matches the pattern
+                        any(cv -> occursin(pattern, cv), all_capture_values)
+                    end
+                elseif func == "any-not-match?"
+                    # Quantified negated regex: check if ANY captured value doesn't match regex
+                    # Format: (#any-not-match? @capture "pattern")
+                    if length(args) != 2
+                        @warn "incorrect number of arguments to '$func', expected 2"
+                        false
+                    else
+                        all_capture_values = get(capture_args, 1, [args[1]])
+                        pattern = Regex(args[2])
+                        # Check if ANY value doesn't match the pattern
+                        any(cv -> !occursin(pattern, cv), all_capture_values)
+                    end
                 elseif func == "set!"
-                    @warn "'$func' not implemented" # TODO
-                    false
+                    # Metadata directive, not a filter - always returns true
+                    # Metadata already parsed at construction and accessible via property_settings()
+                    true
                 else
                     # Invalid predicate functions will fail with a warning:
                     @warn "unknown predicate function '$func'"

@@ -166,3 +166,45 @@ Language(:php_only)
 julia> query = Query(tree_sitter_php_jll, "(identifier) @id", :php_only)
 Query(Language(:php_only))
 ```
+
+## Query Predicates and Metadata
+
+TreeSitter.jl supports tree-sitter query predicates for filtering matches and attaching metadata to patterns.
+
+### Supported Filtering Predicates
+
+**String Comparison:**
+- `#eq?` - String equality: `(#eq? @var "foo")`
+- `#not-eq?` - String inequality: `(#not-eq? @method "constructor")`
+- `#any-of?` - Multi-value equality: `(#any-of? @type "int" "void" "char")`
+
+**Pattern Matching:**
+- `#match?` - Regex match: `(#match? @lowercase "^[a-z]+$")`
+- `#not-match?` - Negated regex: `(#not-match? @public "^_")`
+
+**Node Properties:**
+- `#is?` - Property assertion: `(#is? @node "named")`
+- `#is-not?` - Negated property: `(#is-not? @node "extra")`
+
+Only built-in properties are checked: `named`, `missing`, `extra`
+
+**Tree Structure:**
+- `#has-ancestor?` - Ancestor check: `(#has-ancestor? @indexer index_expression)`
+
+**Quantified Predicates:**
+
+For patterns with quantified captures (e.g., `(comment)+ @comments`), these predicates check if the condition holds for ANY of the captured nodes:
+
+- `#any-eq?` - ANY capture equals value: `(#any-eq? @comments "// TODO")`
+- `#any-not-eq?` - ANY capture not equal: `(#any-not-eq? @ids "reserved")`
+- `#any-match?` - ANY capture matches regex: `(#any-match? @comments "TODO")`
+- `#any-not-match?` - ANY capture doesn't match: `(#any-not-match? @lines "^\\s*$")`
+
+Example usage:
+```julia
+# Match comment blocks where at least one comment contains "TODO"
+q = query```
+((comment)+ @comments
+ (#any-match? @comments "TODO"))
+```julia
+```
