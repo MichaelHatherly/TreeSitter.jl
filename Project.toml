@@ -1,7 +1,7 @@
 name = "TreeSitter"
 uuid = "f42328cb-ece0-4cf2-995f-9e7abb27d006"
 authors = ["Michael Hatherly <michaelhatherly@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
