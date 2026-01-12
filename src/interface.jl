@@ -348,17 +348,27 @@ function parse_set_property(args::Vector{String})
 end
 
 # Parse #is?/#is-not? directive arguments into QueryProperty
-# Format: (#is? @capture "property") or (#is? @capture "property" "value")
-# First arg is always @capture reference, second is property name
+# Formats:
+#   (#is? @capture "property") - with explicit capture
+#   (#is? "property") - property only, applies to pattern's captures
 function parse_property_predicate(args::Vector{String})
-    if length(args) < 2
-        error("is?/is-not? requires @capture and property name")
+    if isempty(args)
+        error("is?/is-not? requires at least a property name")
     end
 
-    # Extract capture ID from @capture_N
-    capture_id = startswith(args[1], "@capture_") ? parse(Int, args[1][10:end]) : nothing
-    key = args[2]
-    value = length(args) >= 3 ? args[3] : nothing
+    # Check if first arg is capture reference (@capture_N) or property name
+    if startswith(args[1], "@capture_")
+        # Format: (#is? @capture "property")
+        capture_id = parse(Int, args[1][10:end])
+        key = get(args, 2, nothing)
+        key === nothing && error("is?/is-not? with capture requires property name")
+        value = get(args, 3, nothing)
+    else
+        # Format: (#is? property) - applies to pattern's captures
+        capture_id = nothing
+        key = args[1]
+        value = get(args, 2, nothing)
+    end
 
     return QueryProperty(key, value, capture_id)
 end
@@ -632,56 +642,78 @@ function predicate(q::Query, m::QueryMatch, source::AbstractString)
                     end
                 elseif func == "is?"
                     # Check if node has built-in property: named, missing, extra
-                    # Format: (#is? @capture "property") - property_name is second arg after capture
-                    if length(args) < 2
-                        @warn "incorrect number of arguments to '$func', expected @capture and property"
-                        false
-                    elseif isempty(nodes)
-                        @warn "'$func' requires access to node structure"
+                    # Formats:
+                    #   (#is? @capture "property") - property is second arg
+                    #   (#is? property) - property is first arg (no capture ref)
+                    if isempty(args)
+                        @warn "incorrect number of arguments to '$func', expected property name"
                         false
                     else
-                        node = nodes[1]
-                        property_name = args[2]  # Second arg is property name, first is capture text
-                        # Check built-in properties via C API
-                        if property_name == "named"
-                            is_named(node)
-                        elseif property_name == "missing"
-                            is_missing(node)
-                        elseif property_name == "extra"
-                            is_extra(node)
+                        # Property is first arg if no capture ref, second if capture ref present
+                        property_name =
+                            startswith(args[1], "@") ? get(args, 2, "") : args[1]
+                        if isempty(property_name)
+                            @warn "'$func' missing property name"
+                            false
                         else
-                            # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops
-                            # to preserve backwards compatibility with upstream queries. The property
-                            # assertion is still stored in property_predicates for inspection.
-                            # Returning true prevents filtering the pattern.
-                            true
+                            # For single-arg format, use match's first capture if nodes is empty
+                            check_nodes = if isempty(nodes)
+                                [Node(unsafe_load(m.obj.captures, 1).node, m.tree)]
+                            else
+                                nodes
+                            end
+                            node = check_nodes[1]
+                            if property_name == "named"
+                                is_named(node)
+                            elseif property_name == "missing"
+                                is_missing(node)
+                            elseif property_name == "extra"
+                                is_extra(node)
+                            else
+                                # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops
+                                # to preserve backwards compatibility with upstream queries. The property
+                                # assertion is still stored in property_predicates for inspection.
+                                # Returning true prevents filtering the pattern.
+                                true
+                            end
                         end
                     end
                 elseif func == "is-not?"
                     # Negated property check
-                    # Format: (#is-not? @capture "property") - property_name is second arg after capture
-                    if length(args) < 2
-                        @warn "incorrect number of arguments to '$func', expected @capture and property"
-                        false
-                    elseif isempty(nodes)
-                        @warn "'$func' requires access to node structure"
+                    # Formats:
+                    #   (#is-not? @capture "property") - property is second arg
+                    #   (#is-not? property) - property is first arg (no capture ref)
+                    if isempty(args)
+                        @warn "incorrect number of arguments to '$func', expected property name"
                         false
                     else
-                        node = nodes[1]
-                        property_name = args[2]  # Second arg is property name, first is capture text
-                        # Check negated built-in properties via C API
-                        if property_name == "named"
-                            !is_named(node)
-                        elseif property_name == "missing"
-                            !is_missing(node)
-                        elseif property_name == "extra"
-                            !is_extra(node)
+                        # Property is first arg if no capture ref, second if capture ref present
+                        property_name =
+                            startswith(args[1], "@") ? get(args, 2, "") : args[1]
+                        if isempty(property_name)
+                            @warn "'$func' missing property name"
+                            false
                         else
-                            # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops.
-                            # Returning true (property not set) preserves backwards compatibility with
-                            # upstream queries like (#is-not? local) which expect non-local identifiers
-                            # to match. The property assertion is stored in property_predicates.
-                            true
+                            # For single-arg format, use match's first capture if nodes is empty
+                            check_nodes = if isempty(nodes)
+                                [Node(unsafe_load(m.obj.captures, 1).node, m.tree)]
+                            else
+                                nodes
+                            end
+                            node = check_nodes[1]
+                            if property_name == "named"
+                                !is_named(node)
+                            elseif property_name == "missing"
+                                !is_missing(node)
+                            elseif property_name == "extra"
+                                !is_extra(node)
+                            else
+                                # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops.
+                                # Returning true (property not set) preserves backwards compatibility with
+                                # upstream queries like (#is-not? local) which expect non-local identifiers
+                                # to match. The property assertion is stored in property_predicates.
+                                true
+                            end
                         end
                     end
                 elseif func == "match?"
