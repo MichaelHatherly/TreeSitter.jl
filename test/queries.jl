@@ -234,6 +234,70 @@ import tree_sitter_julia_jll, tree_sitter_javascript_jll, tree_sitter_c_jll
         @test length(out) >= 1
     end
 
+    @testset "is? predicate - single-arg format" begin
+        p = Parser(tree_sitter_c_jll)
+        source = "int x = 1;"
+        tree = parse(p, source)
+
+        # Single-arg format (#is? named) without explicit capture reference
+        q = query```
+        ((_ ) @node
+         (#is? named))
+        ```c
+
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, literal)
+        end
+
+        # Should include named nodes, exclude '=' and ';'
+        @test "=" ∉ out
+        @test ";" ∉ out
+        @test !isempty(out)
+    end
+
+    @testset "is-not? predicate - single-arg format" begin
+        p = Parser(tree_sitter_c_jll)
+        source = "int x;"
+        tree = parse(p, source)
+
+        # Single-arg format (#is-not? extra)
+        q = query```
+        ((identifier) @node
+         (#is-not? extra))
+        ```c
+
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, literal)
+        end
+
+        # Should match identifiers (they are not extra)
+        @test "x" in out
+    end
+
+    @testset "is-not? predicate - unknown property single-arg" begin
+        p = Parser(tree_sitter_c_jll)
+        source = "int x;"
+        tree = parse(p, source)
+
+        # Unknown property like "local" should not filter matches (compatibility)
+        q = query```
+        ((identifier) @node
+         (#is-not? local))
+        ```c
+
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, literal)
+        end
+
+        @test "x" in out
+    end
+
     @testset "Anonymous nodes - literal matching" begin
         p = Parser(tree_sitter_c_jll)
         source = "int x;"

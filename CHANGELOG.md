@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Add single-arg format for `#is?` and `#is-not?` predicates [#41]
+
 ## [v0.2.0] - 2025-11-30
 
 ### Added
@@ -64,3 +68,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#35]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/35
 [#36]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/36
 [#37]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/37
+[#41]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/41
