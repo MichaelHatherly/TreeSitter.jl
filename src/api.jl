@@ -919,6 +919,9 @@ function get_lang_ptr(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
     return lang_ptr
 end
 
+# Editor preference for selecting query directories when multiple exist
+const EDITOR_PREFERENCE = ["neovim", "helix", "emacs", "zed"]
+
 function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
     # Determine which parser variant to load queries for
     if variant === nothing
@@ -934,26 +937,65 @@ function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
 
     # Use custom queries if available, otherwise use JLL queries
     if isdir(custom)
-        dir = custom
+        base_dir = custom
     elseif isdefined(jll_mod, :artifact_dir)
-        dir = joinpath(getfield(jll_mod, :artifact_dir), "queries")
+        base_dir = joinpath(getfield(jll_mod, :artifact_dir), "queries")
     else
         return dict  # No queries available
     end
 
-    if isdir(dir)
-        for file in readdir(dir)
-            path = joinpath(dir, file)
-            if isfile(path)
-                name, ext = splitext(file)
-                if ext == ".scm"
-                    dict[name] = read(path, String)
-                end
-            end
+    !isdir(base_dir) && return dict
+
+    # Find all directories containing .scm files
+    candidates = find_query_dirs(base_dir)
+    isempty(candidates) && return dict
+
+    # Select best directory
+    best_dir = select_best_query_dir(candidates, base_dir)
+
+    # Load queries from selected directory
+    for file in readdir(best_dir)
+        path = joinpath(best_dir, file)
+        if isfile(path)
+            name, ext = splitext(file)
+            ext == ".scm" && (dict[name] = read(path, String))
         end
     end
 
     return dict
+end
+
+function find_query_dirs(base_dir::String)
+    dirs = String[]
+    for (root, _, files) in walkdir(base_dir)
+        if any(endswith(f, ".scm") for f in files)
+            push!(dirs, root)
+        end
+    end
+    return dirs
+end
+
+function select_best_query_dir(candidates::Vector{String}, base_dir::String)
+    # Prefer root dir if it has queries
+    base_dir in candidates && return base_dir
+
+    # Count .scm files in each candidate
+    scored = [(count_scm_files(d), editor_rank(d), d) for d in candidates]
+
+    # Sort by: most files (descending), then editor preference (ascending)
+    sort!(scored, by = x -> (-x[1], x[2]))
+
+    return scored[1][3]
+end
+
+function count_scm_files(dir::String)
+    count(f -> endswith(f, ".scm"), readdir(dir))
+end
+
+function editor_rank(dir::String)
+    name = basename(dir)
+    idx = findfirst(==(name), EDITOR_PREFERENCE)
+    return idx === nothing ? length(EDITOR_PREFERENCE) + 1 : idx
 end
 
 end

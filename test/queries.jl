@@ -1,4 +1,5 @@
-import tree_sitter_julia_jll, tree_sitter_javascript_jll, tree_sitter_c_jll
+import tree_sitter_julia_jll,
+    tree_sitter_javascript_jll, tree_sitter_c_jll, tree_sitter_matlab_jll
 
 @testset "Captures & Predicates" begin
     @testset "match? predicate" begin
@@ -527,6 +528,26 @@ end
     @test out[3] == ("variable", "main")
     @test out[4] == ("type", "void")
     @test out[5] == ("comment", "// comment")
+
+    # Test loading queries from editor subdirectories (e.g. queries/neovim/)
+    # MATLAB JLL has queries in queries/neovim/ not queries/
+    @testset "Editor subdir queries (MATLAB)" begin
+        lang = Language(tree_sitter_matlab_jll)
+        @test haskey(lang.queries, "highlights")
+
+        p = Parser(tree_sitter_matlab_jll)
+        source = "function y = foo(x)\n    y = x + 1;\nend"
+        tree = parse(p, source)
+        q = Query(tree_sitter_matlab_jll, ["highlights"])
+        out = []
+        for capture in TreeSitter.each_capture(tree, q, source)
+            id = TreeSitter.capture_name(q, capture)
+            literal = TreeSitter.slice(source, capture.node)
+            push!(out, (id, literal))
+        end
+        @test !isempty(out)
+        @test any(t -> t[1] == "keyword", out)  # "function" or "end"
+    end
 end
 
 @testset "Query Syntax Errors" begin
