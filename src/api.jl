@@ -950,16 +950,26 @@ function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
     candidates = find_query_dirs(base_dir)
     isempty(candidates) && return dict
 
-    # Select best directory
-    best_dir = select_best_query_dir(candidates, base_dir)
+    # Collect all query files across all candidate dirs
+    # Key: query name, Value: [(has_lua, path), ...]
+    all_queries = Dict{String,Vector{Tuple{Bool,String}}}()
 
-    # Load queries from selected directory
-    for file in readdir(best_dir)
-        path = joinpath(best_dir, file)
-        if isfile(path)
+    for dir in candidates
+        for file in readdir(dir)
+            path = joinpath(dir, file)
+            isfile(path) || continue
             name, ext = splitext(file)
-            ext == ".scm" && (dict[name] = read(path, String))
+            ext == ".scm" || continue
+            content = read(path, String)
+            has_lua = occursin(r"#lua-", content)
+            push!(get!(all_queries, name, Tuple{Bool,String}[]), (has_lua, path))
         end
+    end
+
+    # For each query, prefer non-lua version, then by editor preference
+    for (name, options) in all_queries
+        sort!(options, by = x -> (x[1], editor_rank(dirname(x[2]))))
+        dict[name] = read(options[1][2], String)
     end
 
     return dict
@@ -973,23 +983,6 @@ function find_query_dirs(base_dir::String)
         end
     end
     return dirs
-end
-
-function select_best_query_dir(candidates::Vector{String}, base_dir::String)
-    # Prefer root dir if it has queries
-    base_dir in candidates && return base_dir
-
-    # Count .scm files in each candidate
-    scored = [(count_scm_files(d), editor_rank(d), d) for d in candidates]
-
-    # Sort by: most files (descending), then editor preference (ascending)
-    sort!(scored, by = x -> (-x[1], x[2]))
-
-    return scored[1][3]
-end
-
-function count_scm_files(dir::String)
-    count(f -> endswith(f, ".scm"), readdir(dir))
 end
 
 function editor_rank(dir::String)

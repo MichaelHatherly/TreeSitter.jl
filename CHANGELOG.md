@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support query loading from editor subdirectories (e.g. `queries/neovim/`) [#42]
+- Support query loading from editor subdirectories, preferring files without lua-specific predicates [#42]
 
 ## [v0.2.1] - 2026-01-12
 
