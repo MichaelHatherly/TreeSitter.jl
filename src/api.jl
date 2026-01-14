@@ -919,6 +919,9 @@ function get_lang_ptr(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
     return lang_ptr
 end
 
+# Editor preference for selecting query directories when multiple exist
+const EDITOR_PREFERENCE = ["neovim", "helix", "emacs", "zed"]
+
 function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
     # Determine which parser variant to load queries for
     if variant === nothing
@@ -934,26 +937,58 @@ function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
 
     # Use custom queries if available, otherwise use JLL queries
     if isdir(custom)
-        dir = custom
+        base_dir = custom
     elseif isdefined(jll_mod, :artifact_dir)
-        dir = joinpath(getfield(jll_mod, :artifact_dir), "queries")
+        base_dir = joinpath(getfield(jll_mod, :artifact_dir), "queries")
     else
         return dict  # No queries available
     end
 
-    if isdir(dir)
+    !isdir(base_dir) && return dict
+
+    # Find all directories containing .scm files
+    candidates = find_query_dirs(base_dir)
+    isempty(candidates) && return dict
+
+    # Collect all query files across all candidate dirs
+    # Key: query name, Value: [(has_lua, path), ...]
+    all_queries = Dict{String,Vector{Tuple{Bool,String}}}()
+
+    for dir in candidates
         for file in readdir(dir)
             path = joinpath(dir, file)
-            if isfile(path)
-                name, ext = splitext(file)
-                if ext == ".scm"
-                    dict[name] = read(path, String)
-                end
-            end
+            isfile(path) || continue
+            name, ext = splitext(file)
+            ext == ".scm" || continue
+            content = read(path, String)
+            has_lua = occursin(r"#lua-", content)
+            push!(get!(all_queries, name, Tuple{Bool,String}[]), (has_lua, path))
         end
     end
 
+    # For each query, prefer non-lua version, then by editor preference
+    for (name, options) in all_queries
+        sort!(options, by = x -> (x[1], editor_rank(dirname(x[2]))))
+        dict[name] = read(options[1][2], String)
+    end
+
     return dict
+end
+
+function find_query_dirs(base_dir::String)
+    dirs = String[]
+    for (root, _, files) in walkdir(base_dir)
+        if any(endswith(f, ".scm") for f in files)
+            push!(dirs, root)
+        end
+    end
+    return dirs
+end
+
+function editor_rank(dir::String)
+    name = basename(dir)
+    idx = findfirst(==(name), EDITOR_PREFERENCE)
+    return idx === nothing ? length(EDITOR_PREFERENCE) + 1 : idx
 end
 
 end

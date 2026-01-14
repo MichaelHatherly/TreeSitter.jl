@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Support query loading from editor subdirectories, preferring files without lua-specific predicates [#42]
+
 ## [v0.2.1] - 2026-01-12
 
 ### Added
@@ -72,3 +76,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#36]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/36
 [#37]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/37
 [#41]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/41
+[#42]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/42
