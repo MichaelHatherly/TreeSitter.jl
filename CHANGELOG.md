@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Support loading parsers from local tree-sitter grammar repositories [#43]
+
 ## [v0.2.2] - 2026-01-14
 
 ### Added
@@ -80,3 +84,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#37]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/37
 [#41]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/41
 [#42]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/42
+[#43]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/43

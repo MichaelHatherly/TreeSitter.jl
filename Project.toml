@@ -6,12 +6,14 @@ version = "0.2.2"
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 tree_sitter_jll = "695101d5-1b81-5434-9529-70430e482717"
 
 [compat]
 AbstractTrees = "0.4"
 CEnum = "0.4, 0.5"
+JSON = "0.21, 1"
 Libdl = "1"
 julia = "1.6"
 tree_sitter_jll = "0.25"

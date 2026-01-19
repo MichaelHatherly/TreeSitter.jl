@@ -167,6 +167,32 @@ julia> query = Query(tree_sitter_php_jll, "(identifier) @id", :php_only)
 Query(Language(:php_only))
 ```
 
+## Local Grammar Repositories
+
+For grammars not yet packaged as JLLs, load parsers directly from local tree-sitter grammar repositories:
+
+```julia
+# Clone and build the grammar
+# $ git clone https://github.com/tree-sitter/tree-sitter-python
+# $ cd tree-sitter-python && tree-sitter build
+
+using TreeSitter
+parser = Parser("/path/to/tree-sitter-python")
+tree = parse(parser, "def foo(): pass")
+```
+
+**Requirements:**
+- Repository must contain `tree-sitter.json` (tree-sitter v0.21+ format)
+- Shared library must be built (`tree-sitter build` or `make`)
+
+**Multi-grammar repositories:**
+```julia
+# tree-sitter-php has both :php and :php_only variants
+parser = Parser("/path/to/tree-sitter-php", :php_only)
+```
+
+Query files from the repository's `queries/` directory are automatically loaded.
+
 ## Query Predicates and Metadata
 
 TreeSitter.jl supports tree-sitter query predicates for filtering matches and attaching metadata to patterns.
