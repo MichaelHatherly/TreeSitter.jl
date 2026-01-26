@@ -4,6 +4,7 @@ import TreeSitter
 import tree_sitter_jll
 
 using CEnum
+using JSON
 using Libdl
 
 const libtreesitter = tree_sitter_jll.libtreesitter_path
@@ -989,6 +990,82 @@ function editor_rank(dir::String)
     name = basename(dir)
     idx = findfirst(==(name), EDITOR_PREFERENCE)
     return idx === nothing ? length(EDITOR_PREFERENCE) + 1 : idx
+end
+
+# Local grammar repo loading
+
+function load_local_grammar(
+    repo_path::AbstractString,
+    variant::Union{Symbol,Nothing} = nothing,
+)
+    ts_json = joinpath(repo_path, "tree-sitter.json")
+    isfile(ts_json) || error("No tree-sitter.json found at $repo_path")
+    meta = JSON.parse(read(ts_json, String))
+
+    grammars = meta["grammars"]
+    grammar = if variant === nothing
+        first(grammars)
+    else
+        idx = findfirst(g -> Symbol(g["name"]) == variant, grammars)
+        idx === nothing && error("Variant ':$variant' not found in $repo_path")
+        grammars[idx]
+    end
+    name = Symbol(grammar["name"])
+    subpath = get(grammar, "path", ".")
+
+    grammar_dir = normpath(joinpath(repo_path, subpath))
+    lib = find_shared_lib(grammar_dir, name)
+    lib === nothing &&
+        error("Shared library not found in $grammar_dir. Run `make` to build.")
+
+    handle = dlopen(lib)
+    func_name = "tree_sitter_$name"
+    func_ptr = dlsym(handle, func_name)
+    lang_ptr = ccall(func_ptr, Ptr{TSLanguage}, ())
+
+    queries = load_local_queries(repo_path, grammar)
+
+    return (name, lang_ptr, queries)
+end
+
+function find_shared_lib(dir::AbstractString, name::Symbol)
+    # Patterns in priority order:
+    # 1. tree-sitter build output: <name>.dylib
+    # 2. Manual builds with lib prefix: libtree-sitter-<name>.dylib
+    patterns = [
+        "$name",
+        "libtree-sitter-$name",
+        "libtree_sitter_$name",
+        "lib$name",
+        "tree-sitter-$name",
+        "tree_sitter_$name",
+    ]
+    exts = Sys.iswindows() ? (".dll",) : Sys.isapple() ? (".dylib", ".so") : (".so",)
+    for pattern in patterns
+        for ext in exts
+            path = joinpath(dir, pattern * ext)
+            isfile(path) && return path
+        end
+    end
+    return nothing
+end
+
+function load_local_queries(repo_path::AbstractString, grammar::AbstractDict)
+    queries = Dict{String,String}()
+    subpath = get(grammar, "path", ".")
+
+    query_dirs = [joinpath(repo_path, "queries"), joinpath(repo_path, subpath, "queries")]
+
+    for qdir in query_dirs
+        isdir(qdir) || continue
+        for f in readdir(qdir)
+            endswith(f, ".scm") || continue
+            name = replace(f, ".scm" => "")
+            haskey(queries, name) && continue
+            queries[name] = read(joinpath(qdir, f), String)
+        end
+    end
+    return queries
 end
 
 end

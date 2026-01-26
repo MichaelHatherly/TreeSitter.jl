@@ -54,6 +54,16 @@ mutable struct Language
         jll_mod = Base.root_module(pkg_id)
         return Language(jll_mod)
     end
+
+    # Internal constructor for local grammar repos
+    Language(name::Symbol, ptr::Ptr{API.TSLanguage}, queries::Dict{String,String}) =
+        new(name, ptr, queries)
+end
+
+function Language(path::AbstractString, variant::Union{Symbol,Nothing} = nothing)
+    isdir(path) || return Language(Symbol(path))
+    name, ptr, queries = API.load_local_grammar(path, variant)
+    return Language(name, ptr, queries)
 end
 Base.show(io::IO, l::Language) = print(io, "Language(", repr(l.name), ")")
 
@@ -73,6 +83,8 @@ mutable struct Parser
     Parser(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing) =
         Parser(Language(jll_mod, variant))
     Parser(name::Symbol) = Parser(Language(name))
+    Parser(path::AbstractString, variant::Union{Symbol,Nothing} = nothing) =
+        Parser(Language(path, variant))
 end
 Base.show(io::IO, p::Parser) = print(io, "Parser(", p.language, ")")
 
@@ -254,6 +266,8 @@ mutable struct Query
     Query(jll_mod::Module, source, variant::Union{Symbol,Nothing} = nothing) =
         Query(Language(jll_mod, variant), source)
     Query(language::Symbol, source) = Query(Language(language), source)
+    Query(path::AbstractString, source, variant::Union{Symbol,Nothing} = nothing) =
+        Query(Language(path, variant), source)
 
     function load_source(lang::Language, files)
         out = IOBuffer()

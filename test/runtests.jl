@@ -6,4 +6,5 @@ using TreeSitter, Test
     include("nodes.jl")
     include("queries.jl")
     include("abstracttrees.jl")
+    include("local_grammar.jl")
 end
