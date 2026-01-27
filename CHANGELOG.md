@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support loading parsers from local tree-sitter grammar repositories [#43]
 
+### Changed
+
+- Cache JLL modules for symbol-based Language construction [#44]
+
 ## [v0.2.2] - 2026-01-14
 
 ### Added
@@ -85,3 +89,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#41]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/41
 [#42]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/42
 [#43]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/43
+[#44]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/44
