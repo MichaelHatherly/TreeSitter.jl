@@ -2,6 +2,8 @@
 # Language
 #
 
+const JLL_MODULE_CACHE = Dict{Symbol,Module}()
+
 function list_parsers(jll_mod::Module)
     # Scan the module for all libtreesitter_*_handle globals
     parsers = Symbol[]
@@ -33,25 +35,17 @@ mutable struct Language
     end
 
     function Language(name::Symbol)
-        Base.depwarn(
-            "Symbol-based Language construction is deprecated. " *
-            "Please pass the JLL module directly: Language(tree_sitter_$(name)_jll)",
-            :Language;
-            force = true,
-        )
-
-        # Look up the JLL module using Base.identify_package
-        pkg_name = "tree_sitter_$(name)_jll"
-        pkg_id = Base.identify_package(pkg_name)
-
-        if pkg_id === nothing
-            error(
-                "Language package '$pkg_name' not found. Please add and import it first:\n" *
-                "  using tree_sitter_$(name)_jll",
-            )
+        jll_mod = get!(JLL_MODULE_CACHE, name) do
+            pkg_name = "tree_sitter_$(name)_jll"
+            pkg_id = Base.identify_package(pkg_name)
+            if pkg_id === nothing
+                error(
+                    "Language package '$pkg_name' not found. Please add and import it first:\n" *
+                    "  using tree_sitter_$(name)_jll",
+                )
+            end
+            Base.root_module(pkg_id)
         end
-
-        jll_mod = Base.root_module(pkg_id)
         return Language(jll_mod)
     end
 
