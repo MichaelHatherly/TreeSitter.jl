@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add node health accessors `has_error`/`has_changes` and byte/point descendant lookup [#50]
+- Add grammar introspection (symbol/field metadata) and query scoping by byte/point range [#50]
+
+### Fixed
+
+- Fix the zero-argument `ts_query_cursor_next_capture` binding signature [#50]
 
 ## [v0.2.3] - 2026-01-27
 

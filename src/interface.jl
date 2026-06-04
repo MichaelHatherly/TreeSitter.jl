@@ -204,6 +204,36 @@ first_child_for_byte(n::Node, byte::Integer) =
 first_named_child_for_byte(n::Node, byte::Integer) =
     Node(API.ts_node_first_named_child_for_byte(n.ptr, byte - 1), n.tree)
 
+function child_by_field_id(n::Node, field_id::Integer)
+    result = Node(API.ts_node_child_by_field_id(n.ptr, field_id), n.tree)
+    is_null(result) && throw(ArgumentError("TreeSitter: no child for field id $field_id"))
+    return result
+end
+
+#
+# Grammar introspection
+#
+
+# Anything carrying a language pointer: the Language itself, or a Tree/Parser to query
+# the grammar they were built with.
+const HasLanguage = Union{Language,Tree,Parser}
+language_ptr(l::Language) = l.ptr
+language_ptr(t::Tree) = API.ts_tree_language(t.ptr)
+language_ptr(p::Parser) = API.ts_parser_language(p.ptr)
+
+symbol_count(x::HasLanguage) = Int(API.ts_language_symbol_count(language_ptr(x)))
+symbol_name(x::HasLanguage, id::Integer) =
+    unsafe_string(API.ts_language_symbol_name(language_ptr(x), id))
+symbol_for_name(x::HasLanguage, name::AbstractString, named::Bool) =
+    Int(API.ts_language_symbol_for_name(language_ptr(x), String(name), sizeof(name), named))
+symbol_type(x::HasLanguage, id::Integer) = API.ts_language_symbol_type(language_ptr(x), id)
+
+field_count(x::HasLanguage) = Int(API.ts_language_field_count(language_ptr(x)))
+field_name_for_id(x::HasLanguage, id::Integer) =
+    unsafe_string(API.ts_language_field_name_for_id(language_ptr(x), id))
+field_id_for_name(x::HasLanguage, name::AbstractString) =
+    Int(API.ts_language_field_id_for_name(language_ptr(x), String(name), sizeof(name)))
+
 #
 # Query
 #
@@ -448,6 +478,15 @@ pattern_count(q::Query) = Int(API.ts_query_pattern_count(q.ptr))
 capture_count(q::Query) = Int(API.ts_query_capture_count(q.ptr))
 string_count(q::Query) = Int(API.ts_query_string_count(q.ptr))
 
+# 1-based byte offset where the given pattern (1-based) starts in the query source.
+start_byte_for_pattern(q::Query, pattern::Integer) =
+    Int(API.ts_query_start_byte_for_pattern(q.ptr, pattern - 1)) + 1
+
+disable_pattern!(q::Query, pattern::Integer) =
+    (API.ts_query_disable_pattern(q.ptr, pattern - 1); q)
+disable_capture!(q::Query, name::AbstractString) =
+    (API.ts_query_disable_capture(q.ptr, String(name), sizeof(name)); q)
+
 mutable struct QueryCursor
     ptr::Ptr{API.TSQueryCursor}
     tree::Union{Tree,Nothing}
@@ -483,6 +522,24 @@ function next_match(cursor::QueryCursor)
     match_ref = Ref{API.TSQueryMatch}()
     success = API.ts_query_cursor_next_match(cursor.ptr, match_ref)
     return success ? QueryMatch(match_ref[], cursor.tree) : nothing
+end
+
+# Restrict subsequent matches to a range. Bytes are 1-based; points are 0-based TSPoint.
+set_byte_range!(c::QueryCursor, from::Integer, to::Integer) =
+    (API.ts_query_cursor_set_byte_range(c.ptr, from - 1, to - 1); c)
+set_point_range!(c::QueryCursor, from::API.TSPoint, to::API.TSPoint) =
+    (API.ts_query_cursor_set_point_range(c.ptr, from, to); c)
+
+remove_match!(c::QueryCursor, id::Integer) =
+    (API.ts_query_cursor_remove_match(c.ptr, id); c)
+
+# Next capture in document order, as a (match, capture-index) pair, or nothing when
+# exhausted. The index is 1-based into the match's captures.
+function next_capture(cursor::QueryCursor)
+    match_ref = Ref{API.TSQueryMatch}()
+    index_ref = Ref{UInt32}()
+    success = API.ts_query_cursor_next_capture(cursor.ptr, match_ref, index_ref)
+    return success ? (QueryMatch(match_ref[], cursor.tree), Int(index_ref[]) + 1) : nothing
 end
 
 struct QueryCapture

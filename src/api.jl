@@ -814,8 +814,15 @@ function ts_query_cursor_remove_match(arg1, id)
     )
 end
 
-function ts_query_cursor_next_capture()
-    ccall((:ts_query_cursor_next_capture, libtreesitter), Cint, ())
+function ts_query_cursor_next_capture(self, match, capture_index)
+    ccall(
+        (:ts_query_cursor_next_capture, libtreesitter),
+        Bool,
+        (Ptr{TSQueryCursor}, Ptr{TSQueryMatch}, Ptr{UInt32}),
+        self,
+        match,
+        capture_index,
+    )
 end
 
 function ts_language_symbol_count(lang)
