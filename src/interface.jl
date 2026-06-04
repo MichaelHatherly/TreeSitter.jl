@@ -108,6 +108,45 @@ function Base.parse(p::Parser, text::AbstractString; encoding::Symbol = :utf8)
     end
 end
 
+# Holds the user's chunk producer and the current chunk, kept alive across read calls.
+mutable struct InputState
+    source::Function
+    chunk::Vector{UInt8}
+end
+
+# C-callable read callback: returns the source chunk starting at a 1-based byte index,
+# or signals EOF with a zero length.
+function _input_trampoline(
+    payload::Ptr{Cvoid},
+    byte_index::UInt32,
+    ::API.TSPoint,
+    bytes_read::Ptr{UInt32},
+)
+    state = unsafe_pointer_to_objref(payload)::InputState
+    state.chunk = Vector{UInt8}(codeunits(String(state.source(Int(byte_index) + 1))))
+    unsafe_store!(bytes_read, UInt32(length(state.chunk)))
+    return isempty(state.chunk) ? Ptr{Cchar}(C_NULL) : Ptr{Cchar}(pointer(state.chunk))
+end
+
+# Parse from a callback that returns the source chunk at a given 1-based byte offset and
+# an empty string at end of input. Useful for sources not held as a single String.
+function Base.parse(p::Parser, source::Function; encoding::Symbol = :utf8)
+    enc =
+        encoding === :utf8 ? API.TSInputEncodingUTF8 :
+        encoding === :utf16 ? API.TSInputEncodingUTF16 :
+        throw(ArgumentError("unknown encoding $encoding"))
+    state = InputState(source, UInt8[])
+    trampoline = @cfunction(
+        _input_trampoline,
+        Ptr{Cchar},
+        (Ptr{Cvoid}, UInt32, API.TSPoint, Ptr{UInt32})
+    )
+    GC.@preserve state begin
+        input = API.TSInput(pointer_from_objref(state), trampoline, enc, C_NULL)
+        return Tree(API.ts_parser_parse(p.ptr, C_NULL, input))
+    end
+end
+
 reset!(p::Parser) = (API.ts_parser_reset(p.ptr); p)
 
 # Restrict parsing to the given source ranges (byte/point fields are 0-based). Useful for

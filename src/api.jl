@@ -132,6 +132,7 @@ struct TSInput
     payload::Ptr{Cvoid}
     read::Ptr{Cvoid}
     encoding::TSInputEncoding
+    decode::Ptr{Cvoid}
 end
 
 @cenum TSLogType::UInt32 begin

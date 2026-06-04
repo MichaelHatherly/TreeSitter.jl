@@ -63,3 +63,16 @@ import tree_sitter_c_jll
         end
     end
 end
+
+@testset "Streaming input parsing" begin
+    parser = Parser(tree_sitter_c_jll)
+    src = "int x = 1;"
+    # The callback returns the source from a 1-based byte offset, or "" at end of input.
+    tree = parse(parser, i -> i <= sizeof(src) ? src[i:end] : "")
+    @test TreeSitter.node_type(TreeSitter.root(tree)) == "translation_unit"
+    @test !TreeSitter.has_error(TreeSitter.root(tree))
+    # Produces the same tree as parsing the whole string.
+    @test TreeSitter.node_string(TreeSitter.root(tree)) ==
+          TreeSitter.node_string(TreeSitter.root(parse(parser, src)))
+    @test_throws ArgumentError parse(parser, i -> ""; encoding = :latin1)
+end
