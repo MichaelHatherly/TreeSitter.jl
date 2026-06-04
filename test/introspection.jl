@@ -1,4 +1,9 @@
-import tree_sitter_c_jll
+import tree_sitter_c_jll, tree_sitter_php_jll
+
+@testset "Parser variant errors" begin
+    # A JLL exposes a fixed set of parser variants; an unknown one is an error.
+    @test_throws ErrorException Language(tree_sitter_php_jll, :nonexistent_variant)
+end
 
 @testset "Grammar introspection" begin
     p = Parser(tree_sitter_c_jll)

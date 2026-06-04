@@ -9,6 +9,7 @@ using TreeSitter, Test
     include("introspection.jl")
     include("cursor.jl")
     include("editing.jl")
+    include("parser_control.jl")
     include("abstracttrees.jl")
     include("local_grammar.jl")
 end

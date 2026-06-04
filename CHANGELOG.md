@@ -13,11 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add grammar introspection (symbol/field metadata) and query scoping by byte/point range [#50]
 - Add `TreeCursor` for stateful traversal with field-name access [#50]
 - Add incremental editing: `edit!`, `copy`, reparse with an old tree, and `changed_ranges` [#50]
+- Add parser control: `reset!`, UTF-16 parsing, included ranges, logging, and DOT graph output [#50]
 
 ### Fixed
 
 - Fix the zero-argument `ts_query_cursor_next_capture` binding signature [#50]
 - Fix the `TSTreeCursor` struct layout for the tree-sitter 0.25 ABI [#50]
+- Fix the zero-argument `ts_parser_set_included_ranges` binding signature [#50]
+
+### Removed
+
+- Remove deprecated timeout and cancellation-flag parser bindings, dropped in tree-sitter 0.26 [#50]
 
 ## [v0.2.3] - 2026-01-27
 

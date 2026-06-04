@@ -68,8 +68,9 @@ Base.show(io::IO, l::Language) = print(io, "Language(", repr(l.name), ")")
 mutable struct Parser
     language::Language
     ptr::Ptr{API.TSParser}
+    logger_sink::Union{Function,Nothing}  # keeps a set_logger! callback alive while installed
     function Parser(lang::Language)
-        parser = new(lang, API.ts_parser_new())
+        parser = new(lang, API.ts_parser_new(), nothing)
         finalizer(p -> API.ts_parser_delete(p.ptr), parser)
         set_language!(parser, lang)
         return parser
@@ -88,8 +89,86 @@ function set_language!(parser::Parser, language::Language)
     return parser
 end
 
-Base.parse(p::Parser, text::AbstractString) =
-    Tree(API.ts_parser_parse_string(p.ptr, C_NULL, text, sizeof(text)))
+function Base.parse(p::Parser, text::AbstractString; encoding::Symbol = :utf8)
+    encoding === :utf8 &&
+        return Tree(API.ts_parser_parse_string(p.ptr, C_NULL, text, sizeof(text)))
+    encoding === :utf16 || throw(ArgumentError("unknown encoding $encoding"))
+    units = transcode(UInt16, String(text))
+    GC.@preserve units begin
+        buffer = Cstring(reinterpret(Ptr{Cchar}, pointer(units)))
+        return Tree(
+            API.ts_parser_parse_string_encoding(
+                p.ptr,
+                C_NULL,
+                buffer,
+                UInt32(2 * length(units)),
+                API.TSInputEncodingUTF16,
+            ),
+        )
+    end
+end
+
+reset!(p::Parser) = (API.ts_parser_reset(p.ptr); p)
+
+# Restrict parsing to the given source ranges (byte/point fields are 0-based). Useful for
+# language injection, e.g. parsing only the script regions of an HTML document.
+function set_included_ranges!(p::Parser, ranges::Vector{API.TSRange})
+    ok = GC.@preserve ranges API.ts_parser_set_included_ranges(
+        p.ptr,
+        pointer(ranges),
+        length(ranges),
+    )
+    ok || throw(ArgumentError("TreeSitter: included ranges must be ordered and disjoint"))
+    return p
+end
+
+function included_ranges(p::Parser)
+    len = Ref{UInt32}()
+    ptr = API.ts_parser_included_ranges(p.ptr, len)
+    # The array is owned by the parser; do not free it.
+    return [unsafe_load(ptr, i) for i = 1:Int(len[])]
+end
+
+# C-callable trampoline: payload is the Parser, whose logger_sink field holds the sink.
+function _logger_trampoline(
+    payload::Ptr{Cvoid},
+    log_type::API.TSLogType,
+    buffer::Ptr{Cchar},
+)
+    parser = unsafe_pointer_to_objref(payload)::Parser
+    sink = parser.logger_sink
+    sink === nothing ||
+        sink(log_type === API.TSLogTypeLex ? :lex : :parse, unsafe_string(buffer))
+    return nothing
+end
+
+# Install a logger called as sink(kind::Symbol, message::String) during parsing, where
+# kind is :parse or :lex.
+function set_logger!(p::Parser, sink::Function)
+    p.logger_sink = sink
+    trampoline =
+        @cfunction(_logger_trampoline, Cvoid, (Ptr{Cvoid}, API.TSLogType, Ptr{Cchar}))
+    API.ts_parser_set_logger(p.ptr, API.TSLogger(pointer_from_objref(p), trampoline))
+    return p
+end
+
+logger(p::Parser) = API.ts_parser_logger(p.ptr)
+
+# Write parser DOT graphs during subsequent parses. dest is a file path, an IO, or
+# nothing to disable. tree-sitter owns a duplicate of the file descriptor and flushes it
+# when graphs are disabled or redirected.
+function print_dot_graphs!(p::Parser, io::IO)
+    API.ts_parser_print_dot_graphs(p.ptr, _dup_fd(Base.fd(io)))
+    return p
+end
+
+print_dot_graphs!(p::Parser, path::AbstractString) =
+    open(io -> print_dot_graphs!(p, io), path; write = true)
+
+print_dot_graphs!(p::Parser, ::Nothing) = (API.ts_parser_print_dot_graphs(p.ptr, -1); p)
+
+_dup_fd(fd) = @static Sys.iswindows() ? ccall(:_dup, Cint, (Cint,), fd) :
+        ccall(:dup, Cint, (Cint,), fd)
 
 #
 # Tree
