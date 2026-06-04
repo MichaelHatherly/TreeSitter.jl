@@ -211,6 +211,45 @@ end
     @test TreeSitter.slice("[1, 2, 3]", prev_named) == "2"
 end
 
+@testset "Node Health" begin
+    p = Parser(tree_sitter_c_jll)
+
+    valid = TreeSitter.root(parse(p, "int x = 1;"))
+    @test !TreeSitter.has_error(valid)
+    @test !TreeSitter.has_changes(valid)
+
+    # Missing semicolon produces an ERROR/MISSING node.
+    broken = TreeSitter.root(parse(p, "int x"))
+    @test TreeSitter.has_error(broken)
+end
+
+@testset "Descendant Lookup" begin
+    p = Parser(tree_sitter_c_jll)
+    src = "int x = 1;"
+    root_node = TreeSitter.root(parse(p, src))
+
+    # Byte offsets are 1-based, matching `byte_range`/`slice`.
+    ident = TreeSitter.descendant_for_byte_range(root_node, 5, 5)
+    @test TreeSitter.node_type(ident) == "identifier"
+    @test TreeSitter.slice(src, ident) == "x"
+
+    num = TreeSitter.named_descendant_for_byte_range(root_node, 9, 9)
+    @test TreeSitter.node_type(num) == "number_literal"
+
+    # Point ranges round-trip through start_point/end_point (0-based TSPoint).
+    from, to = TreeSitter.start_point(ident), TreeSitter.end_point(ident)
+    by_point = TreeSitter.descendant_for_point_range(root_node, from, to)
+    @test by_point == ident
+    @test TreeSitter.node_type(
+        TreeSitter.named_descendant_for_point_range(root_node, from, to),
+    ) == "identifier"
+
+    @test TreeSitter.node_type(TreeSitter.first_child_for_byte(root_node, 1)) ==
+          "declaration"
+    @test TreeSitter.node_type(TreeSitter.first_named_child_for_byte(root_node, 1)) ==
+          "declaration"
+end
+
 @testset "TSPoint Positions" begin
     p = Parser(tree_sitter_julia_jll)
     source = "f(x) = x + 1"

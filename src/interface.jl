@@ -134,6 +134,9 @@ is_missing(n::Node) = API.ts_node_is_missing(n.ptr)
 is_extra(n::Node) = API.ts_node_is_extra(n.ptr)
 is_leaf(n::Node) = iszero(count_nodes(n))
 
+has_error(n::Node) = API.ts_node_has_error(n.ptr)
+has_changes(n::Node) = API.ts_node_has_changes(n.ptr)
+
 count_nodes(n::Node) = Int(API.ts_node_child_count(n.ptr))
 count_named_nodes(n::Node) = Int(API.ts_node_named_child_count(n.ptr))
 
@@ -183,6 +186,23 @@ prev_named_sibling(n::Node) = Node(API.ts_node_prev_named_sibling(n.ptr), n.tree
 # Position info
 start_point(n::Node) = API.ts_node_start_point(n.ptr)
 end_point(n::Node) = API.ts_node_end_point(n.ptr)
+
+# Smallest node spanning a range. Bytes are 1-based to match `byte_range`; points are
+# the 0-based `TSPoint` values returned by `start_point`/`end_point`.
+descendant_for_byte_range(n::Node, from::Integer, to::Integer) =
+    Node(API.ts_node_descendant_for_byte_range(n.ptr, from - 1, to - 1), n.tree)
+named_descendant_for_byte_range(n::Node, from::Integer, to::Integer) =
+    Node(API.ts_node_named_descendant_for_byte_range(n.ptr, from - 1, to - 1), n.tree)
+descendant_for_point_range(n::Node, from::API.TSPoint, to::API.TSPoint) =
+    Node(API.ts_node_descendant_for_point_range(n.ptr, from, to), n.tree)
+named_descendant_for_point_range(n::Node, from::API.TSPoint, to::API.TSPoint) =
+    Node(API.ts_node_named_descendant_for_point_range(n.ptr, from, to), n.tree)
+
+# First child whose extent reaches the given 1-based byte offset.
+first_child_for_byte(n::Node, byte::Integer) =
+    Node(API.ts_node_first_child_for_byte(n.ptr, byte - 1), n.tree)
+first_named_child_for_byte(n::Node, byte::Integer) =
+    Node(API.ts_node_first_named_child_for_byte(n.ptr, byte - 1), n.tree)
 
 #
 # Query

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Add node health accessors `has_error`/`has_changes` and byte/point descendant lookup [#50]
+
 ## [v0.2.3] - 2026-01-27
 
 ### Added
@@ -93,3 +97,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#42]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/42
 [#43]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/43
 [#44]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/44
+[#50]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/50
