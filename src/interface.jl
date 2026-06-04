@@ -107,6 +107,13 @@ Base.show(io::IO, t::Tree) = show(io, root(t))
 
 root(t::Tree) = Node(API.ts_tree_root_node(t.ptr), t)
 
+Base.copy(t::Tree) = Tree(API.ts_tree_copy(t.ptr))
+
+# Incremental reparse. `old` must have the corresponding `edit!` applied so tree-sitter
+# can reuse the unchanged subtrees.
+Base.parse(p::Parser, text::AbstractString, old::Tree) =
+    Tree(API.ts_parser_parse_string(p.ptr, old.ptr, text, sizeof(text)))
+
 traverse(f, tree::Tree, iter = children) = traverse(f, root(tree), iter)
 
 #
@@ -293,6 +300,47 @@ function traverse(f, c::TreeCursor)
     end
     f(node, field, false)
     return nothing
+end
+
+#
+# Editing
+#
+
+# Describe a source edit. Byte offsets are 1-based to match `byte_range`; points are
+# 0-based TSPoint values, as returned by `start_point`/`end_point`.
+input_edit(
+    start_byte::Integer,
+    old_end_byte::Integer,
+    new_end_byte::Integer,
+    start_point::API.TSPoint,
+    old_end_point::API.TSPoint,
+    new_end_point::API.TSPoint,
+) = API.TSInputEdit(
+    start_byte - 1,
+    old_end_byte - 1,
+    new_end_byte - 1,
+    start_point,
+    old_end_point,
+    new_end_point,
+)
+
+edit!(t::Tree, e::API.TSInputEdit) = (API.ts_tree_edit(t.ptr, Ref(e)); t)
+
+# Apply an edit to a node held outside a tree, returning the adjusted node.
+function edit!(n::Node, e::API.TSInputEdit)
+    ref = Ref(n.ptr)
+    API.ts_node_edit(ref, Ref(e))
+    return Node(ref[], n.tree)
+end
+
+# Ranges that differ between an edited old tree and its incremental reparse. Byte and
+# point fields on each TSRange are 0-based C offsets.
+function changed_ranges(old::Tree, new::Tree)
+    len = Ref{UInt32}()
+    ptr = API.ts_tree_get_changed_ranges(old.ptr, new.ptr, len)
+    ranges = [unsafe_load(ptr, i) for i = 1:Int(len[])]
+    Libc.free(ptr)
+    return ranges
 end
 
 #

@@ -8,6 +8,7 @@ using TreeSitter, Test
     include("predicates.jl")
     include("introspection.jl")
     include("cursor.jl")
+    include("editing.jl")
     include("abstracttrees.jl")
     include("local_grammar.jl")
 end

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add node health accessors `has_error`/`has_changes` and byte/point descendant lookup [#50]
 - Add grammar introspection (symbol/field metadata) and query scoping by byte/point range [#50]
 - Add `TreeCursor` for stateful traversal with field-name access [#50]
+- Add incremental editing: `edit!`, `copy`, reparse with an old tree, and `changed_ranges` [#50]
 
 ### Fixed
 
