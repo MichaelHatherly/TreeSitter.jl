@@ -132,6 +132,7 @@ struct TSInput
     payload::Ptr{Cvoid}
     read::Ptr{Cvoid}
     encoding::TSInputEncoding
+    decode::Ptr{Cvoid}
 end
 
 @cenum TSLogType::UInt32 begin
@@ -162,7 +163,7 @@ end
 struct TSTreeCursor
     tree::Ptr{Cvoid}
     id::Ptr{Cvoid}
-    context::NTuple{2,UInt32}
+    context::NTuple{3,UInt32}
 end
 
 struct TSQueryCapture
@@ -244,8 +245,15 @@ function ts_parser_language(self)
     ccall((:ts_parser_language, libtreesitter), Ptr{TSLanguage}, (Ptr{TSParser},), self)
 end
 
-function ts_parser_set_included_ranges()
-    ccall((:ts_parser_set_included_ranges, libtreesitter), Cint, ())
+function ts_parser_set_included_ranges(self, ranges, count)
+    ccall(
+        (:ts_parser_set_included_ranges, libtreesitter),
+        Bool,
+        (Ptr{TSParser}, Ptr{TSRange}, UInt32),
+        self,
+        ranges,
+        count,
+    )
 end
 
 function ts_parser_included_ranges(self, length)
@@ -296,34 +304,6 @@ end
 
 function ts_parser_reset(self)
     ccall((:ts_parser_reset, libtreesitter), Cvoid, (Ptr{TSParser},), self)
-end
-
-function ts_parser_set_timeout_micros(self, timeout)
-    ccall(
-        (:ts_parser_set_timeout_micros, libtreesitter),
-        Cvoid,
-        (Ptr{TSParser}, UInt64),
-        self,
-        timeout,
-    )
-end
-
-function ts_parser_timeout_micros(self)
-    ccall((:ts_parser_timeout_micros, libtreesitter), UInt64, (Ptr{TSParser},), self)
-end
-
-function ts_parser_set_cancellation_flag(self, flag)
-    ccall(
-        (:ts_parser_set_cancellation_flag, libtreesitter),
-        Cvoid,
-        (Ptr{TSParser}, Ptr{Cint}),
-        self,
-        flag,
-    )
-end
-
-function ts_parser_cancellation_flag()
-    ccall((:ts_parser_cancellation_flag, libtreesitter), Ptr{Cint}, ())
 end
 
 function ts_parser_set_logger(self, logger)
@@ -814,8 +794,15 @@ function ts_query_cursor_remove_match(arg1, id)
     )
 end
 
-function ts_query_cursor_next_capture()
-    ccall((:ts_query_cursor_next_capture, libtreesitter), Cint, ())
+function ts_query_cursor_next_capture(self, match, capture_index)
+    ccall(
+        (:ts_query_cursor_next_capture, libtreesitter),
+        Bool,
+        (Ptr{TSQueryCursor}, Ptr{TSQueryMatch}, Ptr{UInt32}),
+        self,
+        match,
+        capture_index,
+    )
 end
 
 function ts_language_symbol_count(lang)

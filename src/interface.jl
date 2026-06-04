@@ -68,8 +68,9 @@ Base.show(io::IO, l::Language) = print(io, "Language(", repr(l.name), ")")
 mutable struct Parser
     language::Language
     ptr::Ptr{API.TSParser}
+    logger_sink::Union{Function,Nothing}  # keeps a set_logger! callback alive while installed
     function Parser(lang::Language)
-        parser = new(lang, API.ts_parser_new())
+        parser = new(lang, API.ts_parser_new(), nothing)
         finalizer(p -> API.ts_parser_delete(p.ptr), parser)
         set_language!(parser, lang)
         return parser
@@ -88,8 +89,174 @@ function set_language!(parser::Parser, language::Language)
     return parser
 end
 
-Base.parse(p::Parser, text::AbstractString) =
-    Tree(API.ts_parser_parse_string(p.ptr, C_NULL, text, sizeof(text)))
+"""
+    parse(parser::Parser, text::AbstractString; encoding=:utf8) -> Tree
+    parse(parser::Parser, source::Function; encoding=:utf8) -> Tree
+    parse(parser::Parser, text::AbstractString, old::Tree) -> Tree
+
+Parse source into a `Tree`. `encoding` is `:utf8` or `:utf16`.
+
+Pass a `source` callback to parse a source not held as a single `String`:
+`source(offset)` returns the chunk at a 1-based byte offset, or an empty string at end
+of input.
+
+Pass an `old` tree that has had the matching `edit!` applied to reparse incrementally,
+reusing the unchanged subtrees.
+
+# Example
+```julia
+parser = Parser(tree_sitter_julia_jll)
+tree = parse(parser, "f(x) = x + 1")
+```
+"""
+function Base.parse(p::Parser, text::AbstractString; encoding::Symbol = :utf8)
+    encoding === :utf8 &&
+        return Tree(API.ts_parser_parse_string(p.ptr, C_NULL, text, sizeof(text)))
+    encoding === :utf16 || throw(ArgumentError("unknown encoding $encoding"))
+    units = transcode(UInt16, String(text))
+    GC.@preserve units begin
+        buffer = Cstring(reinterpret(Ptr{Cchar}, pointer(units)))
+        return Tree(
+            API.ts_parser_parse_string_encoding(
+                p.ptr,
+                C_NULL,
+                buffer,
+                UInt32(2 * length(units)),
+                API.TSInputEncodingUTF16,
+            ),
+        )
+    end
+end
+
+# Holds the user's chunk producer and the current chunk, kept alive across read calls.
+mutable struct InputState
+    source::Function
+    chunk::Vector{UInt8}
+end
+
+# C-callable read callback: returns the source chunk starting at a 1-based byte index,
+# or signals EOF with a zero length.
+function _input_trampoline(
+    payload::Ptr{Cvoid},
+    byte_index::UInt32,
+    ::API.TSPoint,
+    bytes_read::Ptr{UInt32},
+)
+    state = unsafe_pointer_to_objref(payload)::InputState
+    state.chunk = Vector{UInt8}(codeunits(String(state.source(Int(byte_index) + 1))))
+    unsafe_store!(bytes_read, UInt32(length(state.chunk)))
+    return isempty(state.chunk) ? Ptr{Cchar}(C_NULL) : Ptr{Cchar}(pointer(state.chunk))
+end
+
+function Base.parse(p::Parser, source::Function; encoding::Symbol = :utf8)
+    enc =
+        encoding === :utf8 ? API.TSInputEncodingUTF8 :
+        encoding === :utf16 ? API.TSInputEncodingUTF16 :
+        throw(ArgumentError("unknown encoding $encoding"))
+    state = InputState(source, UInt8[])
+    trampoline = @cfunction(
+        _input_trampoline,
+        Ptr{Cchar},
+        (Ptr{Cvoid}, UInt32, API.TSPoint, Ptr{UInt32})
+    )
+    GC.@preserve state begin
+        input = API.TSInput(pointer_from_objref(state), trampoline, enc, C_NULL)
+        return Tree(API.ts_parser_parse(p.ptr, C_NULL, input))
+    end
+end
+
+"""
+    reset!(parser::Parser) -> Parser
+
+Discard the parser's state so the next `parse` starts fresh rather than resuming a
+cancelled parse.
+"""
+reset!(p::Parser) = (API.ts_parser_reset(p.ptr); p)
+
+"""
+    set_included_ranges!(parser::Parser, ranges::Vector{API.TSRange}) -> Parser
+
+Restrict parsing to the given source ranges (byte and point fields are 0-based). Used
+for language injection, such as parsing only the script regions of an HTML document.
+Throws if the ranges are not ordered and disjoint.
+"""
+function set_included_ranges!(p::Parser, ranges::Vector{API.TSRange})
+    ok = GC.@preserve ranges API.ts_parser_set_included_ranges(
+        p.ptr,
+        pointer(ranges),
+        length(ranges),
+    )
+    ok || throw(ArgumentError("TreeSitter: included ranges must be ordered and disjoint"))
+    return p
+end
+
+"""
+    included_ranges(parser::Parser) -> Vector{API.TSRange}
+
+Return the ranges the parser is restricted to. A fresh parser reports a single range
+covering the whole document.
+"""
+function included_ranges(p::Parser)
+    len = Ref{UInt32}()
+    ptr = API.ts_parser_included_ranges(p.ptr, len)
+    # The array is owned by the parser; do not free it.
+    return [unsafe_load(ptr, i) for i = 1:Int(len[])]
+end
+
+# C-callable trampoline: payload is the Parser, whose logger_sink field holds the sink.
+function _logger_trampoline(
+    payload::Ptr{Cvoid},
+    log_type::API.TSLogType,
+    buffer::Ptr{Cchar},
+)
+    parser = unsafe_pointer_to_objref(payload)::Parser
+    sink = parser.logger_sink
+    sink === nothing ||
+        sink(log_type === API.TSLogTypeLex ? :lex : :parse, unsafe_string(buffer))
+    return nothing
+end
+
+"""
+    set_logger!(parser::Parser, sink::Function) -> Parser
+
+Install a logging callback invoked as `sink(kind::Symbol, message::String)` during
+parsing, where `kind` is `:parse` or `:lex`.
+"""
+function set_logger!(p::Parser, sink::Function)
+    p.logger_sink = sink
+    trampoline =
+        @cfunction(_logger_trampoline, Cvoid, (Ptr{Cvoid}, API.TSLogType, Ptr{Cchar}))
+    API.ts_parser_set_logger(p.ptr, API.TSLogger(pointer_from_objref(p), trampoline))
+    return p
+end
+
+"""
+    logger(parser::Parser) -> API.TSLogger
+
+Return the parser's current logger. The `log` field is null when none is installed.
+"""
+logger(p::Parser) = API.ts_parser_logger(p.ptr)
+
+"""
+    print_dot_graphs!(parser::Parser, dest) -> Parser
+
+Write parser DOT graphs during subsequent parses. `dest` is a file path, an `IO`, or
+`nothing` to disable. tree-sitter owns a duplicate of the underlying file descriptor and
+flushes it when graphs are disabled or redirected, so call `print_dot_graphs!(parser,
+nothing)` to finish writing.
+"""
+function print_dot_graphs!(p::Parser, io::IO)
+    API.ts_parser_print_dot_graphs(p.ptr, _dup_fd(Base.fd(io)))
+    return p
+end
+
+print_dot_graphs!(p::Parser, path::AbstractString) =
+    open(io -> print_dot_graphs!(p, io), path; write = true)
+
+print_dot_graphs!(p::Parser, ::Nothing) = (API.ts_parser_print_dot_graphs(p.ptr, -1); p)
+
+_dup_fd(fd) = @static Sys.iswindows() ? ccall(:_dup, Cint, (Cint,), fd) :
+        ccall(:dup, Cint, (Cint,), fd)
 
 #
 # Tree
@@ -106,6 +273,17 @@ end
 Base.show(io::IO, t::Tree) = show(io, root(t))
 
 root(t::Tree) = Node(API.ts_tree_root_node(t.ptr), t)
+
+"""
+    copy(tree::Tree) -> Tree
+
+Return an independent copy of `tree`, useful for keeping the pre-edit tree when reparsing
+incrementally.
+"""
+Base.copy(t::Tree) = Tree(API.ts_tree_copy(t.ptr))
+
+Base.parse(p::Parser, text::AbstractString, old::Tree) =
+    Tree(API.ts_parser_parse_string(p.ptr, old.ptr, text, sizeof(text)))
 
 traverse(f, tree::Tree, iter = children) = traverse(f, root(tree), iter)
 
@@ -133,6 +311,20 @@ is_named(n::Node) = API.ts_node_is_named(n.ptr)
 is_missing(n::Node) = API.ts_node_is_missing(n.ptr)
 is_extra(n::Node) = API.ts_node_is_extra(n.ptr)
 is_leaf(n::Node) = iszero(count_nodes(n))
+
+"""
+    has_error(n::Node) -> Bool
+
+Return `true` if `n` or any node beneath it is a syntax error.
+"""
+has_error(n::Node) = API.ts_node_has_error(n.ptr)
+
+"""
+    has_changes(n::Node) -> Bool
+
+Return `true` if `n` overlaps a region edited since the last parse.
+"""
+has_changes(n::Node) = API.ts_node_has_changes(n.ptr)
 
 count_nodes(n::Node) = Int(API.ts_node_child_count(n.ptr))
 count_named_nodes(n::Node) = Int(API.ts_node_named_child_count(n.ptr))
@@ -183,6 +375,281 @@ prev_named_sibling(n::Node) = Node(API.ts_node_prev_named_sibling(n.ptr), n.tree
 # Position info
 start_point(n::Node) = API.ts_node_start_point(n.ptr)
 end_point(n::Node) = API.ts_node_end_point(n.ptr)
+
+"""
+    descendant_for_byte_range(n::Node, from, to) -> Node
+    named_descendant_for_byte_range(n::Node, from, to) -> Node
+    descendant_for_point_range(n::Node, from::API.TSPoint, to::API.TSPoint) -> Node
+    named_descendant_for_point_range(n::Node, from::API.TSPoint, to::API.TSPoint) -> Node
+
+Return the smallest node under `n` that spans the given range. Byte offsets are 1-based,
+matching `byte_range`; points are the 0-based `TSPoint` values returned by `start_point`
+and `end_point`. The `named_` variants skip anonymous nodes.
+"""
+descendant_for_byte_range(n::Node, from::Integer, to::Integer) =
+    Node(API.ts_node_descendant_for_byte_range(n.ptr, from - 1, to - 1), n.tree)
+named_descendant_for_byte_range(n::Node, from::Integer, to::Integer) =
+    Node(API.ts_node_named_descendant_for_byte_range(n.ptr, from - 1, to - 1), n.tree)
+descendant_for_point_range(n::Node, from::API.TSPoint, to::API.TSPoint) =
+    Node(API.ts_node_descendant_for_point_range(n.ptr, from, to), n.tree)
+named_descendant_for_point_range(n::Node, from::API.TSPoint, to::API.TSPoint) =
+    Node(API.ts_node_named_descendant_for_point_range(n.ptr, from, to), n.tree)
+
+"""
+    first_child_for_byte(n::Node, byte) -> Node
+    first_named_child_for_byte(n::Node, byte) -> Node
+
+Return the first child of `n` whose extent reaches the given 1-based byte offset. The
+`named_` variant skips anonymous nodes.
+"""
+first_child_for_byte(n::Node, byte::Integer) =
+    Node(API.ts_node_first_child_for_byte(n.ptr, byte - 1), n.tree)
+first_named_child_for_byte(n::Node, byte::Integer) =
+    Node(API.ts_node_first_named_child_for_byte(n.ptr, byte - 1), n.tree)
+
+"""
+    child_by_field_id(n::Node, field_id::Integer) -> Node
+
+Return the child of `n` for the numeric `field_id`. Throws if there is no such child.
+Use `field_id_for_name` to resolve a field name to an id.
+"""
+function child_by_field_id(n::Node, field_id::Integer)
+    result = Node(API.ts_node_child_by_field_id(n.ptr, field_id), n.tree)
+    is_null(result) && throw(ArgumentError("TreeSitter: no child for field id $field_id"))
+    return result
+end
+
+#
+# Grammar introspection
+#
+
+# Anything carrying a language pointer: the Language itself, or a Tree/Parser to query
+# the grammar they were built with.
+const HasLanguage = Union{Language,Tree,Parser}
+language_ptr(l::Language) = l.ptr
+language_ptr(t::Tree) = API.ts_tree_language(t.ptr)
+language_ptr(p::Parser) = API.ts_parser_language(p.ptr)
+
+"""
+    symbol_count(x) -> Int
+
+Number of distinct node types in the grammar. `x` is a `Language`, `Tree`, or `Parser`.
+"""
+symbol_count(x::HasLanguage) = Int(API.ts_language_symbol_count(language_ptr(x)))
+
+"""
+    symbol_name(x, id::Integer) -> String
+
+Name of the node type with the given symbol id.
+"""
+symbol_name(x::HasLanguage, id::Integer) =
+    unsafe_string(API.ts_language_symbol_name(language_ptr(x), id))
+
+"""
+    symbol_for_name(x, name::AbstractString, named::Bool) -> Int
+
+Symbol id for a node type. `named` selects a named node type over an anonymous one of
+the same name.
+"""
+symbol_for_name(x::HasLanguage, name::AbstractString, named::Bool) =
+    Int(API.ts_language_symbol_for_name(language_ptr(x), String(name), sizeof(name), named))
+
+"""
+    symbol_type(x, id::Integer) -> API.TSSymbolType
+
+Whether the symbol id is a regular, anonymous, or auxiliary node type.
+"""
+symbol_type(x::HasLanguage, id::Integer) = API.ts_language_symbol_type(language_ptr(x), id)
+
+"""
+    field_count(x) -> Int
+
+Number of distinct field names in the grammar.
+"""
+field_count(x::HasLanguage) = Int(API.ts_language_field_count(language_ptr(x)))
+
+"""
+    field_name_for_id(x, id::Integer) -> String
+
+Field name for the given field id.
+"""
+field_name_for_id(x::HasLanguage, id::Integer) =
+    unsafe_string(API.ts_language_field_name_for_id(language_ptr(x), id))
+
+"""
+    field_id_for_name(x, name::AbstractString) -> Int
+
+Field id for the given field name.
+"""
+field_id_for_name(x::HasLanguage, name::AbstractString) =
+    Int(API.ts_language_field_id_for_name(language_ptr(x), String(name), sizeof(name)))
+
+#
+# TreeCursor
+#
+
+"""
+    TreeCursor(n::Node)
+    TreeCursor(t::Tree)
+
+A stateful cursor over a tree. Cheaper than repeated `Node` navigation for full
+traversals, and exposes the field name a node occupies in its parent. Move it with the
+`goto_*` methods and read its position with `current_node`, `current_field_name`, and
+`current_field_id`.
+"""
+mutable struct TreeCursor
+    ref::Base.RefValue{API.TSTreeCursor}
+    tree::Tree
+    function TreeCursor(ref::Base.RefValue{API.TSTreeCursor}, tree::Tree)
+        cursor = new(ref, tree)
+        finalizer(c -> API.ts_tree_cursor_delete(c.ref), cursor)
+        return cursor
+    end
+end
+TreeCursor(n::Node) = TreeCursor(Ref(API.ts_tree_cursor_new(n.ptr)), n.tree)
+TreeCursor(t::Tree) = TreeCursor(root(t))
+Base.show(io::IO, ::TreeCursor) = print(io, "TreeCursor()")
+
+"""
+    current_node(c::TreeCursor) -> Node
+
+The node the cursor is currently on.
+"""
+current_node(c::TreeCursor) = Node(API.ts_tree_cursor_current_node(c.ref), c.tree)
+
+"""
+    current_field_id(c::TreeCursor) -> Int
+
+Field id the current node occupies in its parent, or `0` for none.
+"""
+current_field_id(c::TreeCursor) = Int(API.ts_tree_cursor_current_field_id(c.ref))
+
+"""
+    current_field_name(c::TreeCursor) -> Union{String,Nothing}
+
+Field name the current node occupies in its parent, or `nothing` at the root and for
+children with no field.
+"""
+function current_field_name(c::TreeCursor)
+    str = API.ts_tree_cursor_current_field_name(c.ref)
+    return reinterpret(Ptr{Cchar}, str) == C_NULL ? nothing : unsafe_string(str)
+end
+
+"""
+    goto_parent!(c::TreeCursor) -> Bool
+    goto_next_sibling!(c::TreeCursor) -> Bool
+    goto_first_child!(c::TreeCursor) -> Bool
+
+Move the cursor to the parent, next sibling, or first child. Return `false` and leave the
+cursor in place when there is no such node.
+"""
+goto_parent!(c::TreeCursor) = API.ts_tree_cursor_goto_parent(c.ref) != 0
+goto_next_sibling!(c::TreeCursor) = API.ts_tree_cursor_goto_next_sibling(c.ref) != 0
+goto_first_child!(c::TreeCursor) = API.ts_tree_cursor_goto_first_child(c.ref) != 0
+
+"""
+    goto_first_child_for_byte!(c::TreeCursor, byte) -> Union{Int,Nothing}
+
+Move to the first child reaching the given 1-based byte offset, returning its 1-based
+index, or `nothing` if there is none.
+"""
+function goto_first_child_for_byte!(c::TreeCursor, byte::Integer)
+    index = API.ts_tree_cursor_goto_first_child_for_byte(c.ref, byte - 1)
+    return index < 0 ? nothing : Int(index) + 1
+end
+
+"""
+    reset!(c::TreeCursor, n::Node) -> TreeCursor
+
+Move the cursor to `n`, discarding its position.
+"""
+reset!(c::TreeCursor, n::Node) =
+    (API.ts_tree_cursor_reset(c.ref, n.ptr); c.tree = n.tree; c)
+
+"""
+    copy(c::TreeCursor) -> TreeCursor
+
+An independent cursor at the same position as `c`.
+"""
+Base.copy(c::TreeCursor) = TreeCursor(Ref(API.ts_tree_cursor_copy(c.ref)), c.tree)
+
+"""
+    traverse(f, c::TreeCursor)
+
+Walk the subtree under the cursor depth-first, calling `f(node, field_name, enter)` on
+the way down (`enter=true`) and up (`enter=false`). `field_name` is `nothing` when the
+node occupies no field.
+"""
+function traverse(f, c::TreeCursor)
+    node, field = current_node(c), current_field_name(c)
+    f(node, field, true)
+    if goto_first_child!(c)
+        traverse(f, c)
+        while goto_next_sibling!(c)
+            traverse(f, c)
+        end
+        goto_parent!(c)
+    end
+    f(node, field, false)
+    return nothing
+end
+
+#
+# Editing
+#
+
+"""
+    input_edit(start_byte, old_end_byte, new_end_byte,
+               start_point, old_end_point, new_end_point) -> API.TSInputEdit
+
+Describe a source edit for `edit!`. Byte offsets are 1-based, matching `byte_range`;
+points are 0-based `TSPoint` values, as returned by `start_point` and `end_point`.
+"""
+input_edit(
+    start_byte::Integer,
+    old_end_byte::Integer,
+    new_end_byte::Integer,
+    start_point::API.TSPoint,
+    old_end_point::API.TSPoint,
+    new_end_point::API.TSPoint,
+) = API.TSInputEdit(
+    start_byte - 1,
+    old_end_byte - 1,
+    new_end_byte - 1,
+    start_point,
+    old_end_point,
+    new_end_point,
+)
+
+"""
+    edit!(tree::Tree, e::API.TSInputEdit) -> Tree
+    edit!(n::Node, e::API.TSInputEdit) -> Node
+
+Apply an edit so the tree can be reparsed incrementally. Edit the tree, then call
+`parse(parser, new_text, tree)`. The `Node` form adjusts a node held outside a tree and
+returns the updated node. Build `e` with `input_edit`.
+"""
+edit!(t::Tree, e::API.TSInputEdit) = (API.ts_tree_edit(t.ptr, Ref(e)); t)
+
+function edit!(n::Node, e::API.TSInputEdit)
+    ref = Ref(n.ptr)
+    API.ts_node_edit(ref, Ref(e))
+    return Node(ref[], n.tree)
+end
+
+"""
+    changed_ranges(old::Tree, new::Tree) -> Vector{API.TSRange}
+
+Ranges that differ between an edited `old` tree and its incremental reparse `new`. Byte
+and point fields on each `TSRange` are 0-based.
+"""
+function changed_ranges(old::Tree, new::Tree)
+    len = Ref{UInt32}()
+    ptr = API.ts_tree_get_changed_ranges(old.ptr, new.ptr, len)
+    ranges = [unsafe_load(ptr, i) for i = 1:Int(len[])]
+    Libc.free(ptr)
+    return ranges
+end
 
 #
 # Query
@@ -428,6 +895,30 @@ pattern_count(q::Query) = Int(API.ts_query_pattern_count(q.ptr))
 capture_count(q::Query) = Int(API.ts_query_capture_count(q.ptr))
 string_count(q::Query) = Int(API.ts_query_string_count(q.ptr))
 
+"""
+    start_byte_for_pattern(q::Query, pattern::Integer) -> Int
+
+1-based byte offset where the 1-based `pattern` starts in the query source.
+"""
+start_byte_for_pattern(q::Query, pattern::Integer) =
+    Int(API.ts_query_start_byte_for_pattern(q.ptr, pattern - 1)) + 1
+
+"""
+    disable_pattern!(q::Query, pattern::Integer) -> Query
+
+Disable the 1-based `pattern` so it produces no matches. Irreversible.
+"""
+disable_pattern!(q::Query, pattern::Integer) =
+    (API.ts_query_disable_pattern(q.ptr, pattern - 1); q)
+
+"""
+    disable_capture!(q::Query, name::AbstractString) -> Query
+
+Disable a capture by name so it is dropped from results. Irreversible.
+"""
+disable_capture!(q::Query, name::AbstractString) =
+    (API.ts_query_disable_capture(q.ptr, String(name), sizeof(name)); q)
+
 mutable struct QueryCursor
     ptr::Ptr{API.TSQueryCursor}
     tree::Union{Tree,Nothing}
@@ -463,6 +954,39 @@ function next_match(cursor::QueryCursor)
     match_ref = Ref{API.TSQueryMatch}()
     success = API.ts_query_cursor_next_match(cursor.ptr, match_ref)
     return success ? QueryMatch(match_ref[], cursor.tree) : nothing
+end
+
+"""
+    set_byte_range!(c::QueryCursor, from, to) -> QueryCursor
+    set_point_range!(c::QueryCursor, from::API.TSPoint, to::API.TSPoint) -> QueryCursor
+
+Restrict the cursor's matches to a range. Call before `exec`. Byte offsets are 1-based;
+points are 0-based `TSPoint` values.
+"""
+set_byte_range!(c::QueryCursor, from::Integer, to::Integer) =
+    (API.ts_query_cursor_set_byte_range(c.ptr, from - 1, to - 1); c)
+set_point_range!(c::QueryCursor, from::API.TSPoint, to::API.TSPoint) =
+    (API.ts_query_cursor_set_point_range(c.ptr, from, to); c)
+
+"""
+    remove_match!(c::QueryCursor, id::Integer) -> QueryCursor
+
+Drop the match with the given id so the cursor will not return it.
+"""
+remove_match!(c::QueryCursor, id::Integer) =
+    (API.ts_query_cursor_remove_match(c.ptr, id); c)
+
+"""
+    next_capture(c::QueryCursor) -> Union{Tuple{QueryMatch,Int},Nothing}
+
+The next capture in document order as a `(match, index)` pair where `index` is 1-based
+into the match's captures, or `nothing` when exhausted. Requires a prior `exec`.
+"""
+function next_capture(cursor::QueryCursor)
+    match_ref = Ref{API.TSQueryMatch}()
+    index_ref = Ref{UInt32}()
+    success = API.ts_query_cursor_next_capture(cursor.ptr, match_ref, index_ref)
+    return success ? (QueryMatch(match_ref[], cursor.tree), Int(index_ref[]) + 1) : nothing
 end
 
 struct QueryCapture
