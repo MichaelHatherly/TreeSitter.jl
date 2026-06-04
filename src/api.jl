@@ -162,7 +162,7 @@ end
 struct TSTreeCursor
     tree::Ptr{Cvoid}
     id::Ptr{Cvoid}
-    context::NTuple{2,UInt32}
+    context::NTuple{3,UInt32}
 end
 
 struct TSQueryCapture

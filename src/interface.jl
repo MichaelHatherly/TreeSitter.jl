@@ -235,6 +235,67 @@ field_id_for_name(x::HasLanguage, name::AbstractString) =
     Int(API.ts_language_field_id_for_name(language_ptr(x), String(name), sizeof(name)))
 
 #
+# TreeCursor
+#
+
+# Stateful walk over a tree. Cheaper than repeated Node navigation for full traversals,
+# and exposes the field name a node occupies in its parent.
+mutable struct TreeCursor
+    ref::Base.RefValue{API.TSTreeCursor}
+    tree::Tree
+    function TreeCursor(ref::Base.RefValue{API.TSTreeCursor}, tree::Tree)
+        cursor = new(ref, tree)
+        finalizer(c -> API.ts_tree_cursor_delete(c.ref), cursor)
+        return cursor
+    end
+end
+TreeCursor(n::Node) = TreeCursor(Ref(API.ts_tree_cursor_new(n.ptr)), n.tree)
+TreeCursor(t::Tree) = TreeCursor(root(t))
+Base.show(io::IO, ::TreeCursor) = print(io, "TreeCursor()")
+
+current_node(c::TreeCursor) = Node(API.ts_tree_cursor_current_node(c.ref), c.tree)
+current_field_id(c::TreeCursor) = Int(API.ts_tree_cursor_current_field_id(c.ref))
+
+# Field name the current node occupies in its parent, or nothing at the root or for
+# children with no field.
+function current_field_name(c::TreeCursor)
+    str = API.ts_tree_cursor_current_field_name(c.ref)
+    return reinterpret(Ptr{Cchar}, str) == C_NULL ? nothing : unsafe_string(str)
+end
+
+goto_parent!(c::TreeCursor) = API.ts_tree_cursor_goto_parent(c.ref) != 0
+goto_next_sibling!(c::TreeCursor) = API.ts_tree_cursor_goto_next_sibling(c.ref) != 0
+goto_first_child!(c::TreeCursor) = API.ts_tree_cursor_goto_first_child(c.ref) != 0
+
+# Move to the first child reaching the given 1-based byte offset; returns its 1-based
+# index, or nothing if there is none.
+function goto_first_child_for_byte!(c::TreeCursor, byte::Integer)
+    index = API.ts_tree_cursor_goto_first_child_for_byte(c.ref, byte - 1)
+    return index < 0 ? nothing : Int(index) + 1
+end
+
+reset!(c::TreeCursor, n::Node) =
+    (API.ts_tree_cursor_reset(c.ref, n.ptr); c.tree = n.tree; c)
+
+Base.copy(c::TreeCursor) = TreeCursor(Ref(API.ts_tree_cursor_copy(c.ref)), c.tree)
+
+# Depth-first walk via a cursor, calling f(node, field_name, enter) on the way down
+# (enter=true) and up (enter=false). field_name is nothing when the node has no field.
+function traverse(f, c::TreeCursor)
+    node, field = current_node(c), current_field_name(c)
+    f(node, field, true)
+    if goto_first_child!(c)
+        traverse(f, c)
+        while goto_next_sibling!(c)
+            traverse(f, c)
+        end
+        goto_parent!(c)
+    end
+    f(node, field, false)
+    return nothing
+end
+
+#
 # Query
 #
 
