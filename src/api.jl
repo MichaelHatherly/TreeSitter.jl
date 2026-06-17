@@ -11,95 +11,12 @@ const libtreesitter = tree_sitter_jll.libtreesitter_path
 
 # Structs
 
-const TREE_SITTER_LANGUAGE_VERSION = 11
-const TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION = 9
+const TREE_SITTER_LANGUAGE_VERSION = 15
+const TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION = 13
 const TSSymbol = UInt16
 const TSFieldId = UInt16
 
-struct TSSymbolMetadata
-    visible::Cint
-    named::Cint
-end
-
-struct ANONYMOUS3_reduce
-    symbol::TSSymbol
-    dynamic_precedence::Int16
-    child_count::UInt8
-    production_id::UInt8
-end
-
-struct ANONYMOUS2_params
-    reduce::ANONYMOUS3_reduce
-end
-
-@cenum TSParseActionType::UInt32 begin
-    TSParseActionTypeShift = 0
-    TSParseActionTypeReduce = 1
-    TSParseActionTypeAccept = 2
-    TSParseActionTypeRecover = 3
-end
-
-struct TSParseAction
-    params::ANONYMOUS2_params
-    type::TSParseActionType
-end
-
-struct TSParseActionEntry
-    action::TSParseAction
-end
-
-struct TSLexMode
-    lex_state::UInt16
-    external_lex_state::UInt16
-end
-
-struct ANONYMOUS1_external_scanner
-    states::Ptr{Cint}
-    symbol_map::Ptr{TSSymbol}
-    create::Ptr{Cvoid}
-    destroy::Ptr{Cvoid}
-    bool::Cvoid
-    serialize::Ptr{Cvoid}
-    deserialize::Ptr{Cvoid}
-end
-
-struct TSFieldMapSlice
-    index::UInt16
-    length::UInt16
-end
-
-struct TSFieldMapEntry
-    field_id::TSFieldId
-    child_index::UInt8
-    inherited::Cint
-end
-
-struct TSLanguage
-    version::UInt32
-    symbol_count::UInt32
-    alias_count::UInt32
-    token_count::UInt32
-    external_token_count::UInt32
-    symbol_names::Ptr{Cstring}
-    symbol_metadata::Ptr{TSSymbolMetadata}
-    parse_table::Ptr{UInt16}
-    parse_actions::Ptr{TSParseActionEntry}
-    lex_modes::Ptr{TSLexMode}
-    alias_sequences::Ptr{TSSymbol}
-    max_alias_sequence_length::UInt16
-    bool::Cvoid
-    keyword_capture_token::TSSymbol
-    external_scanner::ANONYMOUS1_external_scanner
-    field_count::UInt32
-    field_map_slices::Ptr{TSFieldMapSlice}
-    field_map_entries::Ptr{TSFieldMapEntry}
-    field_names::Ptr{Cstring}
-    large_state_count::UInt32
-    small_parse_table::Ptr{UInt16}
-    small_parse_table_map::Ptr{UInt32}
-    public_symbol_map::Ptr{TSSymbol}
-end
-
+const TSLanguage = Cvoid
 const TSParser = Cvoid
 const TSTree = Cvoid
 const TSQuery = Cvoid
@@ -107,7 +24,9 @@ const TSQueryCursor = Cvoid
 
 @cenum TSInputEncoding::UInt32 begin
     TSInputEncodingUTF8 = 0
-    TSInputEncodingUTF16 = 1
+    TSInputEncodingUTF16LE = 1
+    TSInputEncodingUTF16BE = 2
+    TSInputEncodingCustom = 3
 end
 
 @cenum TSSymbolType::UInt32 begin

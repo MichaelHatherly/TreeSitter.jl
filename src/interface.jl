@@ -122,7 +122,7 @@ function Base.parse(p::Parser, text::AbstractString; encoding::Symbol = :utf8)
                 C_NULL,
                 buffer,
                 UInt32(2 * length(units)),
-                API.TSInputEncodingUTF16,
+                API.TSInputEncodingUTF16LE,
             ),
         )
     end
@@ -151,7 +151,7 @@ end
 function Base.parse(p::Parser, source::Function; encoding::Symbol = :utf8)
     enc =
         encoding === :utf8 ? API.TSInputEncodingUTF8 :
-        encoding === :utf16 ? API.TSInputEncodingUTF16 :
+        encoding === :utf16 ? API.TSInputEncodingUTF16LE :
         throw(ArgumentError("unknown encoding $encoding"))
     state = InputState(source, UInt8[])
     trampoline = @cfunction(
