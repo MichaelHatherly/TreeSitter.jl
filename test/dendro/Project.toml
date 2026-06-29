@@ -1,0 +1,9 @@
+[deps]
+Dendro = "1795b8db-9815-49e8-b387-5b722b8875ff"
+tree_sitter_julia_jll = "52be201e-a5e9-5cfe-8bf2-2dc4b062171c"
+
+[sources]
+Dendro = {url = "https://github.com/MichaelHatherly/Dendro.jl", rev = "main"}
+
+[compat]
+julia = "1.12"

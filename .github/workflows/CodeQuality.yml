@@ -46,3 +46,18 @@ jobs:
             exit 1
           fi
           echo "✅ Code is properly formatted"
+
+  dendro:
+    name: Dendro quality gate
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: julia-actions/install-juliaup@05d98a2ef433ca0723a8221e38c4723ea92b0c5f # v3.1.4
+        with:
+          channel: '1.12'
+      - uses: julia-actions/cache@a45e8fa8be21c18a06b7177052533149e61e9b38 # v3.1.0
+      - name: Instantiate analysis environment
+        run: julia --project=test/dendro -e 'using Pkg; Pkg.instantiate()'
+      - name: Run Dendro over TreeSitter.jl source
+        run: julia --project=test/dendro test/dendro/dendro.jl

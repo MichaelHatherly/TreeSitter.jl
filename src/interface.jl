@@ -752,56 +752,58 @@ Base.show(io::IO, q::Query) = print(io, "Query(", q.language, ")")
 # Filtering predicates (#eq?, #match?, etc.) remain evaluated at match-time via predicate() function
 # This follows the Rust binding pattern for performance (parse once vs per-match) and correctness (#set! shouldn't filter)
 function parse_predicates!(q::Query)
-    n_patterns = pattern_count(q)
+    for pattern_idx = 1:pattern_count(q)
+        parse_pattern_predicates!(q, pattern_idx)
+    end
+end
 
-    for pattern_idx = 1:n_patterns
-        len = Ref{UInt32}()
-        # Get predicate steps for this pattern (0-based C API)
-        ptr = API.ts_query_predicates_for_pattern(q.ptr, pattern_idx - 1, len)
+# Walk the predicate steps for one pattern, routing each completed predicate to storage.
+# Steps alternate: predicate name (string), arguments (captures/strings), DONE marker.
+function parse_pattern_predicates!(q::Query, pattern_idx)
+    len = Ref{UInt32}()
+    # Get predicate steps for this pattern (0-based C API)
+    ptr = API.ts_query_predicates_for_pattern(q.ptr, pattern_idx - 1, len)
 
-        if len[] > 0
-            # Parse predicate steps into structured metadata
-            # Steps alternate: predicate name (string), arguments (captures/strings), DONE marker
+    func = ""
+    args = String[]
+    for i = 1:len[]
+        step = unsafe_load(ptr, i)
+
+        if step.type === API.TSQueryPredicateStepTypeString
+            # String argument or predicate name
+            str = query_string(q, step.value_id)
+            func == "" ? (func = str) : push!(args, str)
+
+        elseif step.type === API.TSQueryPredicateStepTypeCapture
+            # Capture reference, stored as "@capture_N". The N placeholder stands in
+            # for capture indices needed by quantified predicates.
+            push!(args, "@capture_$(step.value_id)")
+
+        elseif step.type === API.TSQueryPredicateStepTypeDone
+            route_predicate!(q, pattern_idx, func, args)
+            # Reset for next predicate
             func = ""
-            args = String[]
+            empty!(args)
+        end
+    end
+end
 
-            for i = 1:len[]
-                step = unsafe_load(ptr, i)
+# Route a completed predicate to metadata storage. Filtering predicates (#eq?,
+# #match?, etc.) are left for match-time evaluation in predicate().
+function route_predicate!(q::Query, pattern_idx, func, args)
+    if func == "set!"
+        # Metadata directive: (#set! key value) or (#set! key)
+        prop = parse_set_property(args)
+        push!(q.property_settings[pattern_idx], prop)
 
-                if step.type === API.TSQueryPredicateStepTypeString
-                    # String argument or predicate name
-                    str = query_string(q, step.value_id)
-                    func == "" ? (func = str) : push!(args, str)
-
-                elseif step.type === API.TSQueryPredicateStepTypeCapture
-                    # Capture reference - store as "@capturename" for now
-                    # TODO: track capture indices for quantified predicates
-                    push!(args, "@capture_$(step.value_id)")
-
-                elseif step.type === API.TSQueryPredicateStepTypeDone
-                    # End of one predicate - route to appropriate storage
-                    if func == "set!"
-                        # Metadata directive: (#set! key value) or (#set! key)
-                        prop = parse_set_property(args)
-                        push!(q.property_settings[pattern_idx], prop)
-
-                    elseif func == "is?" || func == "is-not?"
-                        # Property assertion: (#is? @capture "property") or (#is-not? @capture "property")
-                        prop = parse_property_predicate(args)
-                        is_positive = (func == "is?")
-                        push!(q.property_predicates[pattern_idx], (prop, is_positive))
-                        # Track unknown properties for warning at construction
-                        if prop.key ∉ ("named", "missing", "extra", "local")
-                            push!(q.unknown_properties, prop.key)
-                        end
-                    end
-                    # Other predicates (#eq?, #match?, etc.) handled at match-time in predicate()
-
-                    # Reset for next predicate
-                    func = ""
-                    empty!(args)
-                end
-            end
+    elseif func == "is?" || func == "is-not?"
+        # Property assertion: (#is? @capture "property") or (#is-not? @capture "property")
+        prop = parse_property_predicate(args)
+        is_positive = (func == "is?")
+        push!(q.property_predicates[pattern_idx], (prop, is_positive))
+        # Track unknown properties for warning at construction
+        if prop.key ∉ ("named", "missing", "extra", "local")
+            push!(q.unknown_properties, prop.key)
         end
     end
 end
