@@ -826,8 +826,9 @@ function get_lang_ptr(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
     return lang_ptr
 end
 
-# Editor preference for selecting query directories when multiple exist
-const EDITOR_PREFERENCE = ["neovim", "helix", "emacs", "zed"]
+# Editor preference for selecting query directories when multiple exist. "nvim" and
+# "neovim" are both common directory names for the same editor.
+const EDITOR_PREFERENCE = ["neovim", "nvim", "helix", "emacs", "zed"]
 
 function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
     # Determine which parser variant to load queries for
@@ -873,13 +874,23 @@ function load_queries(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing)
         end
     end
 
-    # For each query, prefer non-lua version, then by editor preference
+    # For each query, prefer the non-lua version, then the canonical (shallowest) location,
+    # then editor preference. This keeps a top-level `queries/foo.scm` ahead of an
+    # editor-specific `queries/<editor>/foo.scm` copy.
     for (name, options) in all_queries
-        sort!(options, by = x -> (x[1], editor_rank(dirname(x[2]))))
+        sort!(options, by = x -> (x[1], _query_dir_rank(dirname(x[2]), base_dir)))
         dict[name] = read(options[1][2], String)
     end
 
     return dict
+end
+
+# Rank a query directory: shallower (closer to the canonical top-level `queries/`) wins,
+# with editor preference breaking ties among equally-deep directories.
+function _query_dir_rank(dir::String, base_dir::String)
+    rel = relpath(dir, base_dir)
+    depth = rel == "." ? 0 : count(==('/'), rel) + 1
+    return (depth, editor_rank(dir))
 end
 
 function find_query_dirs(base_dir::String)

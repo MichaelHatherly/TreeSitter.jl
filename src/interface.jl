@@ -302,7 +302,14 @@ ensure_not_null(n::Node) =
 
 Base.show(io::IO, n::Node) = print(io, node_string(n))
 
-node_string(n::Node) = (ensure_not_null(n); unsafe_string(API.ts_node_string(n.ptr)))
+function node_string(n::Node)
+    ensure_not_null(n)
+    # ts_node_string returns a malloc'd C string that the caller must free.
+    ptr = API.ts_node_string(n.ptr)
+    str = unsafe_string(ptr)
+    Libc.free(ptr)
+    return str
+end
 node_symbol(n::Node) = (ensure_not_null(n); API.ts_node_symbol(n.ptr))
 node_type(n::Node) = (ensure_not_null(n); unsafe_string(API.ts_node_type(n.ptr)))
 
@@ -943,12 +950,29 @@ function Base.iterate(cursor::QueryCursor, state = nothing)
     return result === nothing ? nothing : (result, nothing)
 end
 
+# The number of matches is only known by exhausting the cursor; each QueryMatch now owns a
+# copy of its captures, so collecting/retaining matches is safe.
+Base.IteratorSize(::Type{QueryCursor}) = Base.SizeUnknown()
+Base.eltype(::Type{QueryCursor}) = QueryMatch
+
 mutable struct QueryMatch
-    obj::API.TSQueryMatch
+    id::UInt32
+    pattern_index::UInt16
+    # Eager copy of the captures. The C `captures` pointer is owned by the cursor and is
+    # invalidated by the next `next_match`/`next_capture`, so we copy it out immediately to
+    # keep retained matches safe after the cursor advances.
+    captures::Vector{API.TSQueryCapture}
     tree::Tree
 end
 
-capture_count(qm::QueryMatch) = Int(qm.obj.capture_count)
+# Build a QueryMatch from a raw TSQueryMatch, copying its captures while the C pointer is
+# still valid.
+function QueryMatch(obj::API.TSQueryMatch, tree::Tree)
+    caps = [unsafe_load(obj.captures, i) for i = 1:Int(obj.capture_count)]
+    return QueryMatch(obj.id, obj.pattern_index, caps, tree)
+end
+
+capture_count(qm::QueryMatch) = length(qm.captures)
 
 function next_match(cursor::QueryCursor)
     match_ref = Ref{API.TSQueryMatch}()
@@ -963,8 +987,11 @@ end
 Restrict the cursor's matches to a range. Call before `exec`. Byte offsets are 1-based;
 points are 0-based `TSPoint` values.
 """
+# `byte_range` returns inclusive 1-based (from, to); tree-sitter wants a half-open 0-based
+# [start, end) range, so the exclusive end is `to`, not `to - 1`. Passing `to - 1` would
+# turn `to == 1` into C end_byte 0, which tree-sitter reinterprets as "unbounded".
 set_byte_range!(c::QueryCursor, from::Integer, to::Integer) =
-    (API.ts_query_cursor_set_byte_range(c.ptr, from - 1, to - 1); c)
+    (API.ts_query_cursor_set_byte_range(c.ptr, from - 1, to); c)
 set_point_range!(c::QueryCursor, from::API.TSPoint, to::API.TSPoint) =
     (API.ts_query_cursor_set_point_range(c.ptr, from, to); c)
 
@@ -997,9 +1024,9 @@ end
 
 function captures(qm::QueryMatch)
     fn = function (ith)
-        ptr = unsafe_load(qm.obj.captures, ith)
-        node = Node(ptr.node, qm.tree)
-        return QueryCapture(node, ptr.index, qm.obj.pattern_index)
+        cap = qm.captures[ith]
+        node = Node(cap.node, qm.tree)
+        return QueryCapture(node, cap.index, qm.pattern_index)
     end
     return (fn(i) for i = 1:capture_count(qm))
 end
@@ -1022,7 +1049,7 @@ end
 ```
 """
 function property(q::Query, m::QueryMatch, key::String)
-    props = property_settings(q, Int(m.obj.pattern_index) + 1)  # C uses 0-based
+    props = property_settings(q, Int(m.pattern_index) + 1)  # C uses 0-based
     for prop in props
         if prop.key == key && prop.capture_id === nothing
             return prop.value
@@ -1070,11 +1097,26 @@ query_string(q, id) =
 # A single predicate from a query pattern: its name, the resolved string
 # arguments, the captured nodes among those arguments, and every value bound to
 # each captured argument (a capture may be quantified and match several nodes).
+# `arg_is_capture` runs parallel to `args`: true where the argument came from a
+# capture, false for a string literal. Predicates that need the literal (e.g.
+# #is?) use it to tell a property name from captured node text.
 struct PredicateCall
     func::String
     args::Vector{String}
+    arg_is_capture::Vector{Bool}
     nodes::Vector{Node}
     capture_args::Dict{Int,Vector{String}}
+end
+
+# Compile a predicate regex, warning and returning `nothing` (rather than
+# throwing) when the pattern is not valid for Julia's regex engine.
+function _try_regex(pat::AbstractString)
+    try
+        return Regex(pat)
+    catch
+        @warn "invalid regex in predicate: $(repr(pat))"
+        return nothing
+    end
 end
 
 # Decode tree-sitter's flat predicate-step stream for a match into one
@@ -1084,9 +1126,9 @@ end
 # argument. A done step closes the current predicate.
 function parse_predicate_calls(q::Query, m::QueryMatch, source::AbstractString)
     len = Ref{UInt32}()
-    ptr = API.ts_query_predicates_for_pattern(q.ptr, m.obj.pattern_index, len)
+    ptr = API.ts_query_predicates_for_pattern(q.ptr, m.pattern_index, len)
     calls = PredicateCall[]
-    func, args, nodes = "", String[], Node[]
+    func, args, arg_is_capture, nodes = "", String[], Bool[], Node[]
     capture_args = Dict{Int,Vector{String}}()
     for i = 1:len[]
         step = unsafe_load(ptr, i)
@@ -1094,7 +1136,7 @@ function parse_predicate_calls(q::Query, m::QueryMatch, source::AbstractString)
             arg_idx = length(args) + 1
             values, capture_nodes = String[], Node[]
             for address = 1:capture_count(m)
-                capture = unsafe_load(m.obj.captures, address)
+                capture = m.captures[address]
                 if capture.index == step.value_id
                     node = Node(capture.node, m.tree)
                     push!(values, slice(source, node))
@@ -1103,16 +1145,32 @@ function parse_predicate_calls(q::Query, m::QueryMatch, source::AbstractString)
             end
             if !isempty(values)
                 push!(args, values[1])
+                push!(arg_is_capture, true)
                 push!(nodes, capture_nodes[1])
                 capture_args[arg_idx] = values
             end
         elseif step.type === API.TSQueryPredicateStepTypeString
             str = query_string(q, step.value_id)
-            func == "" ? (func = str) : push!(args, str)
+            if func == ""
+                func = str
+            else
+                push!(args, str)
+                push!(arg_is_capture, false)
+            end
         elseif step.type === API.TSQueryPredicateStepTypeDone
-            push!(calls, PredicateCall(func, copy(args), copy(nodes), copy(capture_args)))
+            push!(
+                calls,
+                PredicateCall(
+                    func,
+                    copy(args),
+                    copy(arg_is_capture),
+                    copy(nodes),
+                    copy(capture_args),
+                ),
+            )
             func = ""
             empty!(args)
+            empty!(arg_is_capture)
             empty!(nodes)
             empty!(capture_args)
         else
@@ -1140,7 +1198,9 @@ eval_not_eq(c::PredicateCall) = check_arity(c, 2) && c.args[1] != c.args[2]
 
 function eval_match(c::PredicateCall; negate::Bool)
     check_arity(c, 2) || return false
-    matched = occursin(Regex(c.args[2]), c.args[1])
+    rx = _try_regex(c.args[2])
+    rx === nothing && return false
+    matched = occursin(rx, c.args[1])
     return negate ? !matched : matched
 end
 
@@ -1174,14 +1234,16 @@ end
 function eval_any_match(c::PredicateCall)
     check_arity(c, 2) || return false
     values, comparison = quantified_args(c)
-    pattern = Regex(comparison[1])
+    pattern = _try_regex(comparison[1])
+    pattern === nothing && return false
     return any(cv -> occursin(pattern, cv), values)
 end
 
 function eval_any_not_match(c::PredicateCall)
     check_arity(c, 2) || return false
     values, comparison = quantified_args(c)
-    pattern = Regex(comparison[1])
+    pattern = _try_regex(comparison[1])
+    pattern === nothing && return false
     return any(cv -> !occursin(pattern, cv), values)
 end
 
@@ -1200,22 +1262,25 @@ function eval_has_ancestor(c::PredicateCall)
     return false
 end
 
-# Built-in property checks (`named`, `missing`, `extra`). The capture-ref forms
-# `(#is? @c "prop")` and `(#is? prop)` put the property in arg 2 or arg 1. When
-# no node was captured, fall back to the match's first capture. Unknown
-# properties (e.g. `local` from locals.scm) are no-ops that keep the pattern, so
-# both `is?` and `is-not?` return true for them.
+# Built-in property checks (`named`, `missing`, `extra`). The property is the
+# string-literal argument, not captured node text, so select the first
+# non-capture arg. The node tested is an explicit capture's node, else the
+# match's first capture; bail out (rather than read out of bounds) when neither
+# exists. Unknown properties (e.g. `local` from locals.scm) are no-ops that keep
+# the pattern, so both `is?` and `is-not?` return true for them.
 function eval_is(c::PredicateCall, m::QueryMatch; negate::Bool)
-    if isempty(c.args)
-        @warn "incorrect number of arguments to '$(c.func)', expected property name"
-        return false
-    end
-    property_name = startswith(c.args[1], "@") ? get(c.args, 2, "") : c.args[1]
+    lit_idx = findfirst(!, c.arg_is_capture)
+    property_name = lit_idx === nothing ? "" : c.args[lit_idx]
+    node =
+        !isempty(c.nodes) ? c.nodes[1] :
+        capture_count(m) > 0 ? Node(m.captures[1].node, m.tree) : nothing
     if isempty(property_name)
         @warn "'$(c.func)' missing property name"
         return false
+    elseif node === nothing
+        @warn "'$(c.func)' requires a captured node"
+        return false
     end
-    node = isempty(c.nodes) ? Node(unsafe_load(m.obj.captures, 1).node, m.tree) : c.nodes[1]
     held = if property_name == "named"
         is_named(node)
     elseif property_name == "missing"
