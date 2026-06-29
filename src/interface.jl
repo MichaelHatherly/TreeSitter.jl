@@ -1067,279 +1067,206 @@ end
 query_string(q, id) =
     unsafe_string(API.ts_query_string_value_for_id(q.ptr, id, Ref{UInt32}()))
 
-function predicate(q::Query, m::QueryMatch, source::AbstractString)
+# A single predicate from a query pattern: its name, the resolved string
+# arguments, the captured nodes among those arguments, and every value bound to
+# each captured argument (a capture may be quantified and match several nodes).
+struct PredicateCall
+    func::String
+    args::Vector{String}
+    nodes::Vector{Node}
+    capture_args::Dict{Int,Vector{String}}
+end
+
+# Decode tree-sitter's flat predicate-step stream for a match into one
+# PredicateCall per predicate. A capture step contributes the text of every node
+# it binds; the first value also enters `args` so non-quantified predicates read
+# it positionally. A string step names the predicate (first) or adds a literal
+# argument. A done step closes the current predicate.
+function parse_predicate_calls(q::Query, m::QueryMatch, source::AbstractString)
     len = Ref{UInt32}()
     ptr = API.ts_query_predicates_for_pattern(q.ptr, m.obj.pattern_index, len)
-    if len[] > 0
-        func, args, nodes = "", [], []
-        # Track which args are captures and store ALL their values
-        capture_args = Dict{Int,Vector{String}}()  # arg_index => [all values for this capture]
-        capture_nodes = Dict{Int,Vector{Node}}()
-
-        for i = 1:len[]
-            step = unsafe_load(ptr, i)
-            if step.type === API.TSQueryPredicateStepTypeCapture
-                # Collect ALL matching captures, not just first
-                arg_idx = length(args) + 1
-                values = String[]
-                nodes_for_capture = Node[]
-
-                for address = 1:capture_count(m)
-                    capture = unsafe_load(m.obj.captures, address)
-                    if capture.index == step.value_id
-                        node = Node(capture.node, m.tree)
-                        str = slice(source, node)
-                        push!(values, str)
-                        push!(nodes_for_capture, node)
-                    end
+    calls = PredicateCall[]
+    func, args, nodes = "", String[], Node[]
+    capture_args = Dict{Int,Vector{String}}()
+    for i = 1:len[]
+        step = unsafe_load(ptr, i)
+        if step.type === API.TSQueryPredicateStepTypeCapture
+            arg_idx = length(args) + 1
+            values, capture_nodes = String[], Node[]
+            for address = 1:capture_count(m)
+                capture = unsafe_load(m.obj.captures, address)
+                if capture.index == step.value_id
+                    node = Node(capture.node, m.tree)
+                    push!(values, slice(source, node))
+                    push!(capture_nodes, node)
                 end
-
-                # Store first value in args for backwards compatibility with non-quantified predicates
-                if !isempty(values)
-                    push!(args, values[1])
-                    push!(nodes, nodes_for_capture[1])
-                    capture_args[arg_idx] = values
-                    capture_nodes[arg_idx] = nodes_for_capture
-                end
-            elseif step.type === API.TSQueryPredicateStepTypeString
-                # Either a literal argument name, or predicate name.
-                str = query_string(q, step.value_id)
-                func == "" ? (func = str) : push!(args, str)
-            elseif step.type === API.TSQueryPredicateStepTypeDone
-                # This marks the end of an individual predicate. Check whether
-                # we actually have enough arguments to call the predicate and
-                # then continue.
-
-                # Handle the following predicates. Source: tree-sitter rust lib.
-                #
-                #   - eq?
-                #   - not-eq?
-                #   - is?
-                #   - is-not?
-                #   - match?
-                #   - any-of?
-                #   - set!
-                #
-                result = if func == "eq?"
-                    if length(args) != 2
-                        @warn "incorrect number of arguments to '$func', expected 2"
-                        false
-                    else
-                        left, right = args
-                        left == right
-                    end
-                elseif func == "not-eq?"
-                    if length(args) != 2
-                        @warn "incorrect number of arguments to '$func', expected 2"
-                        false
-                    else
-                        left, right = args
-                        left != right
-                    end
-                elseif func == "any-of?"
-                    if length(args) < 2
-                        @warn "incorrect number of arguments to '$func', expected at least 2"
-                        false
-                    else
-                        # First arg is the capture value, rest are possible matches
-                        capture_value = args[1]
-                        any(arg -> arg == capture_value, args[2:end])
-                    end
-                elseif func == "has-ancestor?"
-                    if length(args) < 2
-                        @warn "incorrect number of arguments to '$func', expected at least 2"
-                        false
-                    else
-                        # First arg is the captured node (we need the node, not its text)
-                        # Rest are node type names to check for in ancestors
-                        if isempty(nodes)
-                            @warn "'$func' requires access to node structure"
-                            false
-                        else
-                            captured_node = nodes[1]
-                            ancestor_types = args[2:end]
-
-                            # Walk up the tree checking each ancestor
-                            current = parent(captured_node)
-                            found = false
-                            while !is_null(current)
-                                if node_type(current) in ancestor_types
-                                    found = true
-                                    break
-                                end
-                                current = parent(current)
-                            end
-                            found
-                        end
-                    end
-                elseif func == "is?"
-                    # Check if node has built-in property: named, missing, extra
-                    # Formats:
-                    #   (#is? @capture "property") - property is second arg
-                    #   (#is? property) - property is first arg (no capture ref)
-                    if isempty(args)
-                        @warn "incorrect number of arguments to '$func', expected property name"
-                        false
-                    else
-                        # Property is first arg if no capture ref, second if capture ref present
-                        property_name =
-                            startswith(args[1], "@") ? get(args, 2, "") : args[1]
-                        if isempty(property_name)
-                            @warn "'$func' missing property name"
-                            false
-                        else
-                            # For single-arg format, use match's first capture if nodes is empty
-                            check_nodes = if isempty(nodes)
-                                [Node(unsafe_load(m.obj.captures, 1).node, m.tree)]
-                            else
-                                nodes
-                            end
-                            node = check_nodes[1]
-                            if property_name == "named"
-                                is_named(node)
-                            elseif property_name == "missing"
-                                is_missing(node)
-                            elseif property_name == "extra"
-                                is_extra(node)
-                            else
-                                # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops
-                                # to preserve backwards compatibility with upstream queries. The property
-                                # assertion is still stored in property_predicates for inspection.
-                                # Returning true prevents filtering the pattern.
-                                true
-                            end
-                        end
-                    end
-                elseif func == "is-not?"
-                    # Negated property check
-                    # Formats:
-                    #   (#is-not? @capture "property") - property is second arg
-                    #   (#is-not? property) - property is first arg (no capture ref)
-                    if isempty(args)
-                        @warn "incorrect number of arguments to '$func', expected property name"
-                        false
-                    else
-                        # Property is first arg if no capture ref, second if capture ref present
-                        property_name =
-                            startswith(args[1], "@") ? get(args, 2, "") : args[1]
-                        if isempty(property_name)
-                            @warn "'$func' missing property name"
-                            false
-                        else
-                            # For single-arg format, use match's first capture if nodes is empty
-                            check_nodes = if isempty(nodes)
-                                [Node(unsafe_load(m.obj.captures, 1).node, m.tree)]
-                            else
-                                nodes
-                            end
-                            node = check_nodes[1]
-                            if property_name == "named"
-                                !is_named(node)
-                            elseif property_name == "missing"
-                                !is_missing(node)
-                            elseif property_name == "extra"
-                                !is_extra(node)
-                            else
-                                # Unknown properties (e.g., "local" from locals.scm) are treated as no-ops.
-                                # Returning true (property not set) preserves backwards compatibility with
-                                # upstream queries like (#is-not? local) which expect non-local identifiers
-                                # to match. The property assertion is stored in property_predicates.
-                                true
-                            end
-                        end
-                    end
-                elseif func == "match?"
-                    if length(args) != 2
-                        @warn "incorrect number of arguments to '$func', expected 2"
-                        false
-                    else
-                        arg_1, arg_2 = args
-                        occursin(Regex(arg_2), arg_1)
-                    end
-                elseif func == "not-match?"
-                    # Negated regex match
-                    if length(args) != 2
-                        @warn "incorrect number of arguments to '$func', expected 2"
-                        false
-                    else
-                        arg_1, arg_2 = args
-                        !occursin(Regex(arg_2), arg_1)
-                    end
-                elseif func == "any-eq?"
-                    # Quantified equality: check if ANY captured value equals ANY comparison value
-                    # Format: (#any-eq? @capture "value1" "value2" ...)
-                    if length(args) < 2
-                        @warn "incorrect number of arguments to '$func', expected at least 2"
-                        false
-                    else
-                        # Get all values for the first capture (which may be quantified)
-                        all_capture_values = get(capture_args, 1, [args[1]])
-                        comparison_values = args[2:end]
-                        # Check if ANY captured value equals ANY comparison value
-                        any(cv -> cv in comparison_values, all_capture_values)
-                    end
-                elseif func == "any-not-eq?"
-                    # Quantified inequality: check if ANY captured value doesn't equal ALL comparison values
-                    if length(args) < 2
-                        @warn "incorrect number of arguments to '$func', expected at least 2"
-                        false
-                    else
-                        all_capture_values = get(capture_args, 1, [args[1]])
-                        comparison_values = args[2:end]
-                        # Check if ANY captured value is not in comparison values
-                        any(cv -> cv ∉ comparison_values, all_capture_values)
-                    end
-                elseif func == "any-match?"
-                    # Quantified regex: check if ANY captured value matches regex
-                    # Format: (#any-match? @capture "pattern")
-                    if length(args) != 2
-                        @warn "incorrect number of arguments to '$func', expected 2"
-                        false
-                    else
-                        # Get all values for the first capture
-                        all_capture_values = get(capture_args, 1, [args[1]])
-                        pattern = Regex(args[2])
-                        # Check if ANY value matches the pattern
-                        any(cv -> occursin(pattern, cv), all_capture_values)
-                    end
-                elseif func == "any-not-match?"
-                    # Quantified negated regex: check if ANY captured value doesn't match regex
-                    # Format: (#any-not-match? @capture "pattern")
-                    if length(args) != 2
-                        @warn "incorrect number of arguments to '$func', expected 2"
-                        false
-                    else
-                        all_capture_values = get(capture_args, 1, [args[1]])
-                        pattern = Regex(args[2])
-                        # Check if ANY value doesn't match the pattern
-                        any(cv -> !occursin(pattern, cv), all_capture_values)
-                    end
-                elseif func == "set!"
-                    # Metadata directive, not a filter - always returns true
-                    # Metadata already parsed at construction and accessible via property_settings()
-                    true
-                else
-                    # Invalid predicate functions will fail with a warning:
-                    @warn "unknown predicate function '$func'"
-                    false
-                end
-                if result
-                    # Success, reset for the next predicate.
-                    func = ""
-                    empty!(args)
-                    empty!(nodes)
-                else
-                    # Failed to match the current predicate, so we can bale here.
-                    return false
-                end
-            else
-                # We really shouldn't get here if all is well.
-                error("unreachable reached")
             end
+            if !isempty(values)
+                push!(args, values[1])
+                push!(nodes, capture_nodes[1])
+                capture_args[arg_idx] = values
+            end
+        elseif step.type === API.TSQueryPredicateStepTypeString
+            str = query_string(q, step.value_id)
+            func == "" ? (func = str) : push!(args, str)
+        elseif step.type === API.TSQueryPredicateStepTypeDone
+            push!(calls, PredicateCall(func, copy(args), copy(nodes), copy(capture_args)))
+            func = ""
+            empty!(args)
+            empty!(nodes)
+            empty!(capture_args)
+        else
+            error("unreachable reached")
         end
     end
-    return true
+    return calls
 end
+
+# Warn and return false when a predicate has the wrong number of arguments.
+function check_arity(c::PredicateCall, n::Integer)
+    length(c.args) == n && return true
+    @warn "incorrect number of arguments to '$(c.func)', expected $n"
+    return false
+end
+
+function check_min_arity(c::PredicateCall, n::Integer)
+    length(c.args) >= n && return true
+    @warn "incorrect number of arguments to '$(c.func)', expected at least $n"
+    return false
+end
+
+eval_eq(c::PredicateCall) = check_arity(c, 2) && c.args[1] == c.args[2]
+eval_not_eq(c::PredicateCall) = check_arity(c, 2) && c.args[1] != c.args[2]
+
+function eval_match(c::PredicateCall; negate::Bool)
+    check_arity(c, 2) || return false
+    matched = occursin(Regex(c.args[2]), c.args[1])
+    return negate ? !matched : matched
+end
+
+function eval_any_of(c::PredicateCall)
+    check_min_arity(c, 2) || return false
+    capture_value = c.args[1]
+    return any(arg -> arg == capture_value, c.args[2:end])
+end
+
+# A quantified predicate tests one capture, which may match several nodes,
+# against literal comparison values. The capture is the first argument (every
+# tree-sitter binding requires this); the comparison values follow. With no
+# capture argument, the first argument stands in as the sole tested value.
+function quantified_args(c::PredicateCall)
+    values = get(c.capture_args, 1, [c.args[1]])
+    return (values, c.args[2:end])
+end
+
+function eval_any_eq(c::PredicateCall)
+    check_min_arity(c, 2) || return false
+    values, comparison = quantified_args(c)
+    return any(cv -> cv in comparison, values)
+end
+
+function eval_any_not_eq(c::PredicateCall)
+    check_min_arity(c, 2) || return false
+    values, comparison = quantified_args(c)
+    return any(cv -> cv ∉ comparison, values)
+end
+
+function eval_any_match(c::PredicateCall)
+    check_arity(c, 2) || return false
+    values, comparison = quantified_args(c)
+    pattern = Regex(comparison[1])
+    return any(cv -> occursin(pattern, cv), values)
+end
+
+function eval_any_not_match(c::PredicateCall)
+    check_arity(c, 2) || return false
+    values, comparison = quantified_args(c)
+    pattern = Regex(comparison[1])
+    return any(cv -> !occursin(pattern, cv), values)
+end
+
+function eval_has_ancestor(c::PredicateCall)
+    check_min_arity(c, 2) || return false
+    if isempty(c.nodes)
+        @warn "'$(c.func)' requires access to node structure"
+        return false
+    end
+    ancestor_types = c.args[2:end]
+    current = parent(c.nodes[1])
+    while !is_null(current)
+        node_type(current) in ancestor_types && return true
+        current = parent(current)
+    end
+    return false
+end
+
+# Built-in property checks (`named`, `missing`, `extra`). The capture-ref forms
+# `(#is? @c "prop")` and `(#is? prop)` put the property in arg 2 or arg 1. When
+# no node was captured, fall back to the match's first capture. Unknown
+# properties (e.g. `local` from locals.scm) are no-ops that keep the pattern, so
+# both `is?` and `is-not?` return true for them.
+function eval_is(c::PredicateCall, m::QueryMatch; negate::Bool)
+    if isempty(c.args)
+        @warn "incorrect number of arguments to '$(c.func)', expected property name"
+        return false
+    end
+    property_name = startswith(c.args[1], "@") ? get(c.args, 2, "") : c.args[1]
+    if isempty(property_name)
+        @warn "'$(c.func)' missing property name"
+        return false
+    end
+    node = isempty(c.nodes) ? Node(unsafe_load(m.obj.captures, 1).node, m.tree) : c.nodes[1]
+    held = if property_name == "named"
+        is_named(node)
+    elseif property_name == "missing"
+        is_missing(node)
+    elseif property_name == "extra"
+        is_extra(node)
+    else
+        return true
+    end
+    return negate ? !held : held
+end
+
+# Predicate names follow the tree-sitter rust library. `set!` is a metadata
+# directive parsed at construction, so as a filter it always passes.
+function eval_predicate(c::PredicateCall, m::QueryMatch)
+    if c.func == "eq?"
+        eval_eq(c)
+    elseif c.func == "not-eq?"
+        eval_not_eq(c)
+    elseif c.func == "any-of?"
+        eval_any_of(c)
+    elseif c.func == "has-ancestor?"
+        eval_has_ancestor(c)
+    elseif c.func == "is?"
+        eval_is(c, m; negate = false)
+    elseif c.func == "is-not?"
+        eval_is(c, m; negate = true)
+    elseif c.func == "match?"
+        eval_match(c; negate = false)
+    elseif c.func == "not-match?"
+        eval_match(c; negate = true)
+    elseif c.func == "any-eq?"
+        eval_any_eq(c)
+    elseif c.func == "any-not-eq?"
+        eval_any_not_eq(c)
+    elseif c.func == "any-match?"
+        eval_any_match(c)
+    elseif c.func == "any-not-match?"
+        eval_any_not_match(c)
+    elseif c.func == "set!"
+        true
+    else
+        @warn "unknown predicate function '$(c.func)'"
+        false
+    end
+end
+
+# A match satisfies a pattern when every predicate passes. Evaluation
+# short-circuits on the first failure.
+predicate(q::Query, m::QueryMatch, source::AbstractString) =
+    all(c -> eval_predicate(c, m), parse_predicate_calls(q, m, source))
 
 function each_capture(tree::Tree, query::Query, source::AbstractString)
     return (
