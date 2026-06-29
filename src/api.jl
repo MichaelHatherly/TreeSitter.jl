@@ -286,7 +286,7 @@ function ts_tree_get_changed_ranges(old_tree, new_tree, length)
     )
 end
 
-# TODO: handle FILE.
+# Needs a FILE* handle before it can be bound.
 # function ts_tree_print_dot_graph(arg1, arg2)
 #     ccall((:ts_tree_print_dot_graph, libtreesitter), Cvoid, (Ptr{TSTree}, Ptr{FILE}), arg1, arg2)
 # end

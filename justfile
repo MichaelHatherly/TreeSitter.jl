@@ -17,3 +17,8 @@ format:
 # Run test suite
 test:
     julia --project=. -e 'using Pkg; Pkg.test()'
+
+# Run the Dendro structural quality gate over src/
+dendro:
+    julia --project=test/dendro -e 'using Pkg; Pkg.instantiate()'
+    julia --project=test/dendro test/dendro/dendro.jl
