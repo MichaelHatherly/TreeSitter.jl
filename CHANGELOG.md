@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add language injection: `parse` recursively parses embedded languages (JS/CSS in HTML, heredocs and phpdoc in PHP, tagged templates in JS) into a recursive `Tree` of layers over one shared source. A `Parser`'s `languages` set pins the injectable grammars, otherwise they resolve dynamically. Navigate with `layers`, `layer_at`, `slice`; analyse without parsing via `injection_sites` [#60]
 - Add node health accessors `has_error`/`has_changes` and byte/point descendant lookup [#50]
 - Add grammar introspection (symbol/field metadata) and query scoping by byte/point range [#50]
 - Add `TreeCursor` for stateful traversal with field-name access [#50]
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix query directives (`#offset!` and other `!`-suffixed names) being treated as failing filters, which dropped their matches from `each_capture` [#60]
 - Fix the zero-argument `ts_query_cursor_next_capture` binding signature [#50]
 - Fix the `TSTreeCursor` struct layout for the tree-sitter 0.25 ABI [#50]
 - Fix the zero-argument `ts_parser_set_included_ranges` binding signature [#50]
@@ -120,3 +122,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#44]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/44
 [#50]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/50
 [#54]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/54
+[#60]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/60

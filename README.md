@@ -234,3 +234,73 @@ q = query```
  (#any-match? @comments "TODO"))
 ```julia
 ```
+
+## Language Injection
+
+Many files embed one language in another: JavaScript and CSS inside HTML `<script>`/`<style>`, PHP inside HTML, heredocs and phpdoc inside PHP, regex and jsdoc inside JavaScript. Grammars describe these regions in an `injections.scm` query, marking the embedded text with `@injection.content` and naming the language either statically (`#set! injection.language "..."`) or dynamically (the text of an `@injection.language` capture). TreeSitter.jl reads those queries and parses the embedded languages for you.
+
+`parse` does the whole job; `injection_sites` stops at the analysis; `ts_range` is the low-level range helper.
+
+### Recursive parse
+
+`parse` parses a source and every language embedded in it, to a bounded depth. A `Tree` is recursive: it carries its `language`, the shared `source`, the `ranges` it covers, and the `children` layers for embedded languages. A grammar that declares no injections leaves a single-layer tree, so the plain case is the base case of an injected one.
+
+```julia
+tree = parse(Parser(:html), "<p>hi</p><script>f(x)</script>")
+
+tree.language.name                        # :html
+child = tree.children[1]
+child.language.name                       # :javascript
+TreeSitter.slice(child)                    # "f(x)"
+
+# The layer covering a 1-based byte offset, deepest first.
+TreeSitter.layer_at(tree, 20).language.name   # :javascript
+
+# Every layer, depth-first with the root first.
+[l.language.name for l in TreeSitter.layers(tree)]   # [:html, :javascript]
+```
+
+A sub-tree's node offsets stay in the original document's coordinate space, so a query on a child layer reports positions into the shared source:
+
+```julia
+q = Query(:javascript, "(call_expression) @c")
+for c in TreeSitter.each_capture(child, q, tree.source)
+    TreeSitter.slice(tree.source, c.node)   # "f(x)"
+end
+```
+
+### Language resolution
+
+Injected languages resolve dynamically by default: an injection name maps through `INJECTION_ALIASES` (case-insensitive, e.g. `"js"` to `:javascript`, `"c++"` to `:cpp`) to a grammar symbol, and the JLL loads on demand. Pass `Parser(lang; languages=[...])` to pin the set from JLL modules, `Language`s, or local grammar paths, which disables dynamic loading. A site whose grammar is unavailable is recorded in the root tree's `unresolved` rather than raised:
+
+```julia
+tree = parse(Parser(:html), "<style>a{}</style>")
+tree.unresolved   # [UnresolvedInjection("css", :unavailable)] when tree_sitter_css_jll is absent
+
+# Pin the grammars, including a local one, and skip dynamic loading:
+parse(Parser(:html; languages = [tree_sitter_javascript_jll, Language("path/to/tree-sitter-css")]), source)
+```
+
+Bound the recursion with `max_depth` (default 8); `max_depth=0` parses no embedded languages.
+
+### Analysis only
+
+`injection_sites` returns the embedded regions without parsing them, for callers that drive parsing themselves. Each `InjectionSite` carries the resolved language name, the 0-based `ranges`, and the `combined`/`include_children` flags.
+
+```julia
+p = Parser(:html)
+source = "<script>let x=1;</script><style>a{}</style>"
+tree = parse(p, source)
+for site in TreeSitter.injection_sites(p, tree, source)
+    site.language                                  # "javascript", then "css"
+    TreeSitter.slice(source, site.content_nodes[1])
+end
+```
+
+`ts_range(node)` builds the 0-based `API.TSRange` that `set_included_ranges!` expects, bridging the 1-based node coordinates and the 0-based C ranges.
+
+### Limitations
+
+- `include-children` follows tree-sitter's `intersect_ranges`: with the flag, the whole content node is injected; without it, every child node is excluded, leaving the gaps between them.
+- `#offset!` is applied to single-line adjustments only; a directive with a non-zero row delta falls back to the unadjusted range.
+- `injection.combined` groups content ranges by pattern index, matching how a grammar's own patterns combine.
