@@ -227,6 +227,8 @@ Only built-in properties are checked: `named`, `missing`, `extra`
   a `do` block and not for one directly in the function around it
 - `#ancestor-match?` - An ancestor of a type whose text matches a regex:
   `(#ancestor-match? @call "function_definition" "^function\\s+unsafe_")`
+- `#not-ancestor-match?` - No such ancestor, which is how a rule says a call escaped the
+  context it belongs in: `(#not-ancestor-match? @call "function_definition" "^function\\s+unsafe_")`
 - `#structure-eq?` - Structural equality of two captured nodes: same node types, same
   children in order, same text at every leaf. `(#structure-eq? @a @b)` reads two subtrees
   as one shape however they are spaced, where `#eq?` compares raw source text

@@ -345,3 +345,19 @@ end
         @test isempty(result)
     end
 end
+
+@testset "not-ancestor-match?" begin
+    # "An `unsafe_` call outside an `unsafe_`-named function", which needs the negated
+    # form: the positive one cannot say a construct is absent.
+    src = """
+    function unsafe_get(p)
+        unsafe_load(p)
+    end
+    function get(p)
+        unsafe_load(p)
+    end
+    """
+    q = "((block (call_expression . (identifier) @_f) @c) (#match? @_f \"^unsafe_\") (#not-ancestor-match? @c \"function_definition\" \"^function\\\\s+unsafe_\"))"
+    @test predicate_captures(tree_sitter_julia_jll, src, q) ==
+          ["unsafe_load(p)", "unsafe_load"]
+end

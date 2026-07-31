@@ -1403,20 +1403,22 @@ end
 # one exists: whether the enclosing function is named a particular way, say. The whole
 # text of the ancestor is tested, so a pattern usually anchors on how the construct
 # opens.
-function eval_ancestor_match(c::PredicateCall, source::AbstractString)
+function eval_ancestor_match(c::PredicateCall, source::AbstractString; negate::Bool)
     check_arity(c, 3) || return false
     has_nodes(c) || return false
     ancestor_type = c.args[2]
     rx = _try_regex(c.args[3])
     rx === nothing && return false
+    found = false
     current = parent(c.nodes[1])
     while !is_null(current)
-        node_type(current) == ancestor_type &&
-            occursin(rx, slice(source, current)) &&
-            return true
+        if node_type(current) == ancestor_type && occursin(rx, slice(source, current))
+            found = true
+            break
+        end
         current = parent(current)
     end
-    return false
+    return negate ? !found : found
 end
 
 # Two nodes are structurally equal when their types agree, their children correspond one
@@ -1540,7 +1542,9 @@ function eval_tree_predicate(c::PredicateCall, source::AbstractString)
     elseif c.func == "nearest-ancestor?"
         eval_nearest_ancestor(c)
     elseif c.func == "ancestor-match?"
-        eval_ancestor_match(c, source)
+        eval_ancestor_match(c, source; negate = false)
+    elseif c.func == "not-ancestor-match?"
+        eval_ancestor_match(c, source; negate = true)
     elseif c.func == "structure-eq?"
         eval_structure_eq(c, source; negate = false)
     elseif c.func == "not-structure-eq?"
