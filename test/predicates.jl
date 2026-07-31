@@ -278,3 +278,70 @@ end
         @test isempty(result)
     end
 end
+
+@testset "has-descendant? and not-has-descendant?" begin
+    src = "int f(void) { return 1; }\nint g(void) { }\n"
+    with_return = "((function_definition) @f (#has-descendant? @f \"return_statement\"))"
+    without_return = "((function_definition) @f (#not-has-descendant? @f \"return_statement\"))"
+    # A descendant sits at whatever depth the grammar puts it, which a pattern would have
+    # to spell out as a path.
+    @test predicate_captures(tree_sitter_c_jll, src, with_return) ==
+          ["int f(void) { return 1; }"]
+    @test predicate_captures(tree_sitter_c_jll, src, without_return) == ["int g(void) { }"]
+end
+
+@testset "not-any-of?" begin
+    src = "int a; int b; int c;\n"
+    q = "((identifier) @x (#not-any-of? @x \"a\" \"b\"))"
+    @test predicate_captures(tree_sitter_c_jll, src, q) == ["c"]
+end
+
+@testset "not-structure-eq?" begin
+    q = "((if_statement . (_) @a (elseif_clause . (_) @b)) (#not-structure-eq? @a @b))"
+    renamed = "if x > 0\n    a()\nelseif y > 0\n    b()\nend\n"
+    @test predicate_captures(tree_sitter_julia_jll, renamed, q) == ["x > 0", "y > 0"]
+    same = "if x > 0\n    a()\nelseif x>0\n    b()\nend\n"
+    @test isempty(predicate_captures(tree_sitter_julia_jll, same, q))
+end
+
+@testset "descendant predicates: malformed calls warn and filter" begin
+    @testset "wrong arity: $name" for (name, qsrc, rx) in [
+        (
+            "has-descendant?",
+            "((identifier) @x (#has-descendant? @x))",
+            r"'has-descendant\?'",
+        ),
+        (
+            "not-has-descendant?",
+            "((identifier) @x (#not-has-descendant? @x))",
+            r"'not-has-descendant\?'",
+        ),
+        ("not-any-of?", "((identifier) @x (#not-any-of? @x))", r"'not-any-of\?'"),
+        (
+            "not-structure-eq?",
+            "((identifier) @x (#not-structure-eq? @x))",
+            r"'not-structure-eq\?'",
+        ),
+    ]
+        result = @test_logs (:warn, rx) match_mode = :any predicate_captures(
+            tree_sitter_c_jll,
+            "int x;",
+            qsrc,
+        )
+        @test isempty(result)
+    end
+
+    @testset "descendant predicates without a captured node warn: $name" for (name, qsrc) in
+                                                                             [
+        ("has-descendant?", "((identifier) @x (#has-descendant? \"a\" \"b\"))"),
+        ("not-has-descendant?", "((identifier) @x (#not-has-descendant? \"a\" \"b\"))"),
+    ]
+        result =
+            @test_logs (:warn, r"requires access to node structure") match_mode = :any predicate_captures(
+                tree_sitter_c_jll,
+                "int x;",
+                qsrc,
+            )
+        @test isempty(result)
+    end
+end

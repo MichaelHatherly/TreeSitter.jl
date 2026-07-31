@@ -203,6 +203,7 @@ TreeSitter.jl supports tree-sitter query predicates for filtering matches and at
 - `#eq?` - String equality: `(#eq? @var "foo")`
 - `#not-eq?` - String inequality: `(#not-eq? @method "constructor")`
 - `#any-of?` - Multi-value equality: `(#any-of? @type "int" "void" "char")`
+- `#not-any-of?` - Negated multi-value equality: `(#not-any-of? @type "int" "void")`
 
 **Pattern Matching:**
 - `#match?` - Regex match: `(#match? @lowercase "^[a-z]+$")`
@@ -217,6 +218,10 @@ Only built-in properties are checked: `named`, `missing`, `extra`
 **Tree Structure:**
 - `#has-ancestor?` - Ancestor check: `(#has-ancestor? @indexer index_expression)`
 - `#not-has-ancestor?` - No such ancestor: `(#not-has-ancestor? @call function_definition)`
+- `#has-descendant?` - A node of the type sits somewhere below, at any depth:
+  `(#has-descendant? @catch "rethrow_statement")`
+- `#not-has-descendant?` - Nothing of the type sits below, which is how a pattern says a
+  construct is missing: `(#not-has-descendant? @loop "break_statement")`
 - `#nearest-ancestor?` - Which of several encloses most closely, the first named winning:
   `(#nearest-ancestor? @return do_clause function_definition)` holds for a `return` inside
   a `do` block and not for one directly in the function around it
@@ -225,6 +230,7 @@ Only built-in properties are checked: `named`, `missing`, `extra`
 - `#structure-eq?` - Structural equality of two captured nodes: same node types, same
   children in order, same text at every leaf. `(#structure-eq? @a @b)` reads two subtrees
   as one shape however they are spaced, where `#eq?` compares raw source text
+- `#not-structure-eq?` - Negated structural equality: `(#not-structure-eq? @a @b)`
 
 **Quantified Predicates:**
 

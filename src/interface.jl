@@ -1311,10 +1311,11 @@ function eval_match(c::PredicateCall; negate::Bool)
     return negate ? !matched : matched
 end
 
-function eval_any_of(c::PredicateCall)
+function eval_any_of(c::PredicateCall; negate::Bool)
     check_min_arity(c, 2) || return false
     capture_value = c.args[1]
-    return any(arg -> arg == capture_value, c.args[2:end])
+    matched = any(arg -> arg == capture_value, c.args[2:end])
+    return negate ? !matched : matched
 end
 
 # A quantified predicate tests one capture, which may match several nodes,
@@ -1435,13 +1436,35 @@ function structurally_equal(a::Node, b::Node, source::AbstractString)
     return true
 end
 
-function eval_structure_eq(c::PredicateCall, source::AbstractString)
+function eval_structure_eq(c::PredicateCall, source::AbstractString; negate::Bool)
     check_arity(c, 2) || return false
     if length(c.nodes) < 2
         @warn "'$(c.func)' requires two captured nodes"
         return false
     end
-    return structurally_equal(c.nodes[1], c.nodes[2], source)
+    equal = structurally_equal(c.nodes[1], c.nodes[2], source)
+    return negate ? !equal : equal
+end
+
+# True when some node below `n` has one of the given types. The mirror of
+# `has-ancestor?`: a pattern can only reach a descendant by spelling out the path to it,
+# so a construct that may sit at any depth (a `return` somewhere in a function body, a
+# `rethrow` somewhere in a `catch`) is otherwise out of reach. The negated form is the
+# more useful one, since "contains no such thing" is what a rule usually wants to say.
+function subtree_contains(n::Node, types)
+    for i = 1:count_nodes(n)
+        c = child(n, i)
+        node_type(c) in types && return true
+        subtree_contains(c, types) && return true
+    end
+    return false
+end
+
+function eval_has_descendant(c::PredicateCall; negate::Bool)
+    check_min_arity(c, 2) || return false
+    has_nodes(c) || return false
+    found = subtree_contains(c.nodes[1], c.args[2:end])
+    return negate ? !found : found
 end
 
 # Built-in property checks (`named`, `missing`, `extra`). The property is the
@@ -1475,30 +1498,17 @@ function eval_is(c::PredicateCall, m::QueryMatch; negate::Bool)
     return negate ? !held : held
 end
 
-# Predicate names follow the tree-sitter rust library. Directives (names ending in
-# `!`, such as `set!` and `offset!`) annotate a match rather than filter it, so as
-# filters they always pass.
-function eval_predicate(c::PredicateCall, m::QueryMatch, source::AbstractString)
+# The predicates that read capture text and nothing else. `nothing` means the name
+# belongs to another family, which is how the three dispatchers below chain.
+function eval_text_predicate(c::PredicateCall)
     if c.func == "eq?"
         eval_eq(c)
     elseif c.func == "not-eq?"
         eval_not_eq(c)
     elseif c.func == "any-of?"
-        eval_any_of(c)
-    elseif c.func == "has-ancestor?"
-        eval_has_ancestor(c; negate = false)
-    elseif c.func == "not-has-ancestor?"
-        eval_has_ancestor(c; negate = true)
-    elseif c.func == "nearest-ancestor?"
-        eval_nearest_ancestor(c)
-    elseif c.func == "ancestor-match?"
-        eval_ancestor_match(c, source)
-    elseif c.func == "structure-eq?"
-        eval_structure_eq(c, source)
-    elseif c.func == "is?"
-        eval_is(c, m; negate = false)
-    elseif c.func == "is-not?"
-        eval_is(c, m; negate = true)
+        eval_any_of(c; negate = false)
+    elseif c.func == "not-any-of?"
+        eval_any_of(c; negate = true)
     elseif c.func == "match?"
         eval_match(c; negate = false)
     elseif c.func == "not-match?"
@@ -1511,6 +1521,47 @@ function eval_predicate(c::PredicateCall, m::QueryMatch, source::AbstractString)
         eval_any_match(c)
     elseif c.func == "any-not-match?"
         eval_any_not_match(c)
+    else
+        nothing
+    end
+end
+
+# The predicates that read the tree around or below a capture, or compare two subtrees.
+# These need the nodes a capture bound rather than their text.
+function eval_tree_predicate(c::PredicateCall, source::AbstractString)
+    if c.func == "has-ancestor?"
+        eval_has_ancestor(c; negate = false)
+    elseif c.func == "not-has-ancestor?"
+        eval_has_ancestor(c; negate = true)
+    elseif c.func == "has-descendant?"
+        eval_has_descendant(c; negate = false)
+    elseif c.func == "not-has-descendant?"
+        eval_has_descendant(c; negate = true)
+    elseif c.func == "nearest-ancestor?"
+        eval_nearest_ancestor(c)
+    elseif c.func == "ancestor-match?"
+        eval_ancestor_match(c, source)
+    elseif c.func == "structure-eq?"
+        eval_structure_eq(c, source; negate = false)
+    elseif c.func == "not-structure-eq?"
+        eval_structure_eq(c, source; negate = true)
+    else
+        nothing
+    end
+end
+
+# Predicate names follow the tree-sitter rust library, with the structural and ancestry
+# additions this package makes. Directives (names ending in `!`, such as `set!` and
+# `offset!`) annotate a match rather than filter it, so as filters they always pass.
+function eval_predicate(c::PredicateCall, m::QueryMatch, source::AbstractString)
+    text = eval_text_predicate(c)
+    text === nothing || return text
+    tree = eval_tree_predicate(c, source)
+    tree === nothing || return tree
+    return if c.func == "is?"
+        eval_is(c, m; negate = false)
+    elseif c.func == "is-not?"
+        eval_is(c, m; negate = true)
     elseif endswith(c.func, "!")
         true
     else
