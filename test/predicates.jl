@@ -157,3 +157,124 @@ end
     @test TreeSitter.node_string(root_node) isa AbstractString
     @test TreeSitter.node_symbol(root_node) isa Integer
 end
+
+# Structural comparison and the ancestor family. Each answers a question the text
+# predicates cannot: whether two subtrees are the same code however they are spelled,
+# and what a node is enclosed by.
+
+@testset "structure-eq?" begin
+    q = "((if_statement . (_) @a (elseif_clause . (_) @b)) (#structure-eq? @a @b))"
+
+    # The same condition respelled. Whitespace lives between tokens rather than in the
+    # tree, so the two conditions are one shape and `eq?` on their text would disagree.
+    same = "if x > 0\n    a()\nelseif x>0\n    b()\nend\n"
+    @test predicate_captures(tree_sitter_julia_jll, same, q) == ["x > 0", "x>0"]
+
+    # A renamed operand is a different condition, which is what separates this from a
+    # shape-only hash: leaf text is part of the comparison.
+    renamed = "if x > 0\n    a()\nelseif y > 0\n    b()\nend\n"
+    @test isempty(predicate_captures(tree_sitter_julia_jll, renamed, q))
+
+    # A different operator differs in an anonymous token, so anonymous children count too.
+    operator = "if x > 0\n    a()\nelseif x >= 0\n    b()\nend\n"
+    @test isempty(predicate_captures(tree_sitter_julia_jll, operator, q))
+end
+
+@testset "not-has-ancestor?" begin
+    src = "int g;\nint f(void) { int x; return x; }\n"
+    q = "((identifier) @x (#not-has-ancestor? @x \"function_definition\"))"
+    @test predicate_captures(tree_sitter_c_jll, src, q) == ["g"]
+end
+
+@testset "nearest-ancestor?" begin
+    # Both returns sit under a `function_definition`; only the first sits under a
+    # `do_clause` first. `has-ancestor?` walks to the root and cannot tell them apart.
+    src = """
+    function f(xs)
+        map(xs) do x
+            return x
+        end
+        return 1
+    end
+    """
+    nearest_do = "((return_statement) @r (#nearest-ancestor? @r \"do_clause\" \"function_definition\"))"
+    nearest_fun = "((return_statement) @r (#nearest-ancestor? @r \"function_definition\" \"do_clause\"))"
+    @test predicate_captures(tree_sitter_julia_jll, src, nearest_do) == ["return x"]
+    @test predicate_captures(tree_sitter_julia_jll, src, nearest_fun) == ["return 1"]
+end
+
+@testset "ancestor-match?" begin
+    src = """
+    function unsafe_get(p)
+        load(p)
+    end
+    function get(p)
+        load(p)
+    end
+    """
+    q = "((block (call_expression) @c) (#ancestor-match? @c \"function_definition\" \"^function\\\\s+unsafe_\"))"
+    @test predicate_captures(tree_sitter_julia_jll, src, q) == ["load(p)"]
+end
+
+@testset "structural and ancestor predicates: malformed calls warn and filter" begin
+    @testset "wrong arity: $name" for (name, qsrc, rx) in [
+        ("structure-eq?", "((identifier) @x (#structure-eq? @x))", r"'structure-eq\?'"),
+        (
+            "not-has-ancestor?",
+            "((identifier) @x (#not-has-ancestor? @x))",
+            r"'not-has-ancestor\?'",
+        ),
+        (
+            "nearest-ancestor?",
+            "((identifier) @x (#nearest-ancestor? @x))",
+            r"'nearest-ancestor\?'",
+        ),
+        (
+            "ancestor-match?",
+            "((identifier) @x (#ancestor-match? @x \"a\"))",
+            r"'ancestor-match\?'",
+        ),
+    ]
+        result = @test_logs (:warn, rx) match_mode = :any predicate_captures(
+            tree_sitter_c_jll,
+            "int x;",
+            qsrc,
+        )
+        @test isempty(result)
+    end
+
+    # `structure-eq?` compares nodes, so two string literals have nothing to compare.
+    @testset "structure-eq? without two captured nodes warns" begin
+        result =
+            @test_logs (:warn, r"requires two captured nodes") match_mode = :any predicate_captures(
+                tree_sitter_c_jll,
+                "int x;",
+                "((identifier) @x (#structure-eq? \"a\" \"b\"))",
+            )
+        @test isempty(result)
+    end
+
+    @testset "ancestor predicates without a captured node warn: $name" for (name, qsrc) in [
+        ("not-has-ancestor?", "((identifier) @x (#not-has-ancestor? \"a\" \"b\"))"),
+        ("nearest-ancestor?", "((identifier) @x (#nearest-ancestor? \"a\" \"b\" \"c\"))"),
+        ("ancestor-match?", "((identifier) @x (#ancestor-match? \"a\" \"b\" \"c\"))"),
+    ]
+        result =
+            @test_logs (:warn, r"requires access to node structure") match_mode = :any predicate_captures(
+                tree_sitter_c_jll,
+                "int x;",
+                qsrc,
+            )
+        @test isempty(result)
+    end
+
+    @testset "ancestor-match? with an invalid regex warns" begin
+        result =
+            @test_logs (:warn, r"invalid regex in predicate") match_mode = :any predicate_captures(
+                tree_sitter_c_jll,
+                "int x;",
+                "((identifier) @x (#ancestor-match? @x \"translation_unit\" \"[\"))",
+            )
+        @test isempty(result)
+    end
+end

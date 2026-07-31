@@ -1354,19 +1354,94 @@ function eval_any_not_match(c::PredicateCall)
     return any(cv -> !occursin(pattern, cv), values)
 end
 
-function eval_has_ancestor(c::PredicateCall)
+function eval_has_ancestor(c::PredicateCall; negate::Bool)
     check_min_arity(c, 2) || return false
-    if isempty(c.nodes)
-        @warn "'$(c.func)' requires access to node structure"
-        return false
-    end
+    has_nodes(c) || return false
     ancestor_types = c.args[2:end]
+    found = false
     current = parent(c.nodes[1])
     while !is_null(current)
-        node_type(current) in ancestor_types && return true
+        if node_type(current) in ancestor_types
+            found = true
+            break
+        end
+        current = parent(current)
+    end
+    return negate ? !found : found
+end
+
+# The ancestor predicates read the tree above a match, so they need the node a capture
+# bound rather than its text.
+function has_nodes(c::PredicateCall)
+    isempty(c.nodes) || return true
+    @warn "'$(c.func)' requires access to node structure"
+    return false
+end
+
+# Walk up to the first ancestor whose type is one of those listed; the predicate holds
+# when that ancestor is of the type named first. Where `has-ancestor?` asks whether an
+# enclosing construct exists anywhere above, this asks which of several encloses most
+# closely. A `return` inside a closure inside a function has both above it, and only the
+# nearest one says which of the two it returns from.
+function eval_nearest_ancestor(c::PredicateCall)
+    check_min_arity(c, 3) || return false
+    has_nodes(c) || return false
+    stopping = c.args[2:end]
+    wanted = first(stopping)
+    current = parent(c.nodes[1])
+    while !is_null(current)
+        found = node_type(current)
+        found in stopping && return found == wanted
         current = parent(current)
     end
     return false
+end
+
+# True when some ancestor of the given type has source text matching the pattern. This
+# is what lets a rule ask about the construct it sits inside rather than only whether
+# one exists: whether the enclosing function is named a particular way, say. The whole
+# text of the ancestor is tested, so a pattern usually anchors on how the construct
+# opens.
+function eval_ancestor_match(c::PredicateCall, source::AbstractString)
+    check_arity(c, 3) || return false
+    has_nodes(c) || return false
+    ancestor_type = c.args[2]
+    rx = _try_regex(c.args[3])
+    rx === nothing && return false
+    current = parent(c.nodes[1])
+    while !is_null(current)
+        node_type(current) == ancestor_type &&
+            occursin(rx, slice(source, current)) &&
+            return true
+        current = parent(current)
+    end
+    return false
+end
+
+# Two nodes are structurally equal when their types agree, their children correspond one
+# for one, and their leaves carry the same text. Anonymous children are compared too, so
+# a differing operator separates two otherwise identical expressions. Whitespace sits
+# between tokens rather than in the tree, which is what makes this the comparison a rule
+# about duplicated code wants: `x > 0` and `x>0` are one shape, and `x > 0` and `y > 0`
+# are two.
+function structurally_equal(a::Node, b::Node, source::AbstractString)
+    node_type(a) == node_type(b) || return false
+    n = count_nodes(a)
+    n == count_nodes(b) || return false
+    iszero(n) && return slice(source, a) == slice(source, b)
+    for i = 1:n
+        structurally_equal(child(a, i), child(b, i), source) || return false
+    end
+    return true
+end
+
+function eval_structure_eq(c::PredicateCall, source::AbstractString)
+    check_arity(c, 2) || return false
+    if length(c.nodes) < 2
+        @warn "'$(c.func)' requires two captured nodes"
+        return false
+    end
+    return structurally_equal(c.nodes[1], c.nodes[2], source)
 end
 
 # Built-in property checks (`named`, `missing`, `extra`). The property is the
@@ -1403,7 +1478,7 @@ end
 # Predicate names follow the tree-sitter rust library. Directives (names ending in
 # `!`, such as `set!` and `offset!`) annotate a match rather than filter it, so as
 # filters they always pass.
-function eval_predicate(c::PredicateCall, m::QueryMatch)
+function eval_predicate(c::PredicateCall, m::QueryMatch, source::AbstractString)
     if c.func == "eq?"
         eval_eq(c)
     elseif c.func == "not-eq?"
@@ -1411,7 +1486,15 @@ function eval_predicate(c::PredicateCall, m::QueryMatch)
     elseif c.func == "any-of?"
         eval_any_of(c)
     elseif c.func == "has-ancestor?"
-        eval_has_ancestor(c)
+        eval_has_ancestor(c; negate = false)
+    elseif c.func == "not-has-ancestor?"
+        eval_has_ancestor(c; negate = true)
+    elseif c.func == "nearest-ancestor?"
+        eval_nearest_ancestor(c)
+    elseif c.func == "ancestor-match?"
+        eval_ancestor_match(c, source)
+    elseif c.func == "structure-eq?"
+        eval_structure_eq(c, source)
     elseif c.func == "is?"
         eval_is(c, m; negate = false)
     elseif c.func == "is-not?"
@@ -1439,7 +1522,7 @@ end
 # A match satisfies a pattern when every predicate passes. Evaluation
 # short-circuits on the first failure.
 predicate(q::Query, m::QueryMatch, source::AbstractString) =
-    all(c -> eval_predicate(c, m), parse_predicate_calls(q, m, source))
+    all(c -> eval_predicate(c, m, source), parse_predicate_calls(q, m, source))
 
 function each_capture(tree::Tree, query::Query, source::AbstractString)
     return (
