@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `#structure-eq?`/`#not-structure-eq?`, comparing two captured nodes by tree shape and leaf text rather than by source text [#65]
+- Add `#not-has-ancestor?`, `#nearest-ancestor?`, `#ancestor-match?`, and `#not-ancestor-match?` for asking what a node is enclosed by [#65]
+- Add `#has-descendant?`/`#not-has-descendant?`, reaching a node at any depth below a capture rather than by spelling out the path [#65]
+- Add `#not-any-of?`, the negation `#any-of?` was missing [#65]
 - Add language injection: `parse` recursively parses embedded languages (JS/CSS in HTML, heredocs and phpdoc in PHP, tagged templates in JS) into a recursive `Tree` of layers over one shared source. A `Parser`'s `languages` set pins the injectable grammars, otherwise they resolve dynamically. Navigate with `layers`, `layer_at`, `slice`; analyse without parsing via `injection_sites` [#60]
 - Add node health accessors `has_error`/`has_changes` and byte/point descendant lookup [#50]
 - Add grammar introspection (symbol/field metadata) and query scoping by byte/point range [#50]
@@ -123,3 +127,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#50]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/50
 [#54]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/54
 [#60]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/60
+[#65]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/65
