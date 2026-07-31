@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [v0.3.0] - 2026-08-01
+
 ### Changed
 
 - Support tree-sitter 0.26 via `tree_sitter_jll` [#54]
@@ -36,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Remove deprecated timeout and cancellation-flag parser bindings, dropped in tree-sitter 0.26 [#50]
+- Remove the internal `API` bindings for parser timeouts and cancellation flags, dropped in tree-sitter 0.26. They were never exported, so the public API is unchanged [#50]
 
 ## [v0.2.3] - 2026-01-27
 
@@ -106,6 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.2.1]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.2.1
 [v0.2.2]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.2.2
 [v0.2.3]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.2.3
+[v0.3.0]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.3.0
 [#24]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/24
 [#25]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/25
 [#26]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/26
