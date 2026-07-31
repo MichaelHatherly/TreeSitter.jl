@@ -6,6 +6,7 @@ export list_parsers
 
 include("api.jl")
 include("interface.jl")
+include("injection.jl")
 include("abstracttrees.jl")
 
 end # module

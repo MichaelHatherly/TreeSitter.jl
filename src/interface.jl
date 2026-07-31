@@ -40,11 +40,12 @@ mutable struct Language
             pkg_id = Base.identify_package(pkg_name)
             if pkg_id === nothing
                 error(
-                    "Language package '$pkg_name' not found. Please add and import it first:\n" *
-                    "  using tree_sitter_$(name)_jll",
+                    "Language package '$pkg_name' not found. Add it to the active project:\n" *
+                    "  import Pkg; Pkg.add(\"tree_sitter_$(name)_jll\")",
                 )
             end
-            Base.root_module(pkg_id)
+            # Load on demand: a grammar in the active project need not be imported first.
+            Base.require(pkg_id)
         end
         return Language(jll_mod)
     end
@@ -69,19 +70,37 @@ mutable struct Parser
     language::Language
     ptr::Ptr{API.TSParser}
     logger_sink::Union{Function,Nothing}  # keeps a set_logger! callback alive while installed
-    function Parser(lang::Language)
-        parser = new(lang, API.ts_parser_new(), nothing)
+    # Grammars available to language injection. `nothing` resolves injected languages
+    # dynamically at parse time; a dict pins the set and disables dynamic loading.
+    injections::Union{Nothing,Dict{Symbol,Language}}
+    function Parser(lang::Language; languages = nothing)
+        registry = languages === nothing ? nothing : injection_registry(languages)
+        parser = new(lang, API.ts_parser_new(), nothing, registry)
         finalizer(p -> API.ts_parser_delete(p.ptr), parser)
         set_language!(parser, lang)
         return parser
     end
-    Parser(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing) =
-        Parser(Language(jll_mod, variant))
-    Parser(name::Symbol) = Parser(Language(name))
-    Parser(path::AbstractString, variant::Union{Symbol,Nothing} = nothing) =
-        Parser(Language(path, variant))
+    Parser(jll_mod::Module, variant::Union{Symbol,Nothing} = nothing; languages = nothing) =
+        Parser(Language(jll_mod, variant); languages)
+    Parser(name::Symbol; languages = nothing) = Parser(Language(name); languages)
+    Parser(
+        path::AbstractString,
+        variant::Union{Symbol,Nothing} = nothing;
+        languages = nothing,
+    ) = Parser(Language(path, variant); languages)
 end
 Base.show(io::IO, p::Parser) = print(io, "Parser(", p.language, ")")
+
+# Build the injection grammar registry from a collection of languages, each given as a
+# `Language`, a JLL `Module`, a grammar `Symbol`, or a local grammar path `String`.
+function injection_registry(languages)
+    registry = Dict{Symbol,Language}()
+    for entry in languages
+        lang = entry isa Language ? entry : Language(entry)
+        registry[lang.name] = lang
+    end
+    return registry
+end
 
 function set_language!(parser::Parser, language::Language)
     API.ts_parser_set_language(parser.ptr, language.ptr)
@@ -90,15 +109,21 @@ function set_language!(parser::Parser, language::Language)
 end
 
 """
-    parse(parser::Parser, text::AbstractString; encoding=:utf8) -> Tree
+    parse(parser::Parser, text::AbstractString; encoding=:utf8, max_depth=8) -> Tree
     parse(parser::Parser, source::Function; encoding=:utf8) -> Tree
-    parse(parser::Parser, text::AbstractString, old::Tree) -> Tree
+    parse(parser::Parser, text::AbstractString, old::Tree; max_depth=8) -> Tree
 
 Parse source into a `Tree`. `encoding` is `:utf8` or `:utf16`.
 
+Languages embedded via the grammar's injections query are parsed too, up to `max_depth`
+levels, and hang off `tree.children`; a grammar that declares no injections leaves a
+single-layer tree. The parser resolves injected languages from its `languages` set, or
+dynamically when it was given none. Sites that could not be parsed are recorded in
+`tree.unresolved`. See [`Tree`](@ref), [`layers`](@ref), [`layer_at`](@ref).
+
 Pass a `source` callback to parse a source not held as a single `String`:
 `source(offset)` returns the chunk at a 1-based byte offset, or an empty string at end
-of input.
+of input. A callback-parsed tree has no shared source, so it is never injected into.
 
 Pass an `old` tree that has had the matching `edit!` applied to reparse incrementally,
 reusing the unchanged subtrees.
@@ -107,25 +132,38 @@ reusing the unchanged subtrees.
 ```julia
 parser = Parser(tree_sitter_julia_jll)
 tree = parse(parser, "f(x) = x + 1")
+
+html = parse(Parser(:html), "<script>f(x)</script>")
+html.children[1].language.name   # :javascript
 ```
 """
-function Base.parse(p::Parser, text::AbstractString; encoding::Symbol = :utf8)
-    encoding === :utf8 &&
-        return Tree(API.ts_parser_parse_string(p.ptr, C_NULL, text, sizeof(text)))
+# The raw tree-sitter parse of a string, returning the C tree pointer without wrapping.
+function _parse_string_ptr(p::Parser, text::AbstractString, old::Ptr, encoding::Symbol)
+    encoding === :utf8 && return API.ts_parser_parse_string(p.ptr, old, text, sizeof(text))
     encoding === :utf16 || throw(ArgumentError("unknown encoding $encoding"))
     units = transcode(UInt16, String(text))
     GC.@preserve units begin
         buffer = Cstring(reinterpret(Ptr{Cchar}, pointer(units)))
-        return Tree(
-            API.ts_parser_parse_string_encoding(
-                p.ptr,
-                C_NULL,
-                buffer,
-                UInt32(2 * length(units)),
-                API.TSInputEncodingUTF16LE,
-            ),
+        return API.ts_parser_parse_string_encoding(
+            p.ptr,
+            old,
+            buffer,
+            UInt32(2 * length(units)),
+            API.TSInputEncodingUTF16LE,
         )
     end
+end
+
+function Base.parse(
+    p::Parser,
+    text::AbstractString;
+    encoding::Symbol = :utf8,
+    max_depth::Integer = 8,
+)
+    ptr = _parse_string_ptr(p, text, C_NULL, encoding)
+    tree = _tree(ptr, p.language, text, API.TSRange[], false)
+    resolve_injections!(tree, p, max_depth)
+    return tree
 end
 
 # Holds the user's chunk producer and the current chunk, kept alive across read calls.
@@ -161,7 +199,10 @@ function Base.parse(p::Parser, source::Function; encoding::Symbol = :utf8)
     )
     GC.@preserve state begin
         input = API.TSInput(pointer_from_objref(state), trampoline, enc, C_NULL)
-        return Tree(API.ts_parser_parse(p.ptr, C_NULL, input))
+        ptr = API.ts_parser_parse(p.ptr, C_NULL, input)
+        # A callback source is not held as a single string, so there is nothing to inject
+        # over: the tree is one layer with no shared source.
+        return _tree(ptr, p.language, "", API.TSRange[], false)
     end
 end
 
@@ -262,28 +303,92 @@ _dup_fd(fd) = @static Sys.iswindows() ? ccall(:_dup, Cint, (Cint,), fd) :
 # Tree
 #
 
+"""
+    UnresolvedInjection
+
+An injection site discovered but not parsed. `reason` is one of `:unavailable` (no
+importable grammar), `:depth_limit`, `:cycle`, or `:overlapping` (rejected by
+`set_included_ranges!`).
+"""
+struct UnresolvedInjection
+    language::String
+    ranges::Vector{API.TSRange}
+    reason::Symbol
+end
+
+Base.show(io::IO, u::UnresolvedInjection) =
+    print(io, "UnresolvedInjection(", repr(u.language), ", ", u.reason, ")")
+
+"""
+    Tree
+
+A parse tree. A tree is also a layer of the injection tree rooted at it: `children` holds
+the layers for languages embedded in `source`, each parsed over its own `ranges` but sharing
+one `source` string, so every node's byte offsets stay in the original document's
+coordinates.
+
+- `language`: the grammar this layer was parsed with.
+- `source`: the whole document, shared by every layer (empty when parsed from a callback).
+- `ranges`: 0-based ranges this layer covers (empty for the root, which covers everything).
+- `combined`: this layer came from a `#set! injection.combined` site.
+- `children`: nested injection layers.
+- `unresolved`: on the root, every injection site discovered but not parsed; empty otherwise.
+"""
 mutable struct Tree
     ptr::Ptr{API.TSTree}
-    function Tree(ptr::Ptr{API.TSTree})
-        tree = new(ptr)
+    language::Language
+    source::String
+    ranges::Vector{API.TSRange}
+    combined::Bool
+    children::Vector{Tree}
+    unresolved::Vector{UnresolvedInjection}
+    function Tree(
+        ptr::Ptr{API.TSTree},
+        language::Language,
+        source::AbstractString,
+        ranges::Vector{API.TSRange},
+        combined::Bool,
+        children::Vector{Tree},
+        unresolved::Vector{UnresolvedInjection},
+    )
+        tree = new(ptr, language, String(source), ranges, combined, children, unresolved)
         finalizer(t -> API.ts_tree_delete(t.ptr), tree)
         return tree
     end
 end
-Base.show(io::IO, t::Tree) = show(io, root(t))
+
+# A leaf tree: one layer, no children or unresolved sites yet.
+_tree(ptr::Ptr{API.TSTree}, language::Language, source::AbstractString, ranges, combined) =
+    Tree(ptr, language, source, ranges, combined, Tree[], UnresolvedInjection[])
+
+Base.show(io::IO, t::Tree) =
+    isempty(t.children) ? show(io, root(t)) :
+    print(io, "Tree(", t.language.name, ", ", length(layers(t)), " layers)")
 
 root(t::Tree) = Node(API.ts_tree_root_node(t.ptr), t)
 
 """
     copy(tree::Tree) -> Tree
 
-Return an independent copy of `tree`, useful for keeping the pre-edit tree when reparsing
-incrementally.
+Return an independent copy of `tree` and its injection layers, useful for keeping the
+pre-edit tree when reparsing incrementally.
 """
-Base.copy(t::Tree) = Tree(API.ts_tree_copy(t.ptr))
+Base.copy(t::Tree) = Tree(
+    API.ts_tree_copy(t.ptr),
+    t.language,
+    t.source,
+    copy(t.ranges),
+    t.combined,
+    Tree[copy(c) for c in t.children],
+    copy(t.unresolved),
+)
 
-Base.parse(p::Parser, text::AbstractString, old::Tree) =
-    Tree(API.ts_parser_parse_string(p.ptr, old.ptr, text, sizeof(text)))
+function Base.parse(p::Parser, text::AbstractString, old::Tree; max_depth::Integer = 8)
+    ptr = API.ts_parser_parse_string(p.ptr, old.ptr, text, sizeof(text))
+    tree = _tree(ptr, p.language, text, API.TSRange[], false)
+    resolve_injections!(tree, p, max_depth)
+    return tree
+end
 
 traverse(f, tree::Tree, iter = children) = traverse(f, root(tree), iter)
 
@@ -1295,8 +1400,9 @@ function eval_is(c::PredicateCall, m::QueryMatch; negate::Bool)
     return negate ? !held : held
 end
 
-# Predicate names follow the tree-sitter rust library. `set!` is a metadata
-# directive parsed at construction, so as a filter it always passes.
+# Predicate names follow the tree-sitter rust library. Directives (names ending in
+# `!`, such as `set!` and `offset!`) annotate a match rather than filter it, so as
+# filters they always pass.
 function eval_predicate(c::PredicateCall, m::QueryMatch)
     if c.func == "eq?"
         eval_eq(c)
@@ -1322,7 +1428,7 @@ function eval_predicate(c::PredicateCall, m::QueryMatch)
         eval_any_match(c)
     elseif c.func == "any-not-match?"
         eval_any_not_match(c)
-    elseif c.func == "set!"
+    elseif endswith(c.func, "!")
         true
     else
         @warn "unknown predicate function '$(c.func)'"

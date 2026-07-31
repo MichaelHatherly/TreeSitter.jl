@@ -33,11 +33,12 @@ include("test/runtests.jl")
 2. **Interface Layer (`src/interface.jl`)**: Julia-friendly wrapper types
    - `list_parsers(jll_mod)`: Discovers available parser variants in a JLL module
    - `Language`: Wraps language pointer with name symbol, supports optional `variant` parameter
-   - `Parser`: Manages parser state, auto-finalizes via GC, supports optional `variant` parameter
-   - `Tree` and `Node`: Represent parse trees, `Node` uses value type wrapping `API.TSNode`
+   - `Parser`: Manages parser state, auto-finalizes via GC, supports optional `variant` parameter and a `languages` injection set
+   - `Tree` and `Node`: Represent parse trees, `Node` uses value type wrapping `API.TSNode`; a `Tree` is also the root layer of its injection tree, carrying `source`, `language`, injected `children`, and root `unresolved`
    - `Query` and `QueryCursor`: Pattern matching with tree-sitter query syntax, supports optional `variant` parameter
    - Core APIs: `parse()`, `traverse()`, `children()`, `named_children()`
-   - Query predicates: filtering predicates `eq?`, `not-eq?`, `match?`, `not-match?`, `any-of?`, the quantified `any-eq?`/`any-not-eq?`/`any-match?`/`any-not-match?` family, and `has-ancestor?`; property checks `is?`/`is-not?` (built-in `named`/`missing`/`extra`, unknown properties are no-ops); `set!` attaches metadata read via `property_settings()`/`property()`
+   - Query predicates: filtering predicates `eq?`, `not-eq?`, `match?`, `not-match?`, `any-of?`, the quantified `any-eq?`/`any-not-eq?`/`any-match?`/`any-not-match?` family, and `has-ancestor?`; property checks `is?`/`is-not?` (built-in `named`/`missing`/`extra`, unknown properties are no-ops); `set!` attaches metadata read via `property_settings()`/`property()`. Directives (names ending in `!`) never filter a match
+   - Language injection (`src/injection.jl`): `ts_range` converts a `Node` to a 0-based `API.TSRange`; `injection_sites` runs a grammar's `injections.scm`, resolving static/dynamic languages and honoring `injection.combined`, `injection.include-children`, and single-line `#offset!`; `parse` recursively parses embedded languages into the returned `Tree`'s `children`, layers sharing one `source` string. A `Parser`'s `languages` set pins the injectable grammars (no dynamic loading); given none, injected languages resolve dynamically via `default_language_resolver`/`INJECTION_ALIASES`. Unavailable, cyclic, and over-depth sites land in the root tree's `unresolved`. Navigate layers with `layers`, `layer_at`, and `slice(::Tree)`
 
 3. **Module (`src/TreeSitter.jl`)**: Main entry point, exports public API
 

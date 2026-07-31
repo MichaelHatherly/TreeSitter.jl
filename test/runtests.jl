@@ -13,4 +13,5 @@ using TreeSitter, Test
     include("abstracttrees.jl")
     include("local_grammar.jl")
     include("bugfixes.jl")
+    include("injection.jl")
 end

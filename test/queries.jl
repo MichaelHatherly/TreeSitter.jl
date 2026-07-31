@@ -594,3 +594,19 @@ end
     @test "unknown" in q.unknown_properties
     @test length(q.unknown_properties) == 1
 end
+
+@testset "Directives do not filter matches" begin
+    # #offset! (and any `!`-suffixed directive) annotates a match; it must not drop it.
+    p = Parser(tree_sitter_javascript_jll)
+    source = "x = `abc`"
+    tree = parse(p, source)
+    q = query```
+    ((template_string) @t
+     (#offset! @t 0 1 0 -1))
+    ```javascript
+    out = String[]
+    for cap in TreeSitter.each_capture(tree, q, source)
+        push!(out, TreeSitter.capture_name(q, cap))
+    end
+    @test out == ["t"]
+end
