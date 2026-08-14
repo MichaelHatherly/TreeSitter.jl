@@ -109,9 +109,9 @@ function set_language!(parser::Parser, language::Language)
 end
 
 """
-    parse(parser::Parser, text::AbstractString; encoding=:utf8, max_depth=8) -> Tree
+    parse(parser::Parser, text::AbstractString; encoding=:utf8, max_depth=8, injections=true) -> Tree
     parse(parser::Parser, source::Function; encoding=:utf8) -> Tree
-    parse(parser::Parser, text::AbstractString, old::Tree; max_depth=8) -> Tree
+    parse(parser::Parser, text::AbstractString, old::Tree; max_depth=8, injections=true) -> Tree
 
 Parse source into a `Tree`. `encoding` is `:utf8` or `:utf16`.
 
@@ -120,6 +120,12 @@ levels, and hang off `tree.children`; a grammar that declares no injections leav
 single-layer tree. The parser resolves injected languages from its `languages` set, or
 dynamically when it was given none. Sites that could not be parsed are recorded in
 `tree.unresolved`. See [`Tree`](@ref), [`layers`](@ref), [`layer_at`](@ref).
+
+`injections = false` skips that resolution: no injections query is run and no layer is
+built, so `children` and `unresolved` come back empty and the root layer is unchanged.
+This is for a caller that reads one language per source and never looks at a layer, where
+resolving them is work nothing downstream can see. It differs from `max_depth = 0`, which
+still finds the sites and records each as an unresolved `:depth_limit`.
 
 Pass a `source` callback to parse a source not held as a single `String`:
 `source(offset)` returns the chunk at a 1-based byte offset, or an empty string at end
@@ -159,10 +165,11 @@ function Base.parse(
     text::AbstractString;
     encoding::Symbol = :utf8,
     max_depth::Integer = 8,
+    injections::Bool = true,
 )
     ptr = _parse_string_ptr(p, text, C_NULL, encoding)
     tree = _tree(ptr, p.language, text, API.TSRange[], false)
-    resolve_injections!(tree, p, max_depth)
+    injections && resolve_injections!(tree, p, max_depth)
     return tree
 end
 
@@ -383,10 +390,16 @@ Base.copy(t::Tree) = Tree(
     copy(t.unresolved),
 )
 
-function Base.parse(p::Parser, text::AbstractString, old::Tree; max_depth::Integer = 8)
+function Base.parse(
+    p::Parser,
+    text::AbstractString,
+    old::Tree;
+    max_depth::Integer = 8,
+    injections::Bool = true,
+)
     ptr = API.ts_parser_parse_string(p.ptr, old.ptr, text, sizeof(text))
     tree = _tree(ptr, p.language, text, API.TSRange[], false)
-    resolve_injections!(tree, p, max_depth)
+    injections && resolve_injections!(tree, p, max_depth)
     return tree
 end
 
