@@ -230,8 +230,38 @@ injection_sites(parser::Parser, tree::Tree, source::AbstractString) =
 # Layer 3 — recursive injected parse
 #
 
-# Compile a layer's injections query, or nothing when the grammar ships none.
-function _injection_query(lang::Language)
+# The compiled injections query per grammar. `Query(lang, ["injections"])` is a function of
+# the language alone: the source it reads is loaded once, when the `Language` is built. It
+# was compiled once per layer per parse instead, which put a query compile on the parse path
+# of every file.
+#
+# Keyed by language rather than by parser or by caller, because that is what the value
+# depends on. `_inject!` recurses into a child layer and asks again for *that* layer's
+# language, so anything keyed further out would cover the top layer alone and a document
+# embedding three languages would keep compiling per layer per parse.
+#
+# Entries live for the process, deliberately. One query per grammar ever loaded is bounded
+# by the grammars a program uses, and a `Query` holds its own `Language`, so weak keys would
+# keep every entry reachable and buy nothing. Identity-keyed: a `Language` wraps a grammar
+# pointer, and two of them built from one grammar are two caches, not a collision.
+const _INJECTION_QUERY_CACHE = IdDict{Language,Union{Query,Nothing}}()
+
+# Guards both grammar-derived caches. `parse` runs on whatever thread its caller is on, and
+# `get!` on a shared dictionary corrupts it when two of them resize it at once, so an entry
+# is taken under this rather than left to a race that looks benign until it is not.
+const _GRAMMAR_LOCK = ReentrantLock()
+
+# A layer's injections query, compiled on first use and reused after. A compiled `Query` is
+# immutable once constructed (its predicates are parsed there, and a `QueryCursor` carries
+# the per-match state), so one shared across concurrent parses is safe.
+_injection_query(lang::Language) = lock(_GRAMMAR_LOCK) do
+    get!(() -> _compile_injection_query(lang), _INJECTION_QUERY_CACHE, lang)
+end
+
+# Compile a layer's injections query, or nothing when the grammar ships none. A query that
+# does not compile warns and yields nothing; cached, so a broken grammar warns once rather
+# than once per parse.
+function _compile_injection_query(lang::Language)
     src = get(lang.queries, "injections", "")
     isempty(strip(src)) && return nothing
     try
@@ -295,11 +325,16 @@ is the dynamic resolution a `Parser` uses when it was not given an explicit `lan
 """
 function default_language_resolver(name::AbstractString)
     sym = _injection_symbol(name)
-    return get!(_LANGUAGE_CACHE, sym) do
-        try
-            Language(sym)
-        catch
-            nothing
+    # Under `_GRAMMAR_LOCK` for the reason the injections query is: a nested injection
+    # resolves its grammar during a parse, so two threads parsing at once enter this
+    # dictionary at once.
+    return lock(_GRAMMAR_LOCK) do
+        get!(_LANGUAGE_CACHE, sym) do
+            try
+                Language(sym)
+            catch
+                nothing
+            end
         end
     end
 end

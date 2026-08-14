@@ -198,4 +198,67 @@ range_text(src, r) = TreeSitter.slice(src, (Int(r.start_byte) + 1, Int(r.end_byt
         @test js.language.name == :javascript
         @test TreeSitter.slice(js) == "g(y)"
     end
+
+    @testset "injections query is compiled once per grammar" begin
+        # The query is a function of the language alone, so asking twice must return the
+        # object built the first time. Compiling per parse put a query compile on the
+        # parse path of every file.
+        lang = TreeSitter.Language(:html)
+        first = TreeSitter._injection_query(lang)
+        @test first !== nothing
+        @test TreeSitter._injection_query(lang) === first
+
+        # A grammar declaring no injections caches that answer too, rather than retrying
+        # the lookup on every parse.
+        bare = TreeSitter.Language(:java)
+        @test TreeSitter._injection_query(bare) === nothing
+        @test haskey(TreeSitter._INJECTION_QUERY_CACHE, bare)
+
+        # Two `Language` values over one grammar are two entries: the cache is keyed by
+        # identity, since each carries its own query table.
+        @test TreeSitter._injection_query(TreeSitter.Language(:html)) !== first
+    end
+
+    @testset "a cached injections query still resolves layers" begin
+        # The cache must not change what a parse produces, including across the repeated
+        # parses that share one compiled query.
+        p = Parser(:html)
+        for _ = 1:3
+            tree = parse(p, "<script>f(x)</script>")
+            js = only(tree.children)
+            @test js.language.name == :javascript
+            @test TreeSitter.slice(js) == "f(x)"
+        end
+    end
+
+    @testset "parse: injections = false skips resolution" begin
+        # The caller reads one language per source and never looks at a layer, so
+        # resolving them is work nothing downstream can see.
+        p = Parser(:html)
+        source = "<script>f(x)</script>"
+        off = parse(p, source; injections = false)
+        @test isempty(off.children)
+        @test isempty(off.unresolved)
+        @test length(TreeSitter.layers(off)) == 1
+
+        # The root layer is untouched: only the layers below it are declined.
+        on = parse(p, source)
+        @test TreeSitter.node_string(TreeSitter.root(off)) ==
+              TreeSitter.node_string(TreeSitter.root(on))
+        @test only(on.children).language.name == :javascript
+
+        # Distinct from `max_depth = 0`, which finds the sites and records each as
+        # unresolved rather than never looking.
+        capped = parse(p, source; max_depth = 0)
+        @test isempty(capped.children)
+        @test only(capped.unresolved).reason == :depth_limit
+    end
+
+    @testset "parse: injections = false on an incremental reparse" begin
+        p = Parser(:html)
+        old = parse(p, "<script>f(x)</script>")
+        tree = parse(p, "<script>g(y)</script>", old; injections = false)
+        @test isempty(tree.children)
+        @test isempty(tree.unresolved)
+    end
 end
