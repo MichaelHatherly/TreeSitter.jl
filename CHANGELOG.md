@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [v0.3.1] - 2026-08-14
+
+### Added
+
+- Add `injections = false` to `parse`, skipping injection resolution for a caller that reads one language per source and never looks at a layer [#69]
+
+### Changed
+
+- Compile a grammar's `injections.scm` once and reuse it, instead of once per layer per parse [#69]
+
 ## [v0.3.0] - 2026-08-01
 
 ### Changed
@@ -109,6 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.2.2]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.2.2
 [v0.2.3]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.2.3
 [v0.3.0]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.3.0
+[v0.3.1]: https://github.com/MichaelHatherly/TreeSitter.jl/releases/tag/v0.3.1
 [#24]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/24
 [#25]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/25
 [#26]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/26
@@ -131,3 +142,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#54]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/54
 [#60]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/60
 [#65]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/65
+[#69]: https://github.com/MichaelHatherly/TreeSitter.jl/issues/69
