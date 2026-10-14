@@ -1,7 +1,7 @@
 name = "TreeSitter"
 uuid = "f42328cb-ece0-4cf2-995f-9e7abb27d006"
-authors = ["Michael Hatherly <michaelhatherly@gmail.com>"]
 version = "0.3.1"
+authors = ["Michael Hatherly <michaelhatherly@gmail.com>"]
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
@@ -12,7 +12,7 @@ tree_sitter_jll = "695101d5-1b81-5434-9529-70430e482717"
 
 [compat]
 AbstractTrees = "0.4"
-CEnum = "0.4, 0.5"
+CEnum = "0.4, 0.5, 1"
 JSON = "0.21, 1"
 Libdl = "1"
 julia = "1.6"
